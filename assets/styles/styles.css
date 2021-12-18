@@ -1,1 +1,103 @@
-/* above the fold CSS goes here */
+:root {
+  /* COLORS */
+  --color-white: #fffcf3;
+  --color-lt-gray: #f9f9f9;
+  --color-md-gray: #ececec;
+  --color-dk-gray: #d3d3d3;
+  --color-black: #140f00;
+  --color-red: #f94f0d;
+  --color-yellow: #fffc92;
+  --color-yellow-alt: #f7ff25;
+  --color-green: #00c1c6;
+  --color-blue: #0d26f9;
+  --color-pink: #ffd4cc;
+  /* BODY */
+  --body-size-m: 1.6rem;
+  /* HEADING */
+  --heading-size-s: 3.2rem;
+  --heading-size-m: 4.8rem;
+  --heading-size-l: 8rem;
+  /* WEIGHTS */
+  --weight-light: 200;
+  --weight-normal: 400;
+  --weight-bold: 600;
+  --weight-black: 800;
+  /* PADDING */
+  --pad-s: 0.6rem;
+  --pad-m: 1rem;
+  --pad-l: 1.6rem;
+  /* PAGE SIZE */
+  --desktop: 120rem;
+  --tablet: 76.8rem;
+  --mobile: 46.4rem;
+}
+
+/* --------------------
+RESET 
+----------------------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 100%;
+	font: inherit;
+}
+
+html {
+  font-size: 62.5% !important; /* setting 1rem to 10px */
+  scroll-behavior: smooth;
+}
+
+/* --------------------
+BASICS 
+----------------------- */
+html, body {
+  color: var(--color-blue);
+  font-family: 'Avenir', 'Century Gothic', sans-serif;
+  font-size: var(--body-size-m);
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  word-spacing: -1px;
+  font-weight: 500;
+}
+
+strong {
+  font-weight: bold;
+  font-weight: var(--weight-black);
+}
+
+em {
+  font-style: italic;
+}
+
+u {
+  text-decoration: wavy underline;
+}
+
+del {
+  visibility: hidden;
+  display: none;
+}
+
+h1, h2, h3 {
+  font-family: 'acumin-pro-extra-condensed', 'Impact', sans-serif;
+  font-weight: var(--weight-bold);
+}
+
+h1 {
+  font-size: var(--heading-size-l);
+}
+
+h2 {
+  font-size: var(--heading-size-m);
+}
+
+h3 {
+  font-size: var(--heading-size-s);
+}
+
+.section-wrapper > div > * {
+  width: 60rem;
+  max-width: 90%;
+  margin: 0 auto;
+}
