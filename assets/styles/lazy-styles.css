@@ -205,3 +205,15 @@ h1, h2, h3 {
   font-weight: var(--weight-black);
   letter-spacing: unset;
 }
+
+h1 {
+  font-size: var(--heading-size-l);
+}
+
+h2 {
+  font-size: var(--heading-size-m);
+}
+
+h3 {
+  font-size: var(--heading-size-s);
+}
