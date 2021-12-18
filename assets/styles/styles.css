@@ -12,6 +12,7 @@
   --color-blue: #0d26f9;
   --color-pink: #ffd4cc;
   /* BODY */
+  --body-size-s: 1.2rem;
   --body-size-m: 1.6rem;
   /* HEADING */
   --heading-size-s: 3.2rem;
@@ -30,6 +31,8 @@
   --desktop: 120rem;
   --tablet: 76.8rem;
   --mobile: 46.4rem;
+  --block-m: 60rem;
+  --block-l: 90rem;
 }
 
 /* --------------------
@@ -49,10 +52,9 @@ html {
 }
 
 /* --------------------
-BASICS 
+FONT FALLBACKS 
 ----------------------- */
 html, body {
-  color: var(--color-blue);
   font-family: 'Avenir', 'Century Gothic', sans-serif;
   font-size: var(--body-size-m);
   line-height: 1.5;
@@ -61,27 +63,8 @@ html, body {
   font-weight: 500;
 }
 
-strong {
-  font-weight: bold;
-  font-weight: var(--weight-black);
-}
-
-em {
-  font-style: italic;
-}
-
-u {
-  text-decoration: wavy underline;
-}
-
-del {
-  visibility: hidden;
-  display: none;
-}
-
 h1, h2, h3 {
   font-family: 'Impact', sans-serif;
-  font-size: 60px;
   line-height: 1;
   letter-spacing: 1px;
   padding-top: var(--pad-m);
@@ -100,8 +83,53 @@ h3 {
   font-size: 24px;
 }
 
+/* --------------------
+BASICS 
+----------------------- */
+strong {
+  font-weight: bold;
+  font-weight: var(--weight-black);
+}
+
+em {
+  font-style: italic;
+}
+
+u {
+  text-decoration: wavy underline;
+}
+
+del {
+  visibility: hidden;
+  display: none;
+}
+
 .section-wrapper > div > * {
-  width: 60rem;
+  width: var(--block-m);
   max-width: 90%;
   margin: 0 auto;
+}
+
+/* DISPLAY */
+html, body {
+  background: var(--color-white);
+  color: var(--color-blue);
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 {
+  text-transform: lowercase;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+a:any-link {
+  color: var(--color-blue);
 }

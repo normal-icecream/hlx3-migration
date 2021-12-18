@@ -11,14 +11,37 @@
  */
 
 /**
+ * Builds an HTML DOM element.
+ * @param {string} tag The type of element
+ * @param {object} params Additional parameters for element
+ * @returns {Element} The block element
+ */
+export function createEl(tag, params) {
+  const el = document.createElement(tag);
+  if (params) {
+    Object.keys(params).forEach((param) => {
+      if (param === 'html') {
+        el.innerHTML = params[param];
+      } else if (param === 'text') {
+        el.textContent = params[param];
+      } else {
+        el.setAttribute(param, params[param]);
+      }
+    });
+  }
+  return el;
+}
+
+/**
  * Loads a CSS file.
  * @param {string} href The path to the CSS file
  */
 export function loadCSS(href) {
   if (!document.querySelector(`head > link[href="${href}"]`)) {
-    const link = document.createElement('link');
-    link.setAttribute('rel', 'stylesheet');
-    link.setAttribute('href', href);
+    const link = createEl('link', {
+      rel: 'stylesheet',
+      href,
+    });
     link.onload = () => {
     };
     link.onerror = () => {
@@ -73,8 +96,9 @@ function wrapSections(sections) {
       // remove empty sections
       div.remove();
     } else if (!div.id) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'section-wrapper';
+      const wrapper = createEl('div', {
+        class: 'section-wrapper',
+      });
       div.parentNode.appendChild(wrapper);
       wrapper.appendChild(div);
     }
@@ -124,13 +148,14 @@ function decorateBlocks(main) {
  */
 function buildBlock(blockName, content) {
   const table = Array.isArray(content) ? content : [[content]];
-  const blockEl = document.createElement('div');
   // build image block nested div structure
-  blockEl.classList.add(blockName);
+  const blockEl = createEl('div', {
+    class: blockName,
+  });
   table.forEach((row) => {
-    const rowEl = document.createElement('div');
+    const rowEl = createEl('div');
     row.forEach((col) => {
-      const colEl = document.createElement('div');
+      const colEl = createEl('div');
       const vals = col.elems ? col.elems : [col];
       vals.forEach((val) => {
         if (val) {
@@ -155,7 +180,7 @@ function buildBlock(blockName, content) {
 export async function loadBlock(block) {
   const blockName = block.getAttribute('data-block-name');
   try {
-    const mod = await import(`/blocks/${blockName}/${blockName}.js`);
+    const mod = await import(`/assets/blocks/${blockName}/${blockName}.js`);
     if (mod.default) {
       await mod.default(block, blockName, document);
     }
@@ -164,7 +189,7 @@ export async function loadBlock(block) {
     console.log(`failed to load module for ${blockName}`, err);
   }
 
-  loadCSS(`/blocks/${blockName}/${blockName}.css`);
+  loadCSS(`/assets/blocks/${blockName}/${blockName}.css`);
 }
 
 /**
@@ -175,6 +200,16 @@ async function loadBlocks(main) {
   main
     .querySelectorAll('div.section-wrapper > div > .block')
     .forEach(async (block) => loadBlock(block));
+}
+
+/**
+ * Build footer
+ */
+function loadFooter() {
+  const footer = document.querySelector('footer');
+  footer.setAttribute('data-block-name', 'footer');
+  footer.setAttribute('data-source', '/footer');
+  loadBlock(footer);
 }
 
 /**
@@ -221,31 +256,34 @@ export function readBlockConfig(block) {
  */
 export function createOptimizedPicture(src, alt = '', eager = false, breakpoints = [{ media: '(min-width: 400px)', width: '2000' }, { width: '750' }]) {
   const url = new URL(src, window.location.href);
-  const picture = document.createElement('picture');
+  const picture = createEl('picture');
   const { pathname } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
   breakpoints.forEach((br) => {
-    const source = document.createElement('source');
+    const source = createEl('source', {
+      type: 'image/webp',
+      srcset: `${pathname}?width=${br.width}&format=webply&optimize=medium`,
+    });
     if (br.media) source.setAttribute('media', br.media);
-    source.setAttribute('type', 'image/webp');
-    source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
   });
 
   // fallback
   breakpoints.forEach((br, i) => {
     if (i < breakpoints.length - 1) {
-      const source = document.createElement('source');
+      const source = createEl('source', {
+        srcset: `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
+      });
       if (br.media) source.setAttribute('media', br.media);
-      source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {
-      const img = document.createElement('img');
-      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
-      img.setAttribute('loading', eager ? 'eager' : 'lazy');
-      img.setAttribute('alt', alt);
+      const img = createEl('img', {
+        src: `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
+        loading: `${eager ? 'eager' : 'lazy'}`,
+        alt,
+      });
       picture.appendChild(img);
     }
   });
@@ -416,6 +454,7 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // load anything that can be postponed to the latest here
+  loadFooter();
 }
 
 /**
