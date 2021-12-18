@@ -34,8 +34,8 @@ export function loadCSS(href) {
  */
 export function getMetadata(name) {
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const $meta = document.head.querySelector(`meta[${attr}="${name}"]`);
-  return $meta && $meta.content;
+  const meta = document.head.querySelector(`meta[${attr}="${name}"]`);
+  return meta && meta.content;
 }
 
 /**
@@ -65,18 +65,18 @@ export function toClassName(name) {
 
 /**
  * Wraps each section in an additional {@code div}.
- * @param {[Element]} $sections The sections
+ * @param {[Element]} sections The sections
  */
-function wrapSections($sections) {
-  $sections.forEach(($div) => {
-    if ($div.childNodes.length === 0) {
+function wrapSections(sections) {
+  sections.forEach((div) => {
+    if (div.childNodes.length === 0) {
       // remove empty sections
-      $div.remove();
-    } else if (!$div.id) {
-      const $wrapper = document.createElement('div');
-      $wrapper.className = 'section-wrapper';
-      $div.parentNode.appendChild($wrapper);
-      $wrapper.appendChild($div);
+      div.remove();
+    } else if (!div.id) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'section-wrapper';
+      div.parentNode.appendChild(wrapper);
+      wrapper.appendChild(div);
     }
   });
 }
@@ -109,12 +109,12 @@ export function decorateBlock(block) {
 
 /**
  * Decorates all blocks in a container element.
- * @param {Element} $main The container element
+ * @param {Element} main The container element
  */
-function decorateBlocks($main) {
-  $main
+function decorateBlocks(main) {
+  main
     .querySelectorAll('div.section-wrapper > div > div')
-    .forEach(($block) => decorateBlock($block));
+    .forEach((block) => decorateBlock(block));
 }
 
 /**
@@ -150,14 +150,14 @@ function buildBlock(blockName, content) {
 
 /**
  * Loads JS and CSS for a block.
- * @param {Element} $block The block element
+ * @param {Element} block The block element
  */
-export async function loadBlock($block) {
-  const blockName = $block.getAttribute('data-block-name');
+export async function loadBlock(block) {
+  const blockName = block.getAttribute('data-block-name');
   try {
     const mod = await import(`/blocks/${blockName}/${blockName}.js`);
     if (mod.default) {
-      await mod.default($block, blockName, document);
+      await mod.default(block, blockName, document);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -169,43 +169,43 @@ export async function loadBlock($block) {
 
 /**
  * Loads JS and CSS for all blocks in a container element.
- * @param {Element} $main The container element
+ * @param {Element} main The container element
  */
-async function loadBlocks($main) {
-  $main
+async function loadBlocks(main) {
+  main
     .querySelectorAll('div.section-wrapper > div > .block')
-    .forEach(async ($block) => loadBlock($block));
+    .forEach(async (block) => loadBlock(block));
 }
 
 /**
  * Extracts the config from a block.
- * @param {Element} $block The block element
+ * @param {Element} block The block element
  * @returns {object} The block config
  */
-export function readBlockConfig($block) {
+export function readBlockConfig(block) {
   const config = {};
-  $block.querySelectorAll(':scope>div').forEach(($row) => {
-    if ($row.children) {
-      const $cols = [...$row.children];
-      if ($cols[1]) {
-        const $value = $cols[1];
-        const name = toClassName($cols[0].textContent);
+  block.querySelectorAll(':scope>div').forEach((row) => {
+    if (row.children) {
+      const cols = [...row.children];
+      if (cols[1]) {
+        const valueEl = cols[1];
+        const name = toClassName(cols[0].textContent);
         let value = '';
-        if ($value.querySelector('a')) {
-          const $as = [...$value.querySelectorAll('a')];
-          if ($as.length === 1) {
-            value = $as[0].href;
+        if (valueEl.querySelector('a')) {
+          const as = [...valueEl.querySelectorAll('a')];
+          if (as.length === 1) {
+            value = as[0].href;
           } else {
-            value = $as.map(($a) => $a.href);
+            value = as.map((a) => a.href);
           }
-        } else if ($value.querySelector('p')) {
-          const $ps = [...$value.querySelectorAll('p')];
-          if ($ps.length === 1) {
-            value = $ps[0].textContent;
+        } else if (valueEl.querySelector('p')) {
+          const ps = [...valueEl.querySelectorAll('p')];
+          if (ps.length === 1) {
+            value = ps[0].textContent;
           } else {
-            value = $ps.map(($p) => $p.textContent);
+            value = ps.map((p) => p.textContent);
           }
-        } else value = $row.children[1].textContent;
+        } else value = row.children[1].textContent;
         config[name] = value;
       }
     }
@@ -269,12 +269,12 @@ function removeStylingFromImages(main) {
 
 /**
  * Normalizes all headings within a container element.
- * @param {Element} $elem The container element
+ * @param {Element} el The container element
  * @param {[string]]} allowedHeadings The list of allowed headings (h1 ... h6)
  */
-export function normalizeHeadings($elem, allowedHeadings) {
+export function normalizeHeadings(el, allowedHeadings) {
   const allowed = allowedHeadings.map((h) => h.toLowerCase());
-  $elem.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((tag) => {
+  el.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((tag) => {
     const h = tag.tagName.toLowerCase();
     if (allowed.indexOf(h) === -1) {
       // current heading is not in the allowed list -> try first to "promote" the heading
@@ -359,23 +359,6 @@ function removeEmptySections(main) {
 }
 
 /**
- * Adds the favicon.
- * @param {string} href The favicon URL
- */
-export function addFavIcon(href) {
-  const link = document.createElement('link');
-  link.rel = 'icon';
-  link.type = 'image/svg+xml';
-  link.href = href;
-  const existingLink = document.querySelector('head link[rel="icon"]');
-  if (existingLink) {
-    existingLink.parentElement.replaceChild(link, existingLink);
-  } else {
-    document.getElementsByTagName('head')[0].appendChild(link);
-  }
-}
-
-/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -425,7 +408,6 @@ async function loadLazy(doc) {
 
   loadBlocks(main);
   loadCSS('/styles/lazy-styles.css');
-  addFavIcon('/styles/favicon.svg');
 }
 
 /**
