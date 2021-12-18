@@ -1,0 +1,15 @@
+footer {
+  margin: var(--pad-l) auto;
+  width: 98%;
+  text-align: center;
+  font-size: var(--body-size-s);
+  flex-shrink: 0; /* sticky footer */
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover, footer a:focus {
+  border-bottom: 1px solid currentColor;
+}
