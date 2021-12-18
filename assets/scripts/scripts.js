@@ -33,6 +33,20 @@ export function createEl(tag, params) {
 }
 
 /**
+ * Creates an SVG tag using the specified ID.
+ * @param {string} name The ID
+ * @returns {element} The SVG tag
+ */
+export function createSVG(name) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `/assets/icons/icons.svg#${name}`);
+  svg.classList.add('icon', `icon-${name}`);
+  svg.appendChild(use);
+  return svg;
+}
+
+/**
  * Loads a CSS file.
  * @param {string} href The path to the CSS file
  */
@@ -200,6 +214,16 @@ async function loadBlocks(main) {
   main
     .querySelectorAll('div.section-wrapper > div > .block')
     .forEach(async (block) => loadBlock(block));
+}
+
+/**
+ * Build header
+ */
+function loadHeader() {
+  const header = document.querySelector('header');
+  header.setAttribute('data-block-name', 'header');
+  header.setAttribute('data-source', '/header');
+  loadBlock(header);
 }
 
 /**
@@ -402,6 +426,7 @@ function removeEmptySections(main) {
  */
 export function decorateMain(main) {
   // forward compatible pictures redecoration
+  loadHeader();
   decoratePictures(main);
   buildAutoBlocks(main);
   removeEmptySections(main);
@@ -443,7 +468,6 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
-
   loadBlocks(main);
   loadCSS('/assets/styles/lazy-styles.css');
 }

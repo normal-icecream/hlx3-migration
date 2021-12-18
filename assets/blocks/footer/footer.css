@@ -1,5 +1,6 @@
 footer {
   margin: var(--pad-l) auto;
+  padding-bottom: var(--pad-s);
   width: 98%;
   text-align: center;
   font-size: var(--body-size-s);
