@@ -1,0 +1,69 @@
+header {
+  min-height: unset;
+  margin: 0 auto;
+  padding: var(--pad-xl) 0;
+  width: var(--block-l);
+  max-width: 90%;
+  text-align: center;
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --------------------
+LOGO 
+----------------------- */
+.header-wrapper .header-link {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.header-wrapper .header-link:hover, 
+.header-wrapper .header-link:focus {
+  transform: rotate(12.5deg);
+}
+
+.header-wrapper .header-logo {
+  width: 8rem;
+  height: 8rem;
+}
+
+/* --------------------
+CART 
+----------------------- */
+.header-wrapper .header-cart {
+  position: relative;
+  background: var(--color-white);
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.header-wrapper .header-cart:hover,
+.header-wrapper .header-cart:focus {
+  transform: scale(1.1) rotate(6deg);
+}
+
+.header-cart .header-cart-icon, .header-cart .header-cart-amount {
+  position: absolute;
+}
+
+.header-cart .header-cart-icon {
+  width: 6rem;
+  height: 8rem;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header-cart .header-cart-amount {
+  font-family: acumin-pro-extra-condensed;
+  font-size: var(--heading-size-s);
+  top: 1.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
