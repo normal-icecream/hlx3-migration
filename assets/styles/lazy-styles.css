@@ -195,6 +195,13 @@
 html, body {
   font-family: 'Poppins';
   line-height: 1.6;
-  font-weight: 400;
-  visibility: visible;
+  font-weight: var(--weight-normal);
+  letter-spacing: unset;
+  word-spacing: unset;
+}
+
+h1, h2, h3 {
+  font-family: 'acumin-pro-extra-condensed';
+  font-weight: var(--weight-black);
+  letter-spacing: unset;
 }
