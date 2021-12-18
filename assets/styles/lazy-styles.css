@@ -204,6 +204,7 @@ h1, h2, h3 {
   font-family: 'acumin-pro-extra-condensed';
   font-weight: var(--weight-bold);
   letter-spacing: unset;
+  line-height: 0.8;
 }
 
 h1 {

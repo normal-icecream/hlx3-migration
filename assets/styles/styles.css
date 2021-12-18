@@ -65,7 +65,7 @@ html, body {
 
 h1, h2, h3 {
   font-family: 'Impact', sans-serif;
-  line-height: 0.8;
+  line-height: 1;
   letter-spacing: 1px;
   padding-top: var(--pad-m);
   padding-bottom: var(--pad-l);
