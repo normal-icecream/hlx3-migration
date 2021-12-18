@@ -202,7 +202,7 @@ html, body {
 
 h1, h2, h3 {
   font-family: 'acumin-pro-extra-condensed';
-  font-weight: var(--weight-black);
+  font-weight: var(--weight-bold);
   letter-spacing: unset;
 }
 

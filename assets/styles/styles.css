@@ -122,6 +122,10 @@ body {
   flex-direction: column;
 }
 
+h1, h2, h3 {
+  text-transform: lowercase;
+}
+
 main {
   flex: 1 0 auto;
 }
