@@ -7,18 +7,19 @@ async function fetchFooterContent(url) {
   if (resp.ok) {
     const html = await resp.text();
     const placeholder = createEl('div', { html });
-    placeholder.innerHTML = html;
     return placeholder;
   }
-  const fallback = createEl('div');
-  fallback.innerHTML = `
+  const year = new Date().getFullYear();
+  const fallback = createEl('div', {
+    html: `
     <div>
       <p>
-        © normal® ice cream, inc. |
+        © normal® ice cream, inc. ${year} |
         all rights reserved | 
         slc, ut
       </p>
-    </div>`;
+    </div>`,
+  });
   return fallback;
 }
 
