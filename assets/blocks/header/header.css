@@ -1,4 +1,5 @@
 header {
+  visibility: unset;
   min-height: unset;
   margin: 0 auto;
   padding: var(--pad-xl) 0;
