@@ -1,5 +1,4 @@
 header {
-  visibility: unset;
   min-height: unset;
   margin: 0 auto;
   padding: var(--pad-xl) 0;
@@ -8,10 +7,15 @@ header {
   text-align: center;
 }
 
+header svg {
+  visibility: hidden;
+}
+
 .header-wrapper {
   display: flex;
   justify-content: space-between;
 }
+
 
 /* --------------------
 LOGO 
@@ -27,6 +31,7 @@ LOGO
 }
 
 .header-wrapper .header-logo {
+  visibility: unset;
   width: 8rem;
   height: 8rem;
 }
@@ -54,6 +59,7 @@ CART
 }
 
 .header-cart .header-cart-icon {
+  visibility: unset;
   width: 6rem;
   height: 8rem;
   top: 0;
@@ -67,4 +73,8 @@ CART
   top: 1.7rem;
   left: 50%;
   transform: translateX(-50%);
+}
+
+header {
+  visibility: unset;
 }

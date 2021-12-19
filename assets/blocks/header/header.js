@@ -92,5 +92,4 @@ export default async function decorateHeader(block) {
   const url = block.getAttribute('data-source');
   const content = await fetchHeaderContent(url);
   buildHeader(block, content);
-  // block.setAttribute('data-loaded', true);
 }

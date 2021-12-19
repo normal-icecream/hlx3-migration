@@ -242,7 +242,7 @@ header, .index {
   visibility: hidden;
 }
 
-header, .block[data-loaded=true] {
+.block[data-loaded=true] {
   visibility: unset;
   animation-name: fadeIn;
   animation-timing-function: ease-in;
