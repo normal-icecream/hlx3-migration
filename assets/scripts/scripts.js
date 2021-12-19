@@ -38,6 +38,8 @@ export function createEl(tag, params) {
  * @returns {element} The SVG tag
  */
 export function createSVG(name) {
+  // eslint-disable-next-line no-param-reassign
+  name = name.replace(/\s+/g, '-').toLowerCase();
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
   use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `/assets/icons/icons.svg#${name}`);

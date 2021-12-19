@@ -36,8 +36,8 @@ CART
 .header-wrapper .header-cart {
   position: relative;
   background: var(--color-white);
-  width: 8rem;
-  height: 8rem;
+  width: var(--btn-m);
+  height: var(--btn-m);
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s;
