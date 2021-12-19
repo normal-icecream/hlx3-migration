@@ -73,8 +73,8 @@ function buildHeader(block, content) {
   if (titleBlock && !metaHide.includes('title')) {
     const fullTitle = titleBlock.querySelector('h1').textContent;
     const title = fullTitle.split('<')[0];
-    const logo = findSVGName(fullTitle);
-    const svg = createSVG(logo);
+    const reg = findSVGName(fullTitle);
+    const svg = createSVG(reg);
     const span = createEl('span', {
       class: 'title',
       text: title,
@@ -92,5 +92,4 @@ export default async function decorateHeader(block) {
   const url = block.getAttribute('data-source');
   const content = await fetchHeaderContent(url);
   buildHeader(block, content);
-  // block.append(content);
 }
