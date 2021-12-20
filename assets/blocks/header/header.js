@@ -27,7 +27,7 @@ async function fetchHeaderContent(url) {
 
 function findSVGName(text) {
   const svgName = text
-    .match(/<[a-zA-z ]{1,}>/)[0]
+    .match(/<[a-zA-z-]{1,}>/)[0]
     .split('<')[1]
     .replace('>', '');
   return svgName;

@@ -398,6 +398,48 @@ function buildImageBlocks(main) {
   });
 }
 
+function classify(main) {
+  const paths = window.location.pathname.split('/').filter((i) => i);
+  if (paths.length) {
+    main.parentElement.parentElement.classList.add(paths.join('-'));
+  }
+}
+
+async function pagify(main) {
+  const configured = ['order'];
+  const pageName = window.location.pathname.split('/').filter((i) => i).join('-');
+  if (configured.includes(pageName)) {
+    try {
+      const mod = await import(`/assets/pages/${pageName}/${pageName}.js`);
+      if (mod.default) {
+        await mod.default(main, pageName, document);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(`failed to load module for ${pageName}`, err);
+    }
+
+    loadCSS(`/assets/pages/${pageName}/${pageName}.css`);
+  }
+}
+
+function replaceSVGs(main) {
+  main.querySelectorAll('h1, h2, h3, a, p, strong, em, u, span').forEach((el) => {
+    const svgs = el.textContent.trim().match(/<[a-zA-z-]{1,}>/);
+    if (svgs) {
+      svgs.forEach((svg) => {
+        const name = svg
+          .split('<')[1]
+          .replace('>', '');
+        const svgEl = createSVG(name);
+        if (el.textContent.trim() === svg) {
+          el.replaceWith(svgEl);
+        }
+      });
+    }
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -427,8 +469,10 @@ function removeEmptySections(main) {
  * @param {Element} main The main element
  */
 export function decorateMain(main) {
-  // forward compatible pictures redecoration
+  classify(main);
   loadHeader();
+  replaceSVGs(main);
+  // forward compatible pictures redecoration
   decoratePictures(main);
   buildAutoBlocks(main);
   removeEmptySections(main);
@@ -445,6 +489,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    await pagify(main);
     doc.querySelector('body').classList.add('appear');
 
     const block = doc.querySelector('.block');
