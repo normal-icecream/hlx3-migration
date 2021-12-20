@@ -7,8 +7,8 @@ footer {
   flex-shrink: 0; /* sticky footer */
 }
 
-footer a {
-  text-decoration: none;
+footer a:any-link {
+  border: 0;
 }
 
 footer a:hover, footer a:focus {
