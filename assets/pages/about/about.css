@@ -1,0 +1,30 @@
+/* --------------------
+COLUMNS 
+----------------------- */
+.about .columns p {
+  line-height: 1;
+}
+
+.about .columns .columns-img {
+  max-width: unset;
+}
+
+@media (min-width: 768px) {
+  .about .about-lab > div {
+    flex-direction: row-reverse;
+  }
+
+  .about .section-wrapper > div .columns {
+    width: var(--block-l);
+  }
+}
+
+/* --------------------
+CAROUSEL 
+----------------------- */
+.about .carousel img {
+  border-radius: 50%;
+  width: 16rem;
+  height: 16rem;
+  object-fit: cover;
+}

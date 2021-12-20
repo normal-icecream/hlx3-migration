@@ -203,7 +203,7 @@ html, body {
   word-spacing: unset;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4, h5 {
   font-family: 'acumin-pro-extra-condensed';
   font-weight: var(--weight-bold);
   letter-spacing: unset;
@@ -220,4 +220,12 @@ h2 {
 
 h3 {
   font-size: var(--heading-size-s);
+}
+
+h4 {
+  font-size: var(--heading-size-xs);
+}
+
+h5 {
+  font-size: var(--body-size-l);
 }

@@ -408,7 +408,7 @@ function classify(main) {
 }
 
 async function pagify(main) {
-  const configured = ['legal', 'order'];
+  const configured = ['about', 'legal', 'order'];
   const paths = window.location.pathname.split('/').filter((i) => i);
   paths.forEach(async (path) => {
     if (configured.includes(path)) {

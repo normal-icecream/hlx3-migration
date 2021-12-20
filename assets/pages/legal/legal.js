@@ -1,3 +1,3 @@
-export default async function decorateOrder(main) {
-  console.log('hi from legal');
+export default async function decorateLegal(main) {
+  main.classList.add('legal-page');
 }
