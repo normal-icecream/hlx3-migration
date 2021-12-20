@@ -43,6 +43,8 @@ NAV
 
 .index-wrapper .index-nav ul {
   list-style-type: none;
+  padding-inline-start: 0;
+  padding-bottom: 0;
 }
 
 .index-wrapper .index-nav ul li,

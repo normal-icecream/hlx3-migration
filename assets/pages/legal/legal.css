@@ -1,8 +1,12 @@
-.legal h1 + p {
+.legal main h1 + p {
   text-align: center;
 }
 
 .legal h2, .legal h3 {
+  text-align: left;
+}
+
+.legal main p {
   text-align: left;
 }
 
