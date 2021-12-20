@@ -401,26 +401,30 @@ function buildImageBlocks(main) {
 function classify(main) {
   const paths = window.location.pathname.split('/').filter((i) => i);
   if (paths.length) {
-    main.parentElement.parentElement.classList.add(paths.join('-'));
+    paths.forEach((path) => {
+      main.parentElement.parentElement.classList.add(path);
+    });
   }
 }
 
 async function pagify(main) {
-  const configured = ['order'];
-  const pageName = window.location.pathname.split('/').filter((i) => i).join('-');
-  if (configured.includes(pageName)) {
-    try {
-      const mod = await import(`/assets/pages/${pageName}/${pageName}.js`);
-      if (mod.default) {
-        await mod.default(main, pageName, document);
+  const configured = ['legal', 'order'];
+  const paths = window.location.pathname.split('/').filter((i) => i);
+  paths.forEach(async (path) => {
+    if (configured.includes(path)) {
+      try {
+        const mod = await import(`/assets/pages/${path}/${path}.js`);
+        if (mod.default) {
+          await mod.default(main, path, document);
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(`failed to load module for ${path}`, err);
       }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(`failed to load module for ${pageName}`, err);
-    }
 
-    loadCSS(`/assets/pages/${pageName}/${pageName}.css`);
-  }
+      loadCSS(`/assets/pages/${path}/${path}.css`);
+    }
+  });
 }
 
 function replaceSVGs(main) {

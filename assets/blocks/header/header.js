@@ -34,7 +34,7 @@ function findSVGName(text) {
 }
 
 function buildHeader(block, content) {
-  const metaHide = getMetadata('hide');
+  const metaHide = getMetadata('hide') || 'null';
 
   const headWrapper = createEl('div', {
     class: 'header-wrapper',

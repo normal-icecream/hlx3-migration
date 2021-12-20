@@ -181,6 +181,10 @@ main {
   flex: 1 0 auto;
 }
 
+.section-wrapper:not(:last-of-type) {
+  margin-bottom: var(--pad-l);
+}
+
 .section-wrapper > div > * {
   width: var(--block-m);
   max-width: 90%;
@@ -192,8 +196,27 @@ h1, h2, h3 {
   text-align: center;
 }
 
+p, ol, ul {
+  padding-bottom: var(--pad-m);
+}
+
 a:any-link {
   color: var(--color-blue);
+  word-break: break-word;
+}
+
+main ol, main ul {
+  padding-inline-start: var(--pad-xl);
+}
+
+ol li::marker {
+  font-family: monospace;
+  font-weight: var(--weight-bold);
+}
+
+ul li::marker {
+  font-size: 120%;
+  line-height: 1;
 }
 
 header {
