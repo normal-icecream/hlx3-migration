@@ -2,11 +2,15 @@
 COLUMNS 
 ----------------------- */
 .about .columns p {
-  line-height: 1;
+  line-height: 1.4;
 }
 
 .about .columns .columns-img {
   max-width: unset;
+}
+
+.about .columns > div {
+  align-items: center;
 }
 
 @media (min-width: 768px) {

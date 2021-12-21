@@ -120,6 +120,5 @@ export default async function decorateIndex(block) {
   buildNav(nav);
   const carousel = block.firstChild.lastChild;
   await buildCarousel(carousel);
-  block.setAttribute('data-loaded', true);
   buildCarouselNav(carousel);
 }

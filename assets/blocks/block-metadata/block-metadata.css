@@ -1,0 +1,22 @@
+/* --------------------
+BACKGROUND
+----------------------- */
+[data-block-meta].background-blue {
+  background: var(--color-blue);
+  padding: var(--pad-xl);
+  padding-bottom: 0;
+}
+
+/* --------------------
+COLOR 
+----------------------- */
+[data-block-meta].color-white {
+  color: var(--color-white);
+  fill: var(--color-white);
+  stroke: var(--color-white);
+}
+
+[data-block-meta].color-white .btn.btn-rect {
+  background: var(--color-white);
+  color: var(--color-blue);
+}
