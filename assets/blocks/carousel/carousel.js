@@ -86,6 +86,9 @@ export default async function decorateCarousel(block) {
       }
     }
   } else {
+    block.querySelectorAll('img').forEach((img) => {
+      img.setAttribute('height', 160);
+    });
     // setup carousel head
     const head = children[0].firstChild;
     head.classList.add('carousel-head');

@@ -106,7 +106,13 @@ DEFAULT CAROUSEL
   }
 }
 
+.carousel .carousel-slides .carousel-slide h3 + p strong{
+  font-size: var(--body-size-l);
+}
+
 .carousel .carousel-slides .carousel-slide img {
+  max-height: 16rem;
+  width: auto;
   transition: transform 0.2s;
 }
 

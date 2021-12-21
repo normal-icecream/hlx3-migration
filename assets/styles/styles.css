@@ -142,8 +142,25 @@ svg {
   width: var(--btn-xl);
 }
 
-svg.icon-reg {
+svg.icon-reg,
+svg.icon-gf,
+svg.icon-v {
   stroke: currentColor;
+}
+
+svg.icon-gf,
+svg.icon-v {
+  height: var(--btn-xs);
+  width: var(--btn-xs);
+  margin-left: calc(var(--pad-xs) * -1);
+}
+
+svg.icon-gf + svg.icon-v,
+svg.icon-v + svg.icon-gf {
+  margin-left: calc(var(--pad-m) * -1);;
+}
+
+svg.icon-reg {
   width: calc(var(--btn-s) / 2);
   height: var(--btn-s);
   margin-bottom: 0.5rem;
@@ -225,10 +242,6 @@ p, ol, ul {
   padding-bottom: var(--pad-m);
 }
 
-sub {
-  color: red;
-}
-
 a:any-link {
   color: var(--color-blue);
   word-break: break-word;
@@ -275,13 +288,29 @@ BUTTONS
 }
 
 /* --------------------
+PAGE HEADER 
+----------------------- */
+h1 + svg {
+  display: block;
+  height: 14rem;
+  width: 14rem;
+}
+
+h1 + svg + p {
+  font-size: var(--body-size-l);
+  font-weight: var(--weight-bold);
+  line-height: 1.4;
+}
+
+/* --------------------
 PAGES 
 ----------------------- */
-html.order, html.order body {
+html.order:not(.catering),
+html.order:not(.catering) body {
   background: var(--color-blue);
 }
 
-html.order * {
+html.order:not(.catering) * {
   color: var(--color-pink);
   fill: var(--color-pink);
 }
