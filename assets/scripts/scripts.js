@@ -194,20 +194,22 @@ function buildBlock(blockName, content) {
  * @param {Element} block The block element
  */
 export async function loadBlock(block) {
-  const blockName = block.getAttribute('data-block-name');
+  if (!block.getAttribute('data-loaded')) {
+    const blockName = block.getAttribute('data-block-name');
 
-  try {
-    const mod = await import(`/assets/blocks/${blockName}/${blockName}.js`);
-    if (mod.default) {
-      await mod.default(block, blockName, document);
+    try {
+      const mod = await import(`/assets/blocks/${blockName}/${blockName}.js`);
+      if (mod.default) {
+        await mod.default(block, blockName, document);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(`failed to load module for ${blockName}`, err);
     }
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.log(`failed to load module for ${blockName}`, err);
-  }
 
-  loadCSS(`/assets/blocks/${blockName}/${blockName}.css`);
-  block.setAttribute('data-loaded', true);
+    loadCSS(`/assets/blocks/${blockName}/${blockName}.css`);
+    block.setAttribute('data-loaded', true);
+  }
 }
 
 /**
@@ -496,7 +498,7 @@ export function decorateMain(main) {
   decorateBlocks(main);
 }
 
-const LCP_BLOCKS = []; // add your LCP blocks to the list
+const LCP_BLOCKS = ['index', 'carousel']; // add your LCP blocks to the list
 
 /**
  * loads everything needed to get to LCP.

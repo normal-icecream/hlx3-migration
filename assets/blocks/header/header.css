@@ -67,7 +67,7 @@ CART
 }
 
 .header-cart .header-cart-amount {
-  font-family: acumin-pro-extra-condensed;
+  font-family: 'acumin-pro-extra-condensed', sans-serif;
   font-size: var(--heading-size-s);
   top: 1.7rem;
   left: 50%;
