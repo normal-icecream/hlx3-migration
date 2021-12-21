@@ -1,0 +1,11 @@
+.pint-club .columns[data-block-meta] svg.icon-pint,
+.pint-club .columns[data-block-meta] svg.icon-cone {
+  height: var(--btn-l);
+  width: var(--btn-l);
+}
+
+.pint-club .columns[data-block-meta] p {
+  line-height: 1.4;
+}
+
+

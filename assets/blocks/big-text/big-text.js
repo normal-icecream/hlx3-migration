@@ -1,3 +1,3 @@
-export default async function decorateBigText(block) {
+export default function decorateBigText(block) {
   block.classList.add('big-text');
 }

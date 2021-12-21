@@ -13,10 +13,9 @@ export default async function decorateColumns(block) {
           col.replaceWith(a);
         } else {
           // create btn
-          console.log('create btn');
+          a.classList.add('btn', 'btn-rect');
         }
       });
     }
   });
-  block.setAttribute('data-loaded', true);
 }

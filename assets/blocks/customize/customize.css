@@ -1,0 +1,74 @@
+.customize-container {
+  width: 100%;
+  background: var(--color-white);
+
+  text-align: center;
+  overflow-y: scroll;
+}
+
+.customize-container[aria-expanded=true] {
+  visibility: unset;
+  display: unset;
+  position: fixed;
+  top: 0;
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.2s;
+}
+
+.customize-container[aria-expanded=true] .customize {
+  height: 100vh;
+  padding: var(--pad-xl) var(--pad-s);
+}
+
+/* --------------------
+CLOSE BUTTON
+----------------------- */
+.customize aside {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--btn-m);
+  width: var(--btn-m);
+  border-radius: 50%;
+  margin-left: auto;
+  background: var(--color-white);
+  transition: background 0.2s, color 0.2s;
+}
+
+.customize aside:hover,
+.customize aside:focus {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.customize aside svg {
+  height: var(--btn-s);
+  width: var(--btn-s);
+}
+
+/* --------------------
+HEAD
+----------------------- */
+.customize .customize-head {
+  margin-top: var(--pad-xl);
+  padding: var(--pad-s);
+  border: 1px solid;
+}
+
+/* --------------------
+BODY
+----------------------- */
+.customize .customize-body {
+  border-left: 1px solid;
+  border-right: 1px solid;
+}
+
+/* --------------------
+FOOT
+----------------------- */
+.customize .customize-foot {
+  margin-top: var(--pad-xl);
+  padding: var(--pad-s);
+  padding-bottom: var(--pad-xxl);
+}

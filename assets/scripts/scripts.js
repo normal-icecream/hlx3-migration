@@ -133,8 +133,8 @@ export function decorateBlock(block) {
   if (section) {
     section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
   }
-  const blocksWithVariants = ['recommended-articles'];
-  blocksWithVariants.forEach((b) => {
+  const variants = ['carousel'];
+  variants.forEach((b) => {
     if (blockName.startsWith(`${b}-`)) {
       const options = blockName.substring(b.length + 1).split('-').filter((opt) => !!opt);
       blockName = b;
@@ -195,6 +195,7 @@ function buildBlock(blockName, content) {
  */
 export async function loadBlock(block) {
   const blockName = block.getAttribute('data-block-name');
+
   try {
     const mod = await import(`/assets/blocks/${blockName}/${blockName}.js`);
     if (mod.default) {
@@ -206,6 +207,7 @@ export async function loadBlock(block) {
   }
 
   loadCSS(`/assets/blocks/${blockName}/${blockName}.css`);
+  block.setAttribute('data-loaded', true);
 }
 
 /**
@@ -372,30 +374,25 @@ function decoratePictures(main) {
 }
 
 /**
- * returns an image caption of a picture elements
- * @param {Element} picture picture element
- */
-function getImageCaption(picture) {
-  const parentEl = picture.parentNode;
-  const parentSiblingEl = parentEl.nextElementSibling;
-  return (parentSiblingEl && parentSiblingEl.firstChild.nodeName === 'EM' ? parentSiblingEl : undefined);
-}
-
-/**
- * builds images blocks from default content.
+ * Builds customize block.
  * @param {Element} main The container element
  */
-function buildImageBlocks(main) {
-  // select all non-featured, default (non-images block) images
-  const imgs = [...main.querySelectorAll(':scope > div > p > picture')];
-  imgs.forEach((img) => {
-    const parent = img.parentNode;
-    const imagesBlock = buildBlock('images', {
-      elems: [parent.cloneNode(true), getImageCaption(img)],
-    });
-    parent.parentNode.insertBefore(imagesBlock, parent);
-    parent.remove();
+function buildCustomizeBlock(main) {
+  const customizeBlock = buildBlock('customize', {
+    elems: [
+      '<aside class="btn btn-close">',
+      '<div class="customize-head"><h2>',
+      '<form class="customize-body">',
+      '<div class="customize-foot"><a class="btn btn-rect">',
+    ],
   });
+  customizeBlock.setAttribute('data-block-name', 'customize');
+  const wrapper = createEl('div', {
+    class: 'section-wrapper customize-container',
+  });
+  wrapper.append(customizeBlock);
+  main.append(wrapper);
+  loadBlock(customizeBlock);
 }
 
 function classify(main) {
@@ -408,7 +405,7 @@ function classify(main) {
 }
 
 async function pagify(main) {
-  const configured = ['about', 'legal', 'order'];
+  const configured = ['about', 'legal', 'order', 'pint-club'];
   const paths = window.location.pathname.split('/').filter((i) => i);
   paths.forEach(async (path) => {
     if (configured.includes(path)) {
@@ -445,16 +442,31 @@ function replaceSVGs(main) {
 }
 
 /**
+ * Fixes images in a container element.
+ * @param {Element} main The container element
+ */
+function updateImages(main) {
+  try {
+    removeStylingFromImages(main);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('updating images failed', error);
+  }
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
-  removeStylingFromImages(main);
   try {
-    buildImageBlocks(main);
+    const metaHide = getMetadata('hide');
+    if (!metaHide || !metaHide.includes('cart')) {
+      buildCustomizeBlock(main);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Auto Blocking failed', error);
+    console.error('autoblocking failed', error);
   }
 }
 
@@ -478,7 +490,7 @@ export function decorateMain(main) {
   replaceSVGs(main);
   // forward compatible pictures redecoration
   decoratePictures(main);
-  buildAutoBlocks(main);
+  updateImages(main);
   removeEmptySections(main);
   wrapSections(main.querySelectorAll(':scope > div'));
   decorateBlocks(main);
@@ -519,8 +531,34 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
-  loadBlocks(main);
   loadCSS('/assets/styles/lazy-styles.css');
+  loadBlocks(main);
+  buildAutoBlocks(main);
+}
+
+export async function fetchFormFields() {
+  if (!window.formFields) {
+    const resp = await fetch('/_admin/forms.json');
+    if (resp.ok) {
+      let json = await resp.json();
+      if (json.data) {
+        json = json.data; // helix quirk, difference between live and local
+      }
+      const fields = {};
+      json.forEach((j) => {
+        if (fields[j.category]) {
+          fields[j.category].push(j);
+        } else {
+          fields[j.category] = [j];
+        }
+      });
+      Object.keys(fields).forEach((key) => {
+        fields[key].sort((a, b) => ((a.order > b.order) ? 1 : -1));
+      });
+      window.formFields = fields;
+    }
+  }
+  return window.formFields;
 }
 
 /**
@@ -530,6 +568,8 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // load anything that can be postponed to the latest here
   loadFooter();
+  fetchFormFields();
+  loadCSS('/assets/utils/forms/forms.css');
 }
 
 /**

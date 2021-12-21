@@ -25,7 +25,7 @@ function buildNavBtn(direction) {
   btn.append(arrow);
   btn.addEventListener('click', (e) => {
     e.preventDefault();
-    const carousel = document.querySelector('.carousel-slides');
+    const carousel = document.querySelector('.carousel > :last-child');
     const currentPosition = carousel.scrollLeft;
     const slideWidth = carousel.querySelector('.carousel-slide').offsetWidth;
     let carouselWidth = slideWidth * (carousel.childNodes.length - 2); // exclude btns
@@ -55,27 +55,57 @@ function buildCarouselNav(carousel) {
   carousel.prepend(leftBtn, rightBtn);
 }
 
-export default function decorateCarousel(block) {
+async function fetchCarouselImages(url) {
+  const resp = await fetch(`${url}.plain.html`);
+  if (resp.ok) {
+    const html = await resp.text();
+    const placeholder = createEl('div', { html });
+    const imgs = placeholder.querySelectorAll('picture');
+    return imgs;
+  }
+  return false;
+}
+
+export default async function decorateCarousel(block) {
   const children = [...block.querySelectorAll(':scope > div')];
-  // setup carousel head
-  const head = children[0].firstChild;
-  head.classList.add('carousel-head');
-  // setup carousel slides
-  children.shift();
-  const slides = children.map((child) => child.firstChild);
-  // build new carousel
-  block.innerHTML = '';
-  const wrapper = createEl('div', {
-    class: `carousel-slides carousel-slides-${slides.length <= 3 ? slides.length : 'multi'}`,
-  });
-  slides.forEach((slide) => {
-    slide.classList.add('carousel-slide');
-    wrapper.append(slide);
-  });
-  block.append(head, wrapper);
-  block.setAttribute('data-loaded', true);
-  // build navigation
-  if (slides.length > 1) {
-    buildCarouselNav(wrapper);
+  if ([...block.classList].includes('carousel-images')) {
+    // fetch carousel images
+    const { pathname } = new URL(block.querySelector('a').href);
+    const imgs = await fetchCarouselImages(pathname);
+    if (imgs) {
+      const wrapper = block.firstChild;
+      wrapper.innerHTML = '';
+      wrapper.classList.add('carousel-images-slides');
+      imgs.forEach((img) => {
+        img.classList.add('carousel-slide');
+        wrapper.append(img);
+      });
+      // build navigation
+      if (imgs.length > 1) {
+        buildCarouselNav(wrapper);
+      }
+    }
+  } else {
+    // setup carousel head
+    const head = children[0].firstChild;
+    head.classList.add('carousel-head');
+    // setup carousel slides
+    children.shift();
+    const slides = children.map((child) => child.firstChild);
+    // build new carousel
+    block.innerHTML = '';
+    const wrapper = createEl('div', {
+      class: `carousel-slides carousel-slides-${slides.length <= 3 ? slides.length : 'multi'}`,
+    });
+    slides.forEach((slide) => {
+      slide.classList.add('carousel-slide');
+      wrapper.append(slide);
+    });
+    block.append(head, wrapper);
+    block.classList.add('carousel-border');
+    // build navigation
+    if (slides.length > 1) {
+      buildCarouselNav(wrapper);
+    }
   }
 }

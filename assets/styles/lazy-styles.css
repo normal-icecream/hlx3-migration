@@ -203,6 +203,11 @@ html, body {
   word-spacing: unset;
 }
 
+.btn.btn-rect {
+  font-family: 'acumin-pro-extra-condensed';
+  font-weight: var(--weight-bold);
+}
+
 h1, h2, h3, h4, h5 {
   font-family: 'acumin-pro-extra-condensed';
   font-weight: var(--weight-bold);
@@ -228,4 +233,21 @@ h4 {
 
 h5 {
   font-size: var(--body-size-l);
+}
+
+/* --------------------
+CUSTOMIZE MENU
+----------------------- */
+.customize-container {
+  visibility: hidden;
+  display: none;
+}
+
+.no-scroll {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+}
+
+.no-scroll::-webkit-scrollbar {
+display:  none; /* for Chrome, Safari, and Opera */
 }

@@ -17,6 +17,7 @@
 @media (min-width: 768px) {
   .columns > div {
     flex-direction: row;
+    align-items: unset;
   }
 }
 

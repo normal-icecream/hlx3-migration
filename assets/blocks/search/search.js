@@ -169,7 +169,6 @@ export default async function decorateLocationsSearch(block) {
 
     block.innerHTML = '';
     block.append(form, results);
-    block.setAttribute('data-loaded', true);
   } else {
     block.parentElement.remove();
   }
