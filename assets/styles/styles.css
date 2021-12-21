@@ -296,12 +296,6 @@ h1 + svg {
   width: 14rem;
 }
 
-h1 + svg + p {
-  font-size: var(--body-size-l);
-  font-weight: var(--weight-bold);
-  line-height: 1.4;
-}
-
 /* --------------------
 PAGES 
 ----------------------- */
@@ -313,6 +307,17 @@ html.order:not(.catering) body {
 html.order:not(.catering) * {
   color: var(--color-pink);
   fill: var(--color-pink);
+}
+
+html.order .section-wrapper:first-of-type p {
+  font-weight: var(--weight-bold);
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  html.order .section-wrapper:first-of-type p {
+    font-size: var(--body-size-l);
+  }
 }
 
 /* --------------------
