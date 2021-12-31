@@ -1,9 +1,9 @@
 :root {
   /* COLORS */
   --color-white: #fffcf3;
-  --color-lt-gray: #f9f9f9;
-  --color-md-gray: #ececec;
-  --color-dk-gray: #d3d3d3;
+  --color-lt-gray: #ececec;
+  --color-md-gray: #a4a29d;
+  --color-dk-gray: #5c594f;
   --color-black: #140f00;
   --color-red: #f94f0d;
   --color-yellow: #fffc92;
@@ -173,6 +173,11 @@ h2 svg.icon-reg {
   width: 2rem;
 }
 
+h3 svg.icon-reg {
+  height: 2rem;
+  width: 1rem;
+}
+
 p svg.icon-reg {
   height: 2rem;
   width: 1rem;
@@ -220,7 +225,11 @@ main {
 }
 
 .section-wrapper:not(:last-of-type) {
-  margin-bottom: var(--pad-l);
+  margin-bottom: var(--pad-xl);
+}
+
+.section-wrapper .block {
+  margin-bottom: var(--pad-xl);
 }
 
 .section-wrapper > div > * {
@@ -279,12 +288,79 @@ BUTTONS
   margin-top: var(--pad-s);
   padding: var(--pad-m) var(--pad-l);
   font-size: var(--body-size-l);
+  font-style: normal;
+  text-decoration: none;
   transition: letter-spacing 0.2s;
 }
 
 .btn.btn-rect:hover,
 .btn.btn-rect:focus {
   letter-spacing: 1px;
+}
+
+.btn.btn-disable {
+  cursor: not-allowed;
+  transition: background 0.2s;
+}
+
+.btn.btn-disable:hover,
+.btn.btn-disable:focus {
+  letter-spacing: unset;
+  background: var(--color-dk-gray) !important;
+}
+
+.btn.btn-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--btn-m);
+  width: var(--btn-m);
+  margin-left: auto;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn.btn-close svg {
+  height: var(--btn-s);
+  width: var(--btn-s);
+}
+
+.btn-back {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: var(--btn-l);
+  width: var(--btn-l);
+  border-radius: 50%;
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  text-align: center;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.btn-back:hover,
+.btn-back:focus {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+@media (min-width: 768px) {
+  .btn-back {
+    position: absolute;
+    top: -3rem;
+    left: -3rem;
+    z-index: 2;
+  }
+}
+
+.btn-back svg {
+  display: block;
+  margin: 0 auto;
+  margin-top: -0.6rem;
+  margin-bottom: -2rem !important;
+  height: var(--btn-xs);
+  width: var(--btn-xs);
 }
 
 /* --------------------
@@ -294,30 +370,6 @@ h1 + svg {
   display: block;
   height: 14rem;
   width: 14rem;
-}
-
-/* --------------------
-PAGES 
------------------------ */
-html.order:not(.catering),
-html.order:not(.catering) body {
-  background: var(--color-blue);
-}
-
-html.order:not(.catering) * {
-  color: var(--color-pink);
-  fill: var(--color-pink);
-}
-
-html.order .section-wrapper:first-of-type p {
-  font-weight: var(--weight-bold);
-  line-height: 1.4;
-}
-
-@media (min-width: 768px) {
-  html.order .section-wrapper:first-of-type p {
-    font-size: var(--body-size-l);
-  }
 }
 
 /* --------------------
@@ -386,13 +438,14 @@ CAROUSEL NAV
 /* --------------------
 CLS STUFF 
 ----------------------- */
-.block-metadata {
+.block-metadata, .popup {
   visibility: hidden;
   display: none;
 }
 
 header, .accordion, .big-text,
-.carousel, .columns, .index, .search {
+.carousel, .collapse, .columns, 
+.contact, .index, .search {
   visibility: hidden;
 }
 

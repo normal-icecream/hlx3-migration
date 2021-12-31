@@ -236,9 +236,9 @@ h5 {
 }
 
 /* --------------------
-CUSTOMIZE MENU
+CUSTOMIZE & CHECKOUT MENUS
 ----------------------- */
-.customize-container {
+.customize-container, .checkout-container {
   visibility: hidden;
   display: none;
 }
@@ -250,4 +250,24 @@ CUSTOMIZE MENU
 
 .no-scroll::-webkit-scrollbar {
 display:  none; /* for Chrome, Safari, and Opera */
+}
+
+/* --------------------
+CART BTNS
+----------------------- */
+.btn.btn-cart {
+  margin-bottom: var(--pad-xl);
+}
+
+a[href^="mailto:"],
+a[href^="tel:"] {
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
+
+a[href^="mailto:"]:hover,
+a[href^="mailto:"]:focus,
+a[href^="tel:"]:hover,
+a[href^="tel:"]:focus {
+  border-bottom: 2px solid;
 }

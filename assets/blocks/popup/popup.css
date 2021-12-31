@@ -1,0 +1,80 @@
+main .popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 100vh;
+  width: var(--block-s);
+  max-width: 90%;
+  padding: var(--pad-xl) var(--pad-s);
+  background: var(--color-pink);
+  text-align: center;
+  overflow-y: scroll;
+  z-index: 10;
+}
+
+.popup .popup-wrapper {
+  max-width: 90%;
+  width: var(--block-xs);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.popup[aria-expanded=true] {
+  visibility: visible;
+  display: unset;
+}
+
+.popup[aria-expanded=false] {
+  visibility: hidden;
+  display: none;
+}
+
+.popup .btn.btn-close:hover,
+.popup .btn.btn-close:focus {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.popup .popup-logo {
+  height: var(--btn-m);
+  width: var(--btn-m);
+  margin-top: var(--pad-xl);
+}
+
+.popup .popup-head {
+  margin-bottom: var(--pad-l);
+}
+
+.popup.popup-red {
+  background: var(--color-red);
+  color: var(--color-white);
+}
+
+.popup.popup-red .btn.btn-close:hover,
+.popup.popup-red .btn.btn-close:focus {
+  background: var(--color-white);
+  color: var(--color-red);
+}
+
+.popup.popup-rainbow {
+  background: var(--color-pink);
+  background: linear-gradient(130deg, #d6feff 0%, var(--color-pink) 50%, #fffed6 100%);
+  color: var(--color-white);
+  text-shadow: 0 0 5px var(--color-md-gray);
+}
+
+.popup.popup-rainbow svg {
+  filter: drop-shadow(0 0 5px var(--color-md-gray));
+}
+
+.popup.popup-rainbow .btn.btn-close:hover,
+.popup.popup-rainbow .btn.btn-close:focus {
+  background: var(--color-white);
+  color: var(--color-pink);
+}
+
+.popup.popup-rainbow .btn.btn-close:hover svg,
+.popup.popup-rainbow .btn.btn-close:focus svg {
+  filter: unset;
+}

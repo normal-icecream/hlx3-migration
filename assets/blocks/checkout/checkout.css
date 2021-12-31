@@ -1,0 +1,203 @@
+.checkout-container {
+  width: 100%;
+  background: var(--color-white);
+  text-align: center;
+  overflow-y: scroll;
+}
+
+.checkout-container[aria-expanded=true] {
+/* .checkout-container { */
+  visibility: unset;
+  display: unset;
+  position: fixed;
+  top: 0;
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.2s;
+  z-index: 8;
+}
+
+.checkout-container[aria-expanded=true] .checkout {
+/* .checkout-container .checkout { */
+  height: 100vh;
+  padding: var(--pad-xl) var(--pad-s);
+}
+
+.checkout div {
+  position: relative;
+}
+
+/* --------------------
+BACK BUTTON
+----------------------- */
+.checkout .btn.btn-back {
+  background: var(--color-yellow-alt);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.checkout .btn.btn-back:hover,
+.checkout .btn.btn-back:focus {
+  background: var(--color-blue);
+  color: var(--color-yellow-alt);
+}
+
+/* --------------------
+HEAD
+----------------------- */
+.checkout .checkout-head {
+  margin-top: var(--pad-xl);
+  padding: var(--pad-s);
+  border: 1px solid;
+}
+
+/* --------------------
+TABLE
+----------------------- */
+.checkout .checkout-table {
+  width: 100%;
+  border: 1px solid;
+  border-collapse: collapse;
+  font-family: acumin-pro-extra-condensed;
+  font-weight: var(--weight-bold);
+  font-size: var(--heading-size-xs);
+}
+
+.checkout .checkout-table-body {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+@media (min-width: 464px) {
+  .checkout .checkout-table-body {
+    background: var(--color-green);
+  }
+}
+@media (min-width: 768px) {
+  .checkout .checkout-table-body {
+    background: orange;
+  }
+}
+@media (min-width: 1200px) {
+  .checkout .checkout-table-body {
+    background: var(--color-red);
+  }
+}
+
+.checkout .checkout-table-body tr:not(:last-of-type) {
+  border-bottom: 1px solid var(--color-white);
+}
+
+.checkout .checkout-table-body .checkout-table-body-quantity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .checkout .checkout-table-body .checkout-table-body-quantity {
+    flex-direction: row;
+    /* justify-content: space-evenly; */
+  }
+
+  .checkout .checkout-quantity {
+    padding: 0 var(--pad-m);
+  }
+}
+
+.checkout .checkout-btn {
+  height: var(--btn-xxs);
+  width: var(--btn-xxs);
+  background: var(--color-white);
+  color: var(--color-blue);
+  border-radius: 50%;
+  font-family: 'Poppins';
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.checkout .checkout-btn.checkout-plus:hover,
+.checkout .checkout-btn.checkout-plus:focus {
+  color: var(--color-green);
+}
+
+.checkout .checkout-btn.checkout-minus:hover,
+.checkout .checkout-btn.checkout-minus:focus {
+  color: var(--color-red);
+}
+
+.checkout .checkout-btn:hover,
+.checkout .checkout-btn:focus {
+  transform: scale(1.1);
+}
+
+@media (min-width: 768px) {
+  .checkout .checkout-quantity {
+    order: 2;
+  }
+
+  .checkout .checkout-btn.checkout-plus {
+    order: 3;
+  }
+}
+
+.checkout .checkout-table-body .checkout-table-body-item {
+  text-align: left;
+  line-height: 1;
+}
+
+.checkout .checkout-table-body .checkout-table-body-price {
+  text-align: right;
+}
+
+.checkout .checkout-table-foot {
+  text-align: right;
+}
+
+.checkout .checkout-table-body tr td,
+.checkout .checkout-table-foot tr td {
+  padding: var(--pad-l) var(--pad-s);
+  border-bottom: 1px solid;
+}
+
+@media (min-width: 464px) {
+  .checkout .checkout-table-body tr td,
+  .checkout .checkout-table-foot tr td {
+    padding: var(--pad-l) var(--pad-l);
+  }
+}
+
+@media (min-width: 768px) {
+  .checkout .checkout-table-body tr td,
+  .checkout .checkout-table-foot tr td {
+    padding: var(--pad-l) var(--pad-xl);
+  }
+}
+
+/* --------------------
+FORM
+----------------------- */
+.checkout .checkout-form {
+  margin-top: var(--pad-xl);
+  border: 1px solid;
+  border-bottom: 0;
+}
+
+.checkout .checkout-form.form-hide {
+  visibility: hidden;
+  display: none;
+}
+
+/* --------------------
+FOOT
+----------------------- */
+.checkout .checkout-foot {
+  margin-top: var(--pad-xl);
+  /* padding: var(--pad-s); */
+  padding-bottom: var(--pad-xxl);
+}
+
+.checkout .checkout-foot .btn.btn-rect {
+  background: var(--color-blue);
+  color: var(--color-white);
+}

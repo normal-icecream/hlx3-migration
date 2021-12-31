@@ -8,10 +8,10 @@ import {
   buildForm,
 } from '../../utils/forms/forms.js';
 
-function setupShipping(form) {
-  const pickupMethod = form.querySelector('input#pickup[name="method"]');
-  const shipMethod = form.querySelector('input#shipping[name="method"]');
-  const addressInfo = form.querySelectorAll('input[data-category="address"');
+function setupShipping() {
+  const pickupMethod = document.querySelector('input#pickup[name="method"]');
+  const shipMethod = document.querySelector('input#shipping[name="method"]');
+  const addressInfo = document.querySelectorAll('input[data-category="address"');
   if (pickupMethod && shipMethod && addressInfo) {
     addressInfo.forEach((field) => {
       field.classList.add('form-field-hide');
@@ -29,9 +29,9 @@ function setupShipping(form) {
   }
 }
 
-function setupGifting(form) {
-  const giftOption = form.querySelector('input[name="gift-option"]');
-  const recipientInfo = form.querySelectorAll('input[data-category="club-gift"');
+function setupGifting() {
+  const giftOption = document.querySelector('input[name="gift-option"]');
+  const recipientInfo = document.querySelectorAll('input[data-category="club-gift"');
   if (recipientInfo) {
     recipientInfo.forEach((field) => {
       field.classList.add('form-field-hide');
@@ -47,7 +47,7 @@ function setupGifting(form) {
         recipientInfo.forEach((field) => {
           field.classList.remove('form-field-hide');
         });
-        const addressInfo = form.querySelectorAll('input[data-category="address"');
+        const addressInfo = document.querySelectorAll('input[data-category="address"');
         if (addressInfo) {
           addressInfo.forEach((field) => {
             field.placeholder = field.placeholder.replace('your', 'recipient');
@@ -55,7 +55,7 @@ function setupGifting(form) {
         }
       } else {
         // hide recipient info
-        const addressInfo = form.querySelectorAll('input[data-category="address"');
+        const addressInfo = document.querySelectorAll('input[data-category="address"');
         if (addressInfo) {
           addressInfo.forEach((field) => {
             field.placeholder = field.placeholder.replace('recipient', 'your');
@@ -79,8 +79,6 @@ async function populateCustomizeBody(type) {
     }
     const formEl = customize.querySelector('form.customize-body');
     await buildForm(formEl, clubFields);
-    setupShipping(formEl);
-    setupGifting(formEl);
   }
 }
 
@@ -97,6 +95,8 @@ export default function decoratePintClub(main) {
           text: 'join the club',
         });
         await populateCustomizeBody(type);
+        await setupShipping();
+        await setupGifting();
         showCustomize();
       });
     }

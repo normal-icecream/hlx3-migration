@@ -1,4 +1,4 @@
-.carousel {
+main .carousel {
   position: relative;
 }
 
@@ -76,6 +76,7 @@ DEFAULT CAROUSEL
 }
 .carousel .carousel-slides .carousel-slide {
   flex-shrink: 0;
+  width: 100%;
   max-width: 100%;
   padding: var(--pad-xl) var(--btn-s);
   text-align: center;
@@ -106,22 +107,18 @@ DEFAULT CAROUSEL
   }
 }
 
-.carousel .carousel-slides .carousel-slide h3 + p strong{
-  font-size: var(--body-size-l);
+.carousel .carousel-slides .carousel-slide .btn.btn-rect {
+  background: var(--color-blue);
+  color: var(--color-white);
 }
 
-.carousel .carousel-slides .carousel-slide img {
-  max-height: 16rem;
-  width: auto;
-  transition: transform 0.2s;
-}
-
-.carousel .carousel-slides .carousel-slide img:hover,
-.carousel .carousel-slides .carousel-slide img:focus {
-  transform: scale(1.1) rotate(3deg);
-}
-
-.carousel .carousel-slides .carousel-slide:nth-child(even) img:hover,
-.carousel .carousel-slides .carousel-slide:nth-child(even) img:focus {
-  transform: scale(1.1) rotate(-3deg);
+/* --------------------
+SPECIAL CAROUSEL STYLES
+----------------------- */
+main .carousel.meet-the-team-carousel .carousel-slides img,
+main .carousel.ice-cream-cake-carousel .carousel-slides img {
+  border-radius: 50%;
+  height: 16rem;
+  width: 16rem;
+  object-fit: cover;
 }

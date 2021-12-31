@@ -12,19 +12,6 @@ function toggle(e) {
   }
 }
 
-// export default function decorateAccordion(block) {
-//   const rows = block.querySelectorAll('div:scope > div');
-//   rows.forEach((row) => {
-//     const q = row.querySelector('h3');
-//     q.setAttribute('role', 'button');
-//     q.setAttribute('aria-expanded', false);
-//     q.setAttribute('aria-controls', toClassName(q.textContent));
-//     q.addEventListener('click', toggle);
-//     const a = q.nextElementSibling;
-//     a.id = toClassName(q.textContent);
-//   })
-// }
-
 export default function decorateAccordion(block) {
   [...block.children].forEach((child) => {
     child.classList.add('accordion-item');

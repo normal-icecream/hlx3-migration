@@ -15,6 +15,11 @@
   border-bottom: 1px solid;
 }
 
+.legal main a:any-link:hover, 
+.legal main a:any-link:focus {
+  border-bottom: 2px solid;
+}
+
 .legal .section-wrapper > div > * {
   width: var(--block-s);
 }

@@ -1,11 +1,11 @@
+main .section-wrapper .big-text {
+  margin-bottom: unset;
+}
+
 .big-text {
   text-align: center;
   font-family: 'acumin-pro-extra-condensed';
   font-size: var(--heading-size-s);
   line-height: 1.1;
   padding-bottom: var(--pad-l);
-}
-
-.big-text em {
-  font-weight: var(--weight-bold);
 }

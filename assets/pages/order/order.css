@@ -1,3 +1,6 @@
+/* --------------------
+ORDER INDEX
+----------------------- */
 .order .order-hide {
   visibility: hidden;
   display: none;
@@ -18,47 +21,16 @@
   transform: scale(1.1) rotate(-3deg);
 }
 
-.order .btn-order {
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: var(--btn-l);
-  width: var(--btn-l);
-  border-radius: 50%;
-  font-weight: var(--weight-bold);
-  line-height: 1;
-  text-align: center;
-  transition: transform 0.2s;
-  cursor: pointer;
+html.order-index,
+html.order-index body {
+  background: var(--color-blue);
 }
 
-.order .btn-order:hover,
-.order .btn-order:focus {
-  transform: scale(1.1) rotate(-3deg);
+html.order-index * {
+  color: var(--color-pink);
+  fill: var(--color-pink);
 }
 
-@media (min-width: 768px) {
-  .order .btn-order {
-    position: absolute;
-    top: -3rem;
-    left: -3rem;
-    z-index: 2;
-  }
-}
-
-.order .btn-order svg {
-  display: block;
-  margin: 0 auto;
-  margin-top: -0.6rem;
-  margin-bottom: -2rem;
-  height: var(--btn-xs);
-  width: var(--btn-xs);
-}
-
-/* --------------------
-MENU SELECTION
------------------------ */
 html.order-selected-pickup, html.order-selected-pickup body {
   background: var(--color-yellow);
 }
@@ -95,4 +67,89 @@ html.order-selected-delivery .btn-order {
 html.order-selected-delivery .btn-order svg {
   fill: var(--color-pink);
   stroke: var(--color-pink);
+}
+
+/* --------------------
+ORDER STORE PAGES
+----------------------- */
+html.order.abnormal .title {
+  font-size: 90%;
+}
+
+@media (min-width: 464px) {
+  html.order.abnormal .title {
+    font-size: unset;
+  }
+}
+
+html.order .section-wrapper:first-of-type svg:not(.icon-close) {
+  margin-bottom: var(--pad-xl);
+}
+
+html.order .section-wrapper:first-of-type p {
+  font-weight: var(--weight-bold);
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  html.order .section-wrapper:first-of-type p {
+    font-size: var(--body-size-l);
+  }
+}
+
+html.order .section-wrapper.section-wrapper-filled {
+  background: var(--color-blue);
+  color: var(--color-white);
+  fill: var(--color-white);
+  width: var(--block-m);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--pad-xl);
+  padding: var(--pad-xl) var(--pad-s);
+}
+
+html.order .section-wrapper.section-wrapper-filled > div {
+  width: var(--block-xs);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html.order .section-wrapper.section-wrapper-filled h2 {
+  margin-bottom: var(--pad-l);
+}
+
+/* --------------------
+ORDER STORE MENUS
+----------------------- */
+html.order img {
+  max-height: 16rem;
+  width: auto;
+  max-width: 100%;
+  transition: transform 0.2s;
+}
+
+html.order * img:hover,
+html.order * img:focus {
+  transform: scale(1.1) rotate(3deg);
+}
+
+html.order *:nth-child(even) img:hover,
+html.order *:nth-child(even) img:focus {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+html.order h3 + h3 {
+  margin-top: -.6rem;
+  padding-top: unset;
+}
+
+html.order h3 + p strong {
+  font-size: var(--body-size-l);
+}
+
+html.order .btn.btn-rect {
+  background: var(--color-white);
+  color: var(--color-blue);
 }
