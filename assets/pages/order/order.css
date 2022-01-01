@@ -120,6 +120,10 @@ html.order .section-wrapper.section-wrapper-filled h2 {
   margin-bottom: var(--pad-l);
 }
 
+html.order .section-wrapper.section-wrapper-filled a:not(.btn) {
+  color: var(--color-white);
+}
+
 /* --------------------
 ORDER STORE MENUS
 ----------------------- */

@@ -1,14 +1,48 @@
+/* eslint-disable import/no-cycle */
 import {
+  buildGScriptLink,
+  buildGQs,
+  createEl,
+  fetchLabels,
   toClassName,
+  getCurrentStore,
 } from '../../scripts/scripts.js';
+
+import {
+  getOrderCredentials,
+  setupCart,
+  updateCartItems,
+} from '../square/square.js';
+
+import {
+  buildScreensaver,
+  makeScreensaverError,
+  removeScreensaver,
+} from '../screensaver/screensaver.js';
 
 function getStyles(style) {
   const styles = getComputedStyle(document.body);
   return styles.getPropertyValue(`--${toClassName(style)}`).trim();
 }
 
+function getData() {
+  const data = {};
+  const tipEl = document.querySelector('.checkout-foot-tip');
+  if (tipEl) {
+    data.tip_amount = tipEl.getAttribute('data-total');
+  }
+  const totalEl = document.querySelector('.checkout-foot-total');
+  if (totalEl) {
+    data.order_amount = totalEl.getAttribute('data-original-total');
+  }
+  const tFoot = document.querySelector('.checkout .checkout-table-foot');
+  if (tFoot) {
+    data.reference_id = tFoot.getAttribute('data-ref');
+  }
+  return data;
+}
+
 async function initializeCard(payments) {
-  // const card = await payments.card();
   const card = await payments.card({
     style: {
       '.input-container': {
@@ -79,7 +113,6 @@ async function initializeGiftCard(payments) {
     },
   });
   await giftCard.attach('#gift-card-container');
-
   return giftCard;
 }
 
@@ -87,19 +120,30 @@ async function initializeGiftCard(payments) {
 // to the project server code so that a payment can be created with
 // Payments API
 async function createPayment(token) {
-  const body = JSON.stringify({
-    locationId: window.location_id,
-    sourceId: token,
+  const store = getCurrentStore();
+  const cred = getOrderCredentials(store);
+  const url = buildGScriptLink(cred.endpoint);
+  const data = getData();
+  const qs = buildGQs({
+    order_amount: data.order_amount,
+    tip_amount: data.tip_amount,
+    source_id: token,
+    location_id: window.location_id,
+    reference_id: data.reference_id,
   });
-  const paymentResponse = await fetch('/payment', {
+  const paymentResponse = await fetch(`${url}?${qs}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
-    body,
   });
   if (paymentResponse.ok) {
-    return paymentResponse.json();
+    const json = await paymentResponse.json();
+    if (json.errors) {
+      throw new Error(JSON.stringify(json.errors));
+    } else {
+      return json;
+    }
   }
   const errorBody = await paymentResponse.text();
   throw new Error(errorBody);
@@ -124,25 +168,82 @@ async function tokenize(paymentMethod) {
   throw new Error(errorMessage);
 }
 
+export function hidePaymentForm() {
+  const form = document.getElementById('payment-form');
+  if (form) {
+    form.remove();
+  }
+}
+
+async function displaySuccessMessage(results) {
+  const foot = document.querySelector('.checkout .checkout-foot');
+  if (foot) {
+    const store = getCurrentStore();
+    const labels = await fetchLabels();
+    const wrapper = createEl('div', {
+      class: 'payment-success-message',
+    });
+    const message = labels[`${store}_thankyou`].split('\n');
+    message.forEach((line) => {
+      const p = createEl('p', {
+        text: line,
+      });
+      wrapper.append(p);
+    });
+    // contact button
+    const phone = labels[`${store}_phone`] ? labels[`${store}_phone`] : labels.store_phone;
+    const contactBtn = createEl('a', {
+      class: 'btn btn-rect btn-fixed',
+      text: phone,
+      href: `sms:+${phone.replace(/\D/g, '')}`,
+    });
+    wrapper.append(contactBtn);
+    // receipt button
+    if (results.payment && results.payment.receipt_url) {
+      const receiptBtn = createEl('a', {
+        class: 'btn btn-rect btn-fixed',
+        text: 'view receipt',
+        href: results.payment.receipt_url,
+        target: '_blank',
+      });
+      wrapper.append(receiptBtn);
+    }
+    foot.append(wrapper);
+  }
+}
+
 // Helper method for displaying the Payment Status on the screen.
 // status is either SUCCESS or FAILURE;
-function displayPaymentResults(status) {
+async function displayPaymentResults(status, results) {
   const statusContainer = document.getElementById(
     'payment-status-container',
   );
   if (status === 'SUCCESS') {
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
+    hidePaymentForm();
+    // send email
+    // send text
+    // empty cart
+    await setupCart();
+    window.cart.empty();
+    updateCartItems();
+    // display message
+    await displaySuccessMessage(results);
+    removeScreensaver();
   } else {
     statusContainer.classList.remove('is-success');
     statusContainer.classList.add('is-failure');
+    removeScreensaver();
   }
   statusContainer.style.visibility = 'visible';
 }
 
 // eslint-disable-next-line consistent-return
-export default async function payment(main) {
+export default async function payment() {
   if (!window.Square) {
+    buildScreensaver('something went wrong. try again?');
+    makeScreensaverError('something went wrong. try again?');
     throw new Error('Square.js failed to load properly');
   }
 
@@ -165,30 +266,35 @@ export default async function payment(main) {
     return false;
   }
 
+  if (!card && !giftCard) {
+    buildScreensaver('something went wrong. try again?');
+    return makeScreensaverError('something went wrong. try again?');
+  }
+
   const cardButton = document.getElementById('card-button');
   const giftCardButton = document.getElementById('gift-card-button');
 
   async function handlePaymentMethodSubmission(event, paymentMethod) {
     event.preventDefault();
+    buildScreensaver('submitting your payment...');
     try {
-      // disable the submit button as we await tokenization and make a
-      // payment request.
+      // disable the submit button as we await tokenization
+      // and make a payment request.
       cardButton.disabled = true;
       giftCardButton.disabled = true;
       const token = await tokenize(paymentMethod);
       const paymentResults = await createPayment(token);
-      displayPaymentResults('SUCCESS');
+      await displayPaymentResults('SUCCESS', paymentResults);
       // eslint-disable-next-line no-console
       console.debug('Payment Success', paymentResults);
     } catch (e) {
       cardButton.disabled = false;
       giftCardButton.disabled = false;
-      displayPaymentResults('FAILURE');
+      await displayPaymentResults('FAILURE');
       // eslint-disable-next-line no-console
       console.error(e.message);
     }
   }
-
 
   cardButton.addEventListener('click', async (event) => {
     await handlePaymentMethodSubmission(event, card);

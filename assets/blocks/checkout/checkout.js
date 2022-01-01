@@ -1,13 +1,14 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-use-before-define */
 import {
   createEl,
   createSVG,
   fetchCatalog,
+  fetchLabels,
   getCurrentStore,
   noScroll,
 } from '../../scripts/scripts.js';
 
-// eslint-disable-next-line import/no-cycle
 import {
   formatMoney,
   setupCart,
@@ -22,6 +23,7 @@ import {
   getContactFromLocalStorage,
   getSubmissionData,
   saveToLocalStorage,
+  setupDiscountField,
   validateForm,
 } from '../../utils/forms/forms.js';
 
@@ -89,6 +91,10 @@ function disableCartEdits() {
     cartBtns.forEach((btn) => {
       btn.remove();
     });
+  }
+  const total = document.querySelector('.checkout-foot-total');
+  if (total) {
+    total.parentNode.classList.add('checkout-total-highlight');
   }
 }
 
@@ -159,20 +165,40 @@ export async function populateCheckoutTable() {
         });
         tr.append(tdt, tda);
         foot.append(tr);
+      } else {
+        // nothing in cart
+        const labels = await fetchLabels();
+        const tr = createEl('tr');
+        const tre = createEl('td', {
+          class: 'checkout-cart-empty',
+          colspan: 3,
+          text: labels.cart_empty,
+        });
+        tr.append(tre);
+        body.append(tr);
+        // hide checkout form
+        hideCheckoutForm();
+        const coFoot = document.querySelector('.checkout .checkout-foot');
+        if (coFoot) {
+          resetCheckoutFootBtn();
+          const a = coFoot.querySelector('a');
+          if (a) {
+            a.textContent = 'place order';
+            a.classList.add('btn-disable');
+          }
+        }
       }
     }
   }
   return true;
 }
 
-function updateCheckoutTable(order, data) {
-  clearCheckoutFoot();
+// function updateCheckoutTable(order, data) { // may use data in future
+function updateCheckoutTable(order) {
+  resetCheckoutFootBtn();
   const tFoot = document.querySelector('.checkout .checkout-table-foot');
   if (tFoot) {
-    console.log(order);
-    // TODO: discount
-    // console.log('discount:', order.total_discount_money.amount);
-
+    tFoot.setAttribute('data-ref', order.reference_id);
     // tip
     const tipTR = createEl('tr');
     const tipLabel = createEl('td', {
@@ -186,92 +212,40 @@ function updateCheckoutTable(order, data) {
     tipTR.append(tipLabel, tipValue);
     tFoot.prepend(tipTR);
     // tax
-    const taxTR = createEl('tr');
-    const taxLabel = createEl('td', {
-      colspan: 2,
-      text: 'prepared food tax (included)',
-    });
-    const taxValue = createEl('td', {
-      class: 'checkout-foot-tax',
-      text: `$${formatMoney(order.total_tax_money.amount)}`,
-    });
-    taxTR.append(taxLabel, taxValue);
-    tFoot.prepend(taxTR);
-
+    if (order.total_tax_money) {
+      const taxTR = createEl('tr');
+      const taxLabel = createEl('td', {
+        colspan: 2,
+        text: 'prepared food tax (included)',
+      });
+      const taxValue = createEl('td', {
+        class: 'checkout-foot-tax',
+        text: `$${formatMoney(order.total_tax_money.amount)}`,
+      });
+      taxTR.append(taxLabel, taxValue);
+      tFoot.prepend(taxTR);
+    }
+    // discount
+    if (order.discounts && order.total_discount_money) {
+      const discountTR = createEl('tr');
+      const discountLabel = createEl('td', {
+        colspan: 2,
+        text: `applied discount (${order.discounts[0].name})`,
+      });
+      const discountValue = createEl('td', {
+        class: 'checkout-foot-discount',
+        text: `-$${formatMoney(order.total_discount_money.amount)}`,
+      });
+      discountTR.append(discountLabel, discountValue);
+      tFoot.prepend(discountTR);
+    }
     // total
-    console.log('   total:', order.total_money.amount);
     const total = tFoot.querySelector('.checkout-foot-total');
+    total.setAttribute('data-original-total', order.total_money.amount);
     total.setAttribute('data-total', order.total_money.amount);
     total.textContent = `$${formatMoney(order.total_money.amount)}`;
   }
 }
-
-// const displayOrderObjInfo = (orderObj, formData) => {
-//   // DISCOUNT INFO
-//   const discountName = document.querySelector("#discount").value;
-//   const $discountRow = document.createElement("tr");
-
-//   if (discountName && orderObj.total_discount_money.amount > 0) {
-
-//     const $discountTitle = document.createElement("td");
-//       $discountTitle.colSpan = 2;
-//       $discountTitle.textContent = `${discountName.split("-").join(" ")} (discount)`;
-
-//     const $discountAmount = document.createElement("td");
-//       $discountAmount.id = "checkout-foot-discount";
-//       $discountAmount.textContent = `- $${formatMoney(orderObj.total_discount_money.amount)}`;
-
-//     $discountRow.append($discountTitle, $discountAmount);
-
-//   }
-
-//   // TAX INFO
-//   const $taxRow = document.createElement("tr");
-
-//   const $taxTitle = document.createElement("td");
-//     $taxTitle.colSpan = 2;
-//     $taxTitle.textContent = "prepared food tax (included)";
-
-//   const $taxAmount = document.createElement("td");
-//     $taxAmount.id = "checkout-foot-tax";
-//     $taxAmount.textContent = `$${formatMoney(orderObj.total_tax_money.amount)}`;
-
-//   $taxRow.append($taxTitle, $taxAmount);
-
-//   // TIP INFO
-//   const $tipRow = document.createElement("tr");
-
-//   const $tipTitle = document.createElement("td");
-//     $tipTitle.colSpan = 2;
-//     $tipTitle.textContent = "tip";
-
-//   const $tipAmount = document.createElement("td");
-//     $tipAmount.id = "checkout-foot-tip";
-//     $tipAmount.textContent = `$${formatMoney(0)}`;
-
-//   $tipRow.append($tipTitle, $tipAmount);
-
-//   // TOTAL ROW
-//   const $totalRow = document.createElement("tr");
-//     $totalRow.classList.add("highlight");
-
-//   const $totalTitle = document.createElement("td");
-//     $totalTitle.colSpan = 2;
-//     $totalTitle.textContent = "total";
-
-//   const $totalAmount = document.createElement("td");
-//     $totalAmount.id = "checkout-foot-total";
-//     $totalAmount.setAttribute("data-total", orderObj.total_money.amount);
-//     $totalAmount.textContent = `$${formatMoney(orderObj.total_money.amount)}`;
-
-//   $totalRow.append($totalTitle, $totalAmount);
-
-//   //////////////////////////////////////////////////////////////
-//   $checkoutTableFooter.prepend($taxRow, $tipRow, $totalRow);
-//   if (discountName && orderObj.total_discount_money.amount > 0) {
-//     $checkoutTableFooter.prepend($discountRow);
-//   }
-// }
 
 export function hideCheckout() {
   const checkout = document.querySelector('.checkout-container');
@@ -279,6 +253,15 @@ export function hideCheckout() {
     checkout.setAttribute('aria-expanded', false);
     document.querySelector('body').classList.remove('no-scroll');
     window.removeEventListener('scroll', noScroll);
+    clearCheckoutFoot();
+    updateCheckout();
+  }
+}
+
+function showCheckoutForm() {
+  const form = document.querySelector('form.checkout-form');
+  if (form) {
+    form.classList.remove('form-hide');
   }
 }
 
@@ -289,18 +272,39 @@ function hideCheckoutForm() {
   }
 }
 
+export function resetCheckoutFootBtn() {
+  const footDiv = document.querySelector('.checkout .checkout-foot');
+  if (footDiv) {
+    // clear foot, replace with order btn
+    footDiv.innerHTML = '';
+    const a = createEl('a', {
+      class: 'btn btn-rect',
+    });
+    footDiv.append(a);
+  }
+}
+
 export function clearCheckoutFoot() {
-  const foot = document.querySelector('.checkout .checkout-foot a');
-  if (foot) {
-    foot.textContent = '';
-    // remove event listeners
-    const newBtn = foot.cloneNode(true);
-    foot.parentNode.replaceChild(newBtn, foot);
+  const form = document.querySelector('.checkout .checkout-form');
+  const paymentStatus = document.getElementById('payment-status-container');
+  const successMessage = document.querySelector('.payment-success-message');
+  if (form) {
+    const paymentForm = document.getElementById('payment-form');
+    if (!paymentForm) {
+      // redisplay checkout form
+      showCheckoutForm();
+    }
+  }
+  if (paymentStatus) {
+    paymentStatus.remove();
+  }
+  if (successMessage) {
+    successMessage.remove();
   }
 }
 
 export function populateCheckoutFoot() {
-  clearCheckoutFoot();
+  resetCheckoutFootBtn();
   const foot = document.querySelector('.checkout .checkout-foot');
   if (foot) {
     const a = foot.querySelector('a');
@@ -315,15 +319,13 @@ export function populateCheckoutFoot() {
           saveToLocalStorage(form);
           const order = await submitOrder(data);
           if (order) {
-            disableCartEdits();
-            hideCheckoutForm();
-            updateCheckoutTable(order, data);
-            buildPaymentForm(['tip', 'payment']);
-            // await displayOrderObjInfo(orderObj, formData);
-            // await buildSquarePaymentForm();
+            await disableCartEdits();
+            await hideCheckoutForm();
+            await updateCheckoutTable(order, data);
+            await buildPaymentForm(['tip', 'payment']);
             removeScreensaver();
           } else {
-            makeScreensaverError("something went wrong and your order didn't go through. try again?")
+            makeScreensaverError('something went wrong and your order didn\'t go through. try again?');
           }
         }
       });
@@ -345,6 +347,10 @@ export function showCheckout() {
     checkout.setAttribute('aria-expanded', true);
     document.querySelector('body').classList.add('no-scroll');
     window.addEventListener('scroll', noScroll);
+    const form = checkout.querySelector('.checkout-form');
+    if (form) {
+      form.classList.remove('form-hide');
+    }
   }
 }
 
@@ -411,9 +417,11 @@ export default async function decorateCheckout(block) {
     wrapper.append(newForm);
     await buildForm(newForm, ['contact', 'pickup', 'discount']);
     getContactFromLocalStorage(newForm);
+    await setupDiscountField();
   } else {
     await buildForm(form, ['contact', 'pickup', 'discount']);
     getContactFromLocalStorage(form);
+    await setupDiscountField();
   }
   const foot = wrapper.querySelector('.checkout-foot');
   if (!foot) {

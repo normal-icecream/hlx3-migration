@@ -298,6 +298,10 @@ BUTTONS
   letter-spacing: 1px;
 }
 
+.btn.btn-fixed {
+  display: block;
+}
+
 .btn.btn-disable {
   cursor: not-allowed;
   transition: background 0.2s;

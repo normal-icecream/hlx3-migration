@@ -1,20 +1,19 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable brace-style */
 import {
   createEl,
   createSVG,
   fetchCatalog,
-  fetchLabels,
   fetchFormFields,
-  getCurrentStore,
   getHoursOfOperation,
   getOpenStatus,
   loadCSS,
   toClassName,
 } from '../../scripts/scripts.js';
 
-// import {
-//   formatMoney,
-// } from '../square/square.js';
+import {
+  formatMoney,
+} from '../square/square.js';
 
 function toggle(e) {
   const expanded = e.target.getAttribute('aria-expanded');
@@ -26,22 +25,39 @@ function toggle(e) {
 }
 
 function buildLabel(field, option) {
-  const label = createEl('label', {
-    class: `form-${field.type}-option`,
-    for: (option.toString().includes(' ') ? toClassName(option) : option),
-    html: option,
-  });
+  let label;
   const bubble = createEl('span', {
     class: `form-${field.type}-bubble`,
   });
-  const optionEl = createEl('input', {
-    class: `form-${field.type}-default`,
-    id: (option.toString().includes(' ') ? toClassName(option) : option),
-    name: field.title,
-    type: field.type,
-  });
-  optionEl.value = option;
-  label.append(optionEl, bubble);
+  if (field.type.includes('single')) { // single checkbox
+    label = createEl('label', {
+      class: `form-${field.type}-option`,
+      for: (field.label.toString().includes(' ') ? toClassName(field.label) : field.label),
+      html: field.label,
+    });
+    const optionEl = createEl('input', {
+      class: `form-${field.type}-default`,
+      id: (field.label.toString().includes(' ') ? toClassName(field.label) : field.label),
+      name: field.title,
+      type: 'checkbox',
+    });
+    optionEl.value = option;
+    label.append(optionEl, bubble);
+  } else { // all other radios & checkboxes
+    label = createEl('label', {
+      class: `form-${field.type}-option`,
+      for: (option.toString().includes(' ') ? toClassName(option) : option),
+      html: option,
+    });
+    const optionEl = createEl('input', {
+      class: `form-${field.type}-default`,
+      id: (option.toString().includes(' ') ? toClassName(option) : option),
+      name: field.title,
+      type: field.type,
+    });
+    optionEl.value = option;
+    label.append(optionEl, bubble);
+  }
   return label;
 }
 
@@ -229,7 +245,6 @@ export async function buildField(field) {
     fieldEl = createEl('div', {
       class: `form-${field.type}-wrapper`,
     });
-    field.type = 'checkbox';
     const label = buildLabel(field, field.options);
     fieldEl.append(label);
   }
@@ -308,15 +323,6 @@ export async function buildField(field) {
   }
   return fieldEl;
 }
-
-// export function populateOptions(el, data) {
-//   data.forEach((d) => {
-//     const option = createEl('option');
-//     option.value = d.value || d;
-//     option.textContent = d.text || d;
-//     el.append(option);
-//   });
-// }
 
 export function cleanStr(str) {
   if (typeof str === 'string') {
@@ -402,6 +408,20 @@ export function validateForm(form) {
   return false;
 }
 
+export async function validateDiscount(text) {
+  const { discounts } = await fetchCatalog();
+  const match = Object.keys(discounts).find((key) => {
+    if (key.toLowerCase() === text.trim().toLowerCase()) {
+      return key;
+    }
+    return false;
+  });
+  return {
+    name: match,
+    id: discounts[match] ? discounts[match].id : null,
+  };
+}
+
 export function getSubmissionData(form) {
   const fields = form.querySelectorAll('[name]'); // all named fields
   const data = {};
@@ -452,26 +472,114 @@ export function saveToLocalStorage(form) {
   }
 }
 
-function setDefaulTip() {
-  const tip = document.getElementById('tip');
-  const options = tip.querySelectorAll('option');
+function setTipValues(tip, options) {
   options.forEach((option) => {
     if (option.value) {
       const value = option.textContent.match(/[0-9]{1,}/);
       if (value) {
         // eslint-disable-next-line prefer-destructuring
         option.value = value[0];
-        if (value[0] === '20') {
-          option.selected = true;
-          tip.classList.add('form-selected');
-        }
       } else {
         option.value = 0;
       }
-    } else {
-      option.remove();
     }
   });
+}
+
+function updateTipAmount(tip) {
+  const tipEl = document.querySelector('.checkout-foot-tip');
+  const totalEl = document.querySelector('.checkout-foot-total');
+  if (tipEl && totalEl) {
+    const tipPercent = Number(tip.value) * 0.01;
+    const totalAmount = Number(totalEl.getAttribute('data-original-total'));
+    const tipAmount = totalAmount * tipPercent;
+    const newTotal = totalAmount + tipAmount;
+    tipEl.textContent = `$${formatMoney(tipAmount)}`;
+    tipEl.setAttribute('data-total', Math.trunc(tipAmount));
+    totalEl.textContent = `$${formatMoney(newTotal)}`;
+    totalEl.setAttribute('data-total', Math.trunc(newTotal));
+  }
+}
+
+function setDefaulTip(tip, options) {
+  let defaultVal = 0;
+  options.forEach((option) => {
+    if (!option.value) {
+      [defaultVal] = option.textContent.match(/[0-9]{1,}/);
+    } else if (option.value === defaultVal) {
+      option.selected = true;
+      tip.classList.add('form-selected');
+      updateTipAmount(tip);
+    }
+  });
+}
+
+function setupTipField() {
+  const tip = document.getElementById('tip');
+  if (tip) {
+    const options = tip.querySelectorAll('option');
+    if (options) {
+      setTipValues(tip, options);
+      tip.addEventListener('change', (e) => {
+        updateTipAmount(e.target);
+      });
+      setDefaulTip(tip, options);
+    }
+  }
+}
+
+function togglePaymentView(cardView = true) {
+  const giftCardWrapper = document.getElementById('gift-card-container');
+  const giftCardBtn = document.getElementById('gift-card-button');
+  const cardWrapper = document.getElementById('card-container');
+  const cardBtn = document.getElementById('card-button');
+  if (giftCardWrapper && giftCardBtn && cardWrapper && cardBtn) {
+    if (cardView) {
+      // hide gift card, show card
+      giftCardWrapper.classList.remove('payment-hide');
+      giftCardBtn.classList.remove('payment-hide');
+      cardWrapper.classList.add('payment-hide');
+      cardBtn.classList.add('payment-hide');
+    } else {
+      // hide card, show gift card
+      cardWrapper.classList.remove('payment-hide');
+      cardBtn.classList.remove('payment-hide');
+      giftCardWrapper.classList.add('payment-hide');
+      giftCardBtn.classList.add('payment-hide');
+    }
+  }
+}
+
+function setupGiftCardField() {
+  const card = document.getElementById('pay-with-gift-card-');
+  if (card) {
+    togglePaymentView(card.checked);
+    card.addEventListener('change', (e) => {
+      togglePaymentView(e.target.checked);
+    });
+  }
+}
+
+export async function setupDiscountField() {
+  const discount = document.getElementById('discount');
+  if (discount) {
+    discount.addEventListener('input', async (e) => {
+      const match = await validateDiscount(e.target.value);
+      if (match && match.name) {
+        const check = createEl('aside', {
+          class: 'discount-valid',
+          text: '👍',
+          title: 'valid discount!',
+        });
+        discount.after(check);
+        discount.setAttribute('data-discount', match.id);
+      } else {
+        discount.removeAttribute('data-discount');
+        const check = document.querySelector('aside.discount-valid');
+        if (check) { check.remove(); }
+      }
+    });
+  }
 }
 
 export async function buildPaymentForm(categories) {
@@ -524,7 +632,8 @@ export async function buildPaymentForm(categories) {
     console.log(`failed to load module for ${payment}`, err);
   }
   loadCSS('/assets/utils/payment/payment.css');
-  setDefaulTip();
+  setupTipField();
+  setupGiftCardField();
 }
 
 export async function buildSquareForm(form, items) {

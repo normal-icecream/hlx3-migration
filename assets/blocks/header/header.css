@@ -46,6 +46,7 @@ CART
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s;
+  z-index: 8;
 }
 
 .header-wrapper .header-cart:hover,
@@ -72,6 +73,17 @@ CART
   top: 1.7rem;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.header-cart.header-cart-fixed {
+  position: fixed;
+  right: 5%;
+}
+
+@media (min-width: 1336px) { /* investigate this number */
+  .header-cart.header-cart-fixed {
+    right: calc((100% - var(--block-l)) / 2);
+  }
 }
 
 header {

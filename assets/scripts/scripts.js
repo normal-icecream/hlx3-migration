@@ -505,6 +505,21 @@ export async function fetchCatalog() {
   return window.catalog;
 }
 
+export function buildGQs(params) {
+  let qs = '';
+  Object.keys(params).forEach((key) => {
+    if (key in params) {
+      if (key === 'line_items') {
+        qs += `${key}=${encodeURIComponent(JSON.stringify(params[key]))}`;
+      } else {
+        qs += `${key}=${encodeURIComponent(params[key])}`;
+      }
+      qs += '&';
+    }
+  });
+  return qs;
+}
+
 export function buildGScriptLink(id) {
   return `https://script.google.com/macros/s/${id}/exec`;
 }

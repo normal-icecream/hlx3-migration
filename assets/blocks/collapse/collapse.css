@@ -50,12 +50,6 @@ STARBURST
   transform: translate(-50%, -50%) rotate(3deg);
 }
 
-@media (min-width: 1824px) {
-  .collapse-wrapper {
-    /* background: var(--color-red); */
-  }
-}
-
 @media (min-width: 768px) {
   .collapse-wrapper {
     position: absolute;

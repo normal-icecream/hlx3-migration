@@ -67,36 +67,19 @@ TABLE
   color: var(--color-white);
 }
 
-@media (min-width: 464px) {
-  .checkout .checkout-table-body {
-    background: var(--color-green);
-  }
-}
-@media (min-width: 768px) {
-  .checkout .checkout-table-body {
-    background: orange;
-  }
-}
-@media (min-width: 1200px) {
-  .checkout .checkout-table-body {
-    background: var(--color-red);
-  }
-}
-
 .checkout .checkout-table-body tr:not(:last-of-type) {
   border-bottom: 1px solid var(--color-white);
 }
 
-.checkout .checkout-table-body .checkout-table-body-quantity {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.checkout .checkout-table-body .checkout-table-body-quantity > * {
+  margin: var(--pad-s) auto;
 }
 
 @media (min-width: 768px) {
   .checkout .checkout-table-body .checkout-table-body-quantity {
-    flex-direction: row;
-    /* justify-content: space-evenly; */
+    min-width: var(--btn-l);
+    padding-left: var(--pad-l);
+    padding-right: var(--pad-l);
   }
 
   .checkout .checkout-quantity {
@@ -105,6 +88,7 @@ TABLE
 }
 
 .checkout .checkout-btn {
+  display: block;
   height: var(--btn-xxs);
   width: var(--btn-xxs);
   background: var(--color-white);
@@ -114,6 +98,12 @@ TABLE
   line-height: 1.3;
   cursor: pointer;
   transition: transform 0.2s;
+}
+
+@media (min-width: 768px) {
+  .checkout .checkout-btn {
+    display: inline-block;
+  }
 }
 
 .checkout .checkout-btn.checkout-plus:hover,
@@ -131,16 +121,6 @@ TABLE
   transform: scale(1.1);
 }
 
-@media (min-width: 768px) {
-  .checkout .checkout-quantity {
-    order: 2;
-  }
-
-  .checkout .checkout-btn.checkout-plus {
-    order: 3;
-  }
-}
-
 .checkout .checkout-table-body .checkout-table-body-item {
   text-align: left;
   line-height: 1;
@@ -154,10 +134,15 @@ TABLE
   text-align: right;
 }
 
+.checkout .checkout-table-foot .checkout-total-highlight {
+  background: var(--color-yellow-alt);
+}
+
 .checkout .checkout-table-body tr td,
 .checkout .checkout-table-foot tr td {
   padding: var(--pad-l) var(--pad-s);
   border-bottom: 1px solid;
+  line-height: 1;
 }
 
 @media (min-width: 464px) {
@@ -195,6 +180,11 @@ FOOT
   margin-top: var(--pad-xl);
   /* padding: var(--pad-s); */
   padding-bottom: var(--pad-xxl);
+}
+
+.checkout .checkout-foot p {
+  /* color: red; */
+  font-weight: var(--weight-bold);
 }
 
 .checkout .checkout-foot .btn.btn-rect {

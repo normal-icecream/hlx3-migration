@@ -1,13 +1,10 @@
 import {
   createEl,
   createSVG,
+  noScroll,
   readBlockConfig,
   toClassName,
 } from '../../scripts/scripts.js';
-
-import {
-  noScroll,
-} from '../customize/customize.js';
 
 function close(e) {
   const target = e.target.closest('.popup');
@@ -23,6 +20,7 @@ export default function decoratePopup(block) {
   const wrapper = createEl('div', {
     class: 'popup-wrapper',
   });
+  let popupStored = false;
   // set color
   if (config.color) {
     block.classList.add(`popup-${config.color}`);
@@ -39,7 +37,7 @@ export default function decoratePopup(block) {
       class: 'popup-head',
       html: config.head,
     });
-    const popupStored = sessionStorage.getItem(`${toClassName(config.head)} popup`);
+    popupStored = sessionStorage.getItem(`${toClassName(config.head)} popup`);
     block.setAttribute('aria-expanded', !popupStored);
     wrapper.append(head);
   }
@@ -87,6 +85,8 @@ export default function decoratePopup(block) {
   btn.append(closeSvg);
   block.prepend(btn);
   btn.addEventListener('click', close);
-  document.querySelector('body').classList.add('no-scroll');
-  window.addEventListener('scroll', noScroll);
+  if (!popupStored) {
+    document.querySelector('body').classList.add('no-scroll');
+    window.addEventListener('scroll', noScroll);
+  }
 }

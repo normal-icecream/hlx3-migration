@@ -1,7 +1,9 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
 import {
   buildGScriptLink,
+  buildGQs,
   fetchCatalog,
   getCurrentStore,
   toClassName,
@@ -14,7 +16,6 @@ import {
   showCustomize,
 } from '../../blocks/customize/customize.js';
 
-// eslint-disable-next-line import/no-cycle
 import {
   showCheckout,
   updateCheckout,
@@ -23,12 +24,17 @@ import {
 import {
   buildSquareForm,
   getSubmissionData,
+  validateDiscount,
   validateForm,
 } from '../forms/forms.js';
 
 import {
   makeScreensaverError,
 } from '../screensaver/screensaver.js';
+
+import {
+  hidePaymentForm,
+} from '../payment/payment.js';
 
 class Cart {
   constructor(body) {
@@ -37,7 +43,7 @@ class Cart {
 
   line_items = [];
 
-  add = async(vari, mods = []) => {
+  add = async (vari, mods = []) => {
     const li = this.find(vari, mods);
     if (li) {
       li.quantity += 1;
@@ -68,14 +74,14 @@ class Cart {
     return this.line_items.find((li) => fp === li.fp);
   };
 
-  load = async() => {
+  load = async () => {
     const store = getCurrentStore();
     const cartObj = JSON.parse(localStorage.getItem(`cart-${store}`));
     this.line_items = [];
     // cart.shipping_quantities = [];
     if (cartObj && cartObj.line_items) {
       const catalog = await fetchCatalog();
-      cartObj.line_items.forEach(async(li) => {
+      cartObj.line_items.forEach(async (li) => {
         if (catalog.byId[li.variation]) {
           let push = true;
           li.mods.forEach((m) => {
@@ -85,6 +91,13 @@ class Cart {
         }
       });
     }
+  };
+
+  empty = () => {
+    this.line_items = [];
+    // this.shipping_quantities = [];
+    // this.shipping_item = {};
+    this.store();
   };
 
   remove = (fp) => {
@@ -141,143 +154,6 @@ class Cart {
   };
 }
 
-const cart = {
-  line_items: [],
-  shipping_quantities: [],
-  shipping_item: {},
-  remove: (fp) => {
-    const index = cart.line_items.findIndex((li) => fp === li.fp);
-    cart.line_items.splice(index, 1);
-    cart.store();
-  },
-  removeShipping: () => {
-    cart.shipping_item = {};
-  },
-  removeShippingQuantity: (fp) => {
-    const index = cart.shipping_quantities.findIndex((sq) => fp === sq.fp);
-    cart.shipping_quantities.splice(index, 1);
-    cart.store();
-  },
-  add: (variation, mods) => {
-    if (!mods) { mods = []; }
-    const li = cart.find(variation, mods);
-    if (li) {
-      li.quantity++;
-    } else {
-      const fp = variation;
-      const price =
-        catalog.byId[variation].item_variation_data.price_money.amount;
-      mods.forEach((m) => {
-        fp += "-" + m;
-        price += catalog.byId[m].modifier_data.price_money.amount;
-      });
-      cart.line_items.push({
-        fp: fp,
-        variation: variation,
-        mods: mods,
-        quantity: 1,
-        price: price,
-      });
-    }
-    cart.store();
-  },
-  addShipping: (variation, quantity = 1) => {
-    const fp = variation;
-    const price = catalog.byId[variation].item_variation_data.price_money.amount;
-    cart.shipping_item = {
-      fp: fp,
-      variation: variation,
-      mods: [],
-      quantity: quantity,
-      price: price,
-    };
-  },
-  addShippingQuantities: (obj) => {
-    cart.shipping_quantities.push(obj);
-    cart.store();
-  },
-  find: (variation, mods) => {
-    const fp = variation;
-    mods.forEach((m) => {
-      fp += "-" + m;
-    });
-    return cart.line_items.find((li) => fp === li.fp);
-  },
-  setQuantity: (fp, q) => {
-    const index = cart.line_items.findIndex((li) => fp === li.fp);
-    cart.line_items[index].quantity = q;
-    cart.store();
-  },
-  totalAmount: () => {
-    const currentStore = getCurrentStore();
-    const total = 0;
-    cart.line_items.forEach((li) => {
-      if (li.quantity > 0) {
-        total += li.price * li.quantity;
-      }
-    });
-    return total;
-  },
-  totalAmountWithShipping: () => {
-    let total = cart.totalAmount();
-    if (cart.shipping_item.price) {
-      total += (cart.shipping_item.price * cart.shipping_item.quantity);
-    }
-    return total;
-  },
-  totalItems: () => {
-    const total = 0;
-    cart.line_items.forEach((li) => {
-      // don't count out-of-stock
-      if (li.quantity) {
-        total += li.quantity;
-      }
-    });
-    return total;
-  },
-  clear: () => {
-    cart.line_items = [];
-    cart.shipping_quantities = [];
-    cart.shipping_item = {};
-    cart.store();
-  },
-  store: () => {
-    const currentStore = getCurrentStore();
-    const cartObj = {
-      lastUpdate: new Date(),
-      line_items: cart.line_items
-    };
-    if (cart.shipping_quantities && currentStore === "shipping") {
-      cartObj.shipping_quantities = cart.shipping_quantities
-    }
-    localStorage.setItem("cart-" + currentStore, JSON.stringify(cartObj));
-  },
-  load: () => {
-    const cartObj = JSON.parse(localStorage.getItem("cart-" + getLastStore()));
-    cart.line_items = [];
-    cart.shipping_quantities = [];
-
-    if (cartObj && cartObj.line_items) {
-      // validate
-      cartObj.line_items.forEach((li) => {
-        if (catalog.byId[li.variation]) {
-          const push = true;
-          li.mods.forEach((m) => {
-            if (!catalog.byId[m]) { push = false };
-          });
-          if (push) { cart.line_items.push(li) };
-        }
-      });
-    }
-
-    if (cartObj && cartObj.shipping_quantities) {
-      cartObj.shipping_quantities.forEach((sq) => {
-        cart.shipping_quantities.push(sq);
-      });
-    }
-  }
-};
-
 export function formatMoney(num) {
   return Number(num / 100).toFixed(2);
 }
@@ -299,8 +175,8 @@ function writeLabelText(str, vari) {
     text += ' flavor (select 1)';
   } else if (text === 'topping') {
     text += 's (select up to 3';
-  } else if ((vari && vari.includes(' size')) ||
-    (vari && vari.includes(' oz'))) {
+  } else if ((vari && vari.includes(' size'))
+    || (vari && vari.includes(' oz'))) {
     text = 'select a size';
   }
   return text;
@@ -450,8 +326,8 @@ export async function addToCart(e) {
     const obj = catalog.byId[id];
     if (obj.type === 'ITEM') {
       if (
-        obj.item_data.modifier_list_info ||
-        obj.item_data.variations.length > 1
+        obj.item_data.modifier_list_info
+        || obj.item_data.variations.length > 1
       ) {
         configItem(obj);
       } else {
@@ -476,9 +352,11 @@ export function setupCartBtn() {
   updateCartItems();
   const cartBtn = document.querySelector('.header-cart');
   if (cartBtn && typeof cartBtn.onclick !== 'function') {
-    cartBtn.addEventListener('click', async() => {
+    cartBtn.classList.add('header-cart-fixed');
+    cartBtn.addEventListener('click', async () => {
       if (cartBtn.textContent > 0) { // only open carts with items
         await updateCheckout();
+        hidePaymentForm();
         showCheckout();
       }
     });
@@ -490,7 +368,6 @@ export function updateCartItems() {
   if (cartBtn) {
     const amount = cartBtn.querySelector('.header-cart-amount');
     if (amount && window.cart) {
-      console.log('updating cart items:', window.cart.totalItems());
       amount.textContent = window.cart.totalItems();
     }
   }
@@ -501,70 +378,38 @@ function generateId(data) {
   const day = new Date().toString().substring(0, 1); // first char of today's date
   const a = data.name.substring(0, 1); // first char of name
   const b = data.email.match(/@./)[0].replace('@', day); // first char of email domain
-  const c = now.match(/T[0-9]{1,}/)[0].replace('T', a).toUpperCase(); // digits from date
-  const d = now.match(/[0-9]{1,}Z/)[0].replace('Z', b).toUpperCase(); // digits from time
-  const id = `${c}${d}`.replace(/[^0-9a-z]/gi, 'N'); // replace nonalphanumeric with N
+  const c = now.match(/T[0-9]{1,}/)[0].replace('T', a); // digits from date
+  const d = now.match(/[0-9]{1,}Z/)[0].replace('Z', b); // digits from time
+  const e = navigator.userAgent.substring(0, 1); // first chart of user agent
+  const id = `${c}${d}${e}`.toUpperCase().replace(/[^0-9a-z]/gi, 'N'); // replace nonalphanumeric with N
   return id;
 }
 
-function getOrderCredentials(store = getCurrentStore()) {
+export function getOrderCredentials(store = getCurrentStore()) {
   if (store === 'store') {
     window.location_id = '6EXJXZ644ND0E';
     return {
       name: store,
-      endpoint: 'AKfycbxRO3In21tjrjr2kfElmU3g8GyTSy8gkR4-DfnlxTWCMa36gxs-Gp4-C6wybbYdL2_G',
+      endpoint: 'AKfycbzUhTchLex797fGwLdR89pl1lNW3gkyHq8rMtCYiH0rhX_4RXHnO2Mefazuot8_WKRl',
       location: '6EXJXZ644ND0E',
     };
   }
-  // switch (storefront) {
-  //     case "store":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbzPFOTS5HT-Vv1mAYv3ktpZfNhGtRPdHz00Qi9Alw/exec",
-  //         locationId: "6EXJXZ644ND0E"
-  //       };
-  //     case "lab":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbyQ1tQesQanw1Dd13t0c7KLxBRwKTesCfbHJQdHMMvc02aWiLGZ/exec",
-  //         locationId: "3HQZPV73H8BHM"
-  //       };
-  //     case "delivery":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbwXsVa_i4JBUjyH7DyWVizeU3h5Rg5efYTtf4pcF4FXxy6zJOU/exec",
-  //         locationId: "WPBKJEG0HRQ9F"
-  //       };
-  //     case "shipping":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbwyNjfGbBg0MBVfmTaIx4Mi5n-b3SfZ59J8n-YAFVEEXbo84qAM2mxC8gi0d8CXq_br/exec",
-  //         locationId: "WPBKJEG0HRQ9F"
-  //       };
-  //     case "pint-club":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbwFL62Dr7SaWDlq8nezAJbRRxsmN1uSlA_nqkQ6lzmtcBUzFwTn1GO7Jo0wCb1s6rtv/exec",
-  //         locationId: "WPBKJEG0HRQ9F"
-  //       };
-  //     case "merch-pickup":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbxzfw2T-Cx3lJMSK2TXqjhlTg1vjcGkTW5_eufayZGHzRrHkM6rUK5thYgTMbWK56ca/exec",
-  //         locationId: "6EXJXZ644ND0E"
-  //       };
-  //     case "merch-shipping":
-  //       return {
-  //         name: storefront,
-  //         endpoint: "https://script.google.com/macros/s/AKfycbxzfw2T-Cx3lJMSK2TXqjhlTg1vjcGkTW5_eufayZGHzRrHkM6rUK5thYgTMbWK56ca/exec",
-  //         locationId: "WPBKJEG0HRQ9F"
-  //       };
-  //     default:
-  //       console.error(`location ${storefront} is not configured`);
-  //       return {
-  //         name: storefront
-  //       };
-  //   }
+  if (store === 'lab') {
+    window.location_id = '3HQZPV73H8BHM';
+    return {
+      name: store,
+      endpoint: 'AKfycbz_2aLiMbIMciqN-PbhNOClNBsyT2Umt6pWq58anI43WOOcYmFvZmpXU7h_OTv6B-70',
+      location: '3HQZPV73H8BHM',
+    };
+  }
+  if (store === 'shipping') {
+    window.location_id = 'WPBKJEG0HRQ9F';
+    return {
+      name: store,
+      endpoint: 'AKfycbw2EFpwWNEQ7KYvUMkxxOlJUHWCijzrJn_O73s3hyBUJ68yVBzd8337yKRjz84cS8kwJg',
+      location: 'WPBKJEG0HRQ9F',
+    };
+  }
   return false;
 }
 
@@ -579,8 +424,33 @@ async function buildOrderParams(data) {
   if (data.email) {
     params.email_address = data.email;
   }
+  if (data.addr1) {
+    params.address_line_1 = data.addr1;
+  }
+  if (data.addr2) {
+    params.address_line_2 = data.addr2;
+  }
+  if (data.city) {
+    params.city = data.city;
+  }
+  if (data.state) {
+    params.state = data.state;
+  }
+  if (data.zip) {
+    params.postal_code = data.zip;
+  }
   if (data['pickup-time']) {
     params.pickup_at = data['pickup-time'];
+  }
+  if (data['delivery-date']) {
+    params.delivery_at = data['delivery-date'];
+  }
+  if (data.discount) {
+    const valid = await validateDiscount(data.discount.trim().toLowerCase());
+    if (valid.name && valid.id) {
+      params.discount_name = valid.name;
+      params.discount = valid.id;
+    }
   }
   params.reference_id = generateId(data);
   params.line_items = [];
@@ -600,17 +470,7 @@ async function buildOrderParams(data) {
 
 export async function submitOrder(data) {
   const params = await buildOrderParams(data);
-  let qs = '';
-  Object.keys(params).forEach((key) => {
-    if (key in params) {
-      if (key === 'line_items') {
-        qs += `${key}=${encodeURIComponent(JSON.stringify(params[key]))}`;
-      } else {
-        qs += `${key}=${encodeURIComponent(params[key])}`;
-      }
-      qs += '&';
-    }
-  });
+  const qs = buildGQs(params);
   const store = getCurrentStore();
   const cred = getOrderCredentials(store);
   const url = buildGScriptLink(cred.endpoint);

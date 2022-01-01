@@ -89,17 +89,34 @@ RADIO & CHECKBOX
 }
 
 .form-radio-option,
-.form-checkbox-option {
+.form-checkbox-option,
+.form-checkbox-single-option {
   position: relative;
   margin-left: var(--pad-m);
   padding-left: calc(var(--btn-xxs) + var(--pad-m));
-  font-family: 'Poppins';
   text-align: left;
   cursor: pointer;
 }
 
+.form-radio-option,
+.form-checkbox-option {
+  font-family: 'Poppins';
+}
+
+.form-checkbox-single-wrapper .form-checkbox-single-option {
+  font-size: var(--heading-size-s);
+  line-height: 1;
+  transition: letter-spacing 0.2s;
+}
+
+.form-checkbox-single-option:hover,
+.form-checkbox-single-option:focus {
+  letter-spacing: 1px;
+}
+
 .form-radio-default,
-.form-checkbox-default {
+.form-checkbox-default,
+.form-checkbox-single-default {
   position: absolute;
   opacity: 0;
   top: 50%;
@@ -108,7 +125,8 @@ RADIO & CHECKBOX
 }
 
 .form-radio-bubble,
-.form-checkbox-bubble {
+.form-checkbox-bubble,
+.form-checkbox-single-bubble {
   position: absolute;
   top: 50%;
   left: 0;
@@ -120,15 +138,9 @@ RADIO & CHECKBOX
 }
 
 .form-radio-default:checked ~ span,
-.form-checkbox-default:checked ~ span{
+.form-checkbox-default:checked ~ span,
+.form-checkbox-single-default:checked ~ span {
   background: currentColor;
-}
-
-.form-checkbox-single-wrapper label.form-checkbox-option {
-  font-family: acumin-pro-extra-condensed;
-  font-size: var(--heading-size-s);
-  font-weight: var(--weight-bold);
-  line-height: 1;
 }
 
 /* --------------------
@@ -229,4 +241,19 @@ INVALID FIELDS
   99% {
     background: var(--color-white); 
   } 
+}
+
+/* --------------------
+DISCOUNT
+----------------------- */
+.discount-valid {
+  position: relative;
+  height: 0;
+  bottom: 6rem;
+  padding-right: var(--pad-l);
+  font-size: var(--heading-size-s);
+  text-align: right;
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.2s;
 }

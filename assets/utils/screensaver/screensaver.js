@@ -18,12 +18,15 @@ export function makeScreensaverError(error) {
     const message = screen.querySelector('.screensaver-message');
     if (message) {
       message.querySelector('h2').textContent = error;
-      const btn = createEl('btn', {
-        class: 'btn btn-rect screensaver-btn',
-        text: 'refresh the page',
-      });
-      btn.addEventListener('click', () => window.location.reload());
-      message.append(btn);
+      const btn = screen.querySelector('screensaver-btn');
+      if (!btn) {
+        const newBtn = createEl('btn', {
+          class: 'btn btn-rect screensaver-btn',
+          text: 'refresh the page',
+        });
+        newBtn.addEventListener('click', () => window.location.reload());
+        message.append(newBtn);
+      }
     }
   }
 }
