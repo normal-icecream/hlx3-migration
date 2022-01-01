@@ -67,6 +67,23 @@ export function loadCSS(href) {
 }
 
 /**
+ * loads a script by adding a script tag to the head.
+ * @param {string} url URL of the js file
+ * @param {Function} callback callback on load
+ * @param {string} type type attribute of script tag
+ * @returns {Element} script element
+ */
+export function loadScript(url, callback, type) {
+  const head = document.querySelector('head');
+  const props = { src: url };
+  if (type) { props.type = type; }
+  const script = createEl('script', props);
+  head.append(script);
+  script.onload = callback;
+  return script;
+}
+
+/**
  * Retrieves the content of a metadata tag.
  * @param {string} name The metadata name (or property)
  * @returns {string} The metadata value
@@ -75,6 +92,11 @@ export function getMetadata(name) {
   const attr = name && name.includes(':') ? 'property' : 'name';
   const meta = document.head.querySelector(`meta[${attr}="${name}"]`);
   return meta && meta.content;
+}
+
+export function getCurrentStore() {
+  const paths = window.location.pathname.split('/').filter((i) => i);
+  return paths[paths.length - 1].replace(/-/g, ' ');
 }
 
 /**
@@ -375,6 +397,33 @@ function decoratePictures(main) {
   });
 }
 
+export function noScroll() {
+  window.scrollTo(0, 0);
+}
+
+/**
+ * Builds checkout block.
+ * @param {Element} main The container element
+ */
+function buildCheckoutBlock(main) {
+  const checkoutBlock = buildBlock('checkout', {
+    elems: [
+      '<aside class="btn btn-back">',
+      '<div class="checkout-head"><h2>',
+      '<table class="checkout-table"><tbody class="checkout-table-body"><tfoot class="checkout-table-foot">',
+      '<form class="checkout-form">',
+      '<div class="checkout-foot"><a class="btn btn-rect">',
+    ],
+  });
+  checkoutBlock.setAttribute('data-block-name', 'checkout');
+  const wrapper = createEl('div', {
+    class: 'section-wrapper checkout-container',
+  });
+  wrapper.append(checkoutBlock);
+  main.append(wrapper);
+  loadBlock(checkoutBlock);
+}
+
 /**
  * Builds customize block.
  * @param {Element} main The container element
@@ -403,6 +452,116 @@ function classify(main) {
     paths.forEach((path) => {
       main.parentElement.parentElement.classList.add(path);
     });
+  }
+}
+
+/**
+ * Fetchs catalog JSON.
+ * @returns {object}
+ */
+export async function fetchCatalog() {
+  if (!window.catalog) {
+    const resp = await fetch('https://www.normal.club/catalog.json', { cache: 'reload' });
+    if (resp.ok) {
+      const json = await resp.json();
+      const catalog = {
+        byId: {},
+        items: [],
+        categories: [],
+        discounts: {},
+      };
+      json.forEach((e) => {
+        if (!catalog.byId[e.id]) {
+          catalog.byId[e.id] = e;
+        }
+        if (e.type === 'ITEM') {
+          catalog.items.push(e);
+          if (e.item_data.variations) {
+            e.item_data.variations.forEach((v) => {
+              catalog.byId[v.id] = v;
+            });
+          }
+        }
+        if (e.type === 'MODIFIER_LIST') {
+          if (e.modifier_list_data.modifiers) {
+            e.modifier_list_data.modifiers.forEach((m) => {
+              m.modifier_data.modifier_list_id = e.id;
+              catalog.byId[m.id] = m;
+            });
+          }
+        }
+        if (e.type === 'DISCOUNT') {
+          if (e.discount_data.name) {
+            catalog.discounts[e.discount_data.name.toLowerCase()] = { id: e.id };
+          }
+        }
+        if (e.type === 'CATEGORY') {
+          catalog.categories.push(e);
+        }
+      });
+      window.catalog = catalog;
+    }
+  }
+  return window.catalog;
+}
+
+export function buildGQs(params) {
+  let qs = '';
+  Object.keys(params).forEach((key) => {
+    if (key in params) {
+      if (key === 'line_items') {
+        qs += `${key}=${encodeURIComponent(JSON.stringify(params[key]))}`;
+      } else {
+        qs += `${key}=${encodeURIComponent(params[key])}`;
+      }
+      qs += '&';
+    }
+  });
+  return qs;
+}
+
+export function buildGScriptLink(id) {
+  return `https://script.google.com/macros/s/${id}/exec`;
+}
+
+/**
+ * Decorates single Square link.
+ * @param {Element} a Anchor element to be decorated
+ */
+function decorateSquareLink(a) {
+  a.classList.add('btn', 'btn-rect', 'btn-cart');
+  const squarePrefix = 'https://squareup.com/dashboard/items/library/';
+  const giftcardPrefix = 'https://squareup.com/gift/';
+  const href = a.getAttribute('href');
+  if (href.startsWith(squarePrefix)) {
+    const id = href.substr(squarePrefix.length);
+    a.setAttribute('data-id', id);
+    a.removeAttribute('href');
+  } else if (href.includes(giftcardPrefix)) {
+    a.target = '_blank';
+  }
+}
+
+async function squarify(main) {
+  const metaHide = getMetadata('hide');
+  if (!metaHide || !metaHide.includes('cart')) {
+    const squareLink = main.querySelector('a[href^="https://squareup"');
+    if (squareLink) {
+      main.querySelectorAll('a').forEach((a) => {
+        decorateSquareLink(a);
+      });
+    }
+    const square = 'square'; // lost a fight with eslint
+    try {
+      const mod = await import(`/assets/utils/${square}/${square}.js`);
+      if (mod.default) {
+        await mod.default(main, square, document);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(`failed to load module for ${square}`, err);
+    }
+    await loadScript('https://js.squareup.com/v2/paymentform');
   }
 }
 
@@ -435,6 +594,17 @@ function replaceSVGs(main) {
           .split('<')[1]
           .replace('>', '');
         const svgEl = createSVG(name);
+        if (name === 'v') {
+          const title = createEl('title', {
+            text: 'vegan',
+          });
+          svgEl.prepend(title);
+        } else if (name === 'gf') {
+          const title = createEl('title', {
+            text: 'gluten free',
+          });
+          svgEl.prepend(title);
+        }
         if (el.textContent.trim() === svg) {
           el.replaceWith(svgEl);
         }
@@ -465,6 +635,8 @@ function buildAutoBlocks(main) {
     const metaHide = getMetadata('hide');
     if (!metaHide || !metaHide.includes('cart')) {
       buildCustomizeBlock(main);
+      buildCheckoutBlock(main);
+      loadScript('https://web.squarecdn.com/v1/square.js');
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -489,6 +661,7 @@ function removeEmptySections(main) {
 export function decorateMain(main) {
   classify(main);
   loadHeader();
+  squarify(main);
   replaceSVGs(main);
   // forward compatible pictures redecoration
   decoratePictures(main);
@@ -498,7 +671,7 @@ export function decorateMain(main) {
   decorateBlocks(main);
 }
 
-const LCP_BLOCKS = ['index', 'carousel']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['index', 'carousel', 'popup']; // add your LCP blocks to the list
 
 /**
  * loads everything needed to get to LCP.
@@ -528,11 +701,107 @@ async function loadEager(doc) {
   }
 }
 
+export async function fetchLabels() {
+  if (!window.labels) {
+    const resp = await fetch('/_admin/labels.json');
+    if (resp.ok) {
+      let json = await resp.json();
+      if (json.data) {
+        json = json.data; // helix quirk, difference between live and local
+      }
+      const labels = {};
+      json.forEach((label) => {
+        labels[label.key] = label.value;
+      });
+      window.labels = labels;
+    }
+  }
+  return window.labels;
+}
+
+function convertHour(timestamp) {
+  if (timestamp.includes('.')) {
+    // eslint-disable-next-line prefer-const
+    let [hour, minute] = timestamp.split('.');
+    switch (minute) {
+      case '25':
+      case 25:
+        minute = 15;
+        break;
+      case '5':
+      case 5:
+        minute = 30;
+        break;
+      case '75':
+      case 75:
+        minute = 45;
+        break;
+      default:
+        break;
+    }
+    return {
+      hour: parseInt(hour, 10),
+      minute,
+      string: `${hour}${minute}`,
+    };
+  }
+  return {
+    hour: parseInt(timestamp, 10),
+    minute: 0,
+    string: `${parseInt(timestamp, 10) * 100}`,
+  };
+}
+
+export async function getHoursOfOperation() {
+  const labels = await fetchLabels();
+  const store = getCurrentStore();
+  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const timesObj = {};
+  if (!labels[`${store}_onlinehoursopen`] && !labels[`${store}_onlinehoursclose`]) {
+    // always open
+    days.forEach((day) => {
+      timesObj[day] = {
+        open: convertHour('0'),
+        close: convertHour('24'),
+      };
+    });
+  } else {
+    const openHours = labels[`${store}_onlinehoursopen`].split(',').map((o) => o.trim());
+    const closeHours = labels[`${store}_onlinehoursclose`].split(',').map((o) => o.trim());
+    days.forEach((day, i) => {
+      timesObj[day] = {
+        open: convertHour(openHours[i]),
+        close: convertHour(closeHours[i]),
+      };
+    });
+  }
+  return timesObj;
+}
+
+export async function getOpenStatus(day) {
+  const timeObj = await getHoursOfOperation();
+  const now = new Date();
+  const currentTime = `${now.getHours()}${now.getMinutes()}`;
+  const openObj = {};
+  if (currentTime < timeObj[day].open.string) {
+    openObj.open = false;
+    openObj.text = 'before open';
+  } else if (currentTime < timeObj[day].close.string) {
+    openObj.open = true;
+    openObj.text = 'after open, before close';
+  } else {
+    openObj.open = false;
+    openObj.text = 'after close';
+  }
+  return openObj;
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  fetchLabels();
   loadCSS('/assets/styles/lazy-styles.css');
   loadBlocks(main);
   buildAutoBlocks(main);
@@ -572,6 +841,7 @@ function loadDelayed() {
   loadFooter();
   fetchFormFields();
   loadCSS('/assets/utils/forms/forms.css');
+  fetchCatalog();
 }
 
 /**

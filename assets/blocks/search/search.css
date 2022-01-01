@@ -175,6 +175,11 @@
   border-bottom: 1px solid;
 }
 
+.search-results-grid div p a:hover,
+.search-results-grid div p a:focus {
+  border-bottom: 2px solid;
+}
+
 .search-results-grid div h4 + h5 {
   padding-top: 0;
   padding-bottom: var(--pad-m);

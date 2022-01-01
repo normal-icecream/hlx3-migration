@@ -1,6 +1,7 @@
 import {
   createEl,
   createSVG,
+  toClassName,
 } from '../../scripts/scripts.js';
 
 function reorgSlides(carousel, direction) {
@@ -25,7 +26,7 @@ function buildNavBtn(direction) {
   btn.append(arrow);
   btn.addEventListener('click', (e) => {
     e.preventDefault();
-    const carousel = document.querySelector('.carousel > :last-child');
+    const carousel = e.target.closest('.carousel > :last-child');
     const currentPosition = carousel.scrollLeft;
     const slideWidth = carousel.querySelector('.carousel-slide').offsetWidth;
     let carouselWidth = slideWidth * (carousel.childNodes.length - 2); // exclude btns
@@ -86,25 +87,47 @@ export default async function decorateCarousel(block) {
       }
     }
   } else {
+    block.querySelectorAll('img').forEach((img) => {
+      img.setAttribute('height', 160);
+    });
     // setup carousel head
     const head = children[0].firstChild;
     head.classList.add('carousel-head');
+    const title = toClassName(head.textContent);
+    block.classList.add(`${title}-carousel`);
     // setup carousel slides
     children.shift();
     const slides = children.map((child) => child.firstChild);
     // build new carousel
     block.innerHTML = '';
     const wrapper = createEl('div', {
-      class: `carousel-slides carousel-slides-${slides.length <= 3 ? slides.length : 'multi'}`,
+      class: 'carousel-slides',
     });
     slides.forEach((slide) => {
-      slide.classList.add('carousel-slide');
-      wrapper.append(slide);
+      // remove deleted content
+      let deleted = false;
+      slide.querySelectorAll('del').forEach((del) => {
+        if (del.textContent.trim() === del.parentNode.textContent.trim()) {
+          del.parentNode.remove();
+          deleted = true;
+        } else {
+          del.remove();
+          deleted = true;
+        }
+      });
+      // content was deleted and only slide remaining is an image
+      if (deleted && slide.childNodes.length === 1 && slide.querySelector('img')) {
+        slide.remove();
+      } else {
+        slide.classList.add('carousel-slide');
+        wrapper.append(slide);
+      }
     });
+    wrapper.classList.add(`carousel-slides-${wrapper.childNodes.length <= 3 ? wrapper.childNodes.length : 'multi'}`);
     block.append(head, wrapper);
     block.classList.add('carousel-border');
     // build navigation
-    if (slides.length > 1) {
+    if (wrapper.childNodes.length > 1) {
       buildCarouselNav(wrapper);
     }
   }

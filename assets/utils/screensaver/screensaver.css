@@ -1,0 +1,73 @@
+.screensaver {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-white);
+  color: var(--color-blue);
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.2s;
+  z-index: 99;
+} 
+
+.screensaver .screensaver-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.screensaver .screensaver-message h2 {
+  font-size: var(--heading-size-xl);
+}
+
+.screensaver .screensaver-box {
+  display: inline-block;
+  animation: bounceX 6s linear infinite alternate;
+}
+
+.screensaver .screensaver-box svg {
+  height: var(--btn-l);
+  width: var(--btn-l);
+  animation: bounceY 4.5s linear infinite alternate;
+}
+
+/* --------------------
+ERROR
+----------------------- */
+.screensaver.screensaver-error {
+  background: var(--color-red);
+  color: var(--color-white);
+}
+
+.screensaver.screensaver-error .screensaver-message h2 {
+  transform: rotate(-3deg);
+}
+
+.screensaver.screensaver-error .screensaver-message .btn.screensaver-btn {
+  color: var(--color-red);
+}
+
+.screensaver.screensaver-error .screensaver-message .btn.screensaver-btn:hover,
+.screensaver.screensaver-error .screensaver-message .btn.screensaver-btn:focus {
+  background: var(--color-yellow);
+}
+
+.screensaver.screensaver-error .screensaver-box svg {
+  transform: rotate(180deg);
+}
+
+@keyframes bounceX {
+  100% {
+      transform: translateX( calc(100vw - var(--btn-l)) );
+  }
+}
+
+@keyframes bounceY {
+  100% {
+      transform: translateY( calc(100vh - var(--btn-l)) );
+  }
+}

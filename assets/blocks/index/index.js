@@ -3,7 +3,7 @@ import {
   createSVG,
 } from '../../scripts/scripts.js';
 
-function buildTitle(nav) {
+export function buildTitle(nav) {
   const titleBlock = nav.querySelector('h1');
   titleBlock.classList.add('title-wrapper');
   const title = titleBlock.textContent.split('<')[0];
@@ -11,11 +11,10 @@ function buildTitle(nav) {
     class: 'title',
     text: title,
   });
-  const reg = titleBlock.textContent
-    .match(/<[a-zA-z ]{1,}>/)[0]
-    .split('<')[1]
-    .replace('>', '');
-  const svg = createSVG(reg);
+  let svg = titleBlock.querySelector('svg');
+  if (!svg) {
+    svg = createSVG('reg');
+  }
   span.append(svg);
   titleBlock.innerHTML = '';
   titleBlock.append(span);

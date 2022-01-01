@@ -1,0 +1,134 @@
+/* --------------------
+STARBURST
+----------------------- */
+.collapse-wrapper {
+  position: relative;
+  text-align: center;
+  height: var(--btn-xl);
+  width: var(--btn-xl);
+  margin: 0 auto;
+  color: var(--color-blue);
+  transition: transform 0.2s linear;
+  cursor: pointer;
+}
+
+.collapse-wrapper:hover,
+.collapse-wrapper:focus {
+  transform: scale(1.4) rotate(-6deg);
+}
+
+.collapse-wrapper svg.icon-starburst {
+  height: var(--btn-xl);
+  width: var(--btn-xl);
+  fill: var(--color-pink);
+  animation-name: star-spin;
+  animation-duration: 24s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
+}
+
+.collapse-wrapper .starburst-text:hover + *,
+.collapse-wrapper .starburst-text:focus + *,
+.collapse-wrapper .starburst:hover,
+.collapse-wrapper .starburst:focus {
+  animation-duration: 8s;
+}
+
+.collapse-wrapper .starburst-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: var(--btn-l);
+  width: var(--btn-l);
+  padding: var(--pad-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(3deg);
+}
+
+@media (min-width: 768px) {
+  .collapse-wrapper {
+    position: absolute;
+    margin-top: calc((var(--btn-l) / 1.1) * -1);
+    left: 3.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .collapse-wrapper {
+    left: 25rem;
+  }
+}
+
+@media (min-width: 1824px) {
+  .collapse-wrapper {
+    left: 58rem;
+  }
+}
+
+/* --------------------
+CLOSE BUTTON
+----------------------- */
+.collapse .btn.btn-close {
+  background: var(--color-pink);
+}
+
+.collapse .btn.btn-close:hover,
+.collapse .btn.btn-close:focus {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+/* --------------------
+MENU 
+----------------------- */
+.collapse {
+  background: var(--color-pink);
+  color: var(--color-blue);
+  fill: var(--color-white);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--pad-xl);
+  padding: var(--pad-xl) var(--pad-s);
+}
+
+.collapse > div {
+  width: var(--block-xs);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --------------------
+VISIBILITY 
+----------------------- */
+.collapse-btn[aria-expanded=false] {
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.4s;
+}
+
+.collapse-btn[aria-expanded=true] {
+  visibility: hidden;
+  display: none;
+}
+
+.collapse-btn[aria-expanded=false] + div .collapse {
+  visibility: hidden;
+  display: none;
+}
+
+
+@keyframes star-spin {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}

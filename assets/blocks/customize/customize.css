@@ -1,7 +1,6 @@
 .customize-container {
   width: 100%;
   background: var(--color-white);
-
   text-align: center;
   overflow-y: scroll;
 }
@@ -14,6 +13,7 @@
   animation-name: fadeIn;
   animation-timing-function: ease-in;
   animation-duration: 0.2s;
+  z-index: 8;
 }
 
 .customize-container[aria-expanded=true] .customize {
@@ -24,27 +24,14 @@
 /* --------------------
 CLOSE BUTTON
 ----------------------- */
-.customize aside {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: var(--btn-m);
-  width: var(--btn-m);
-  border-radius: 50%;
-  margin-left: auto;
+.customize .btn.btn-close {
   background: var(--color-white);
-  transition: background 0.2s, color 0.2s;
 }
 
-.customize aside:hover,
-.customize aside:focus {
+.customize .btn.btn-close:hover,
+.customize .btn.btn-close:focus {
   background: var(--color-blue);
   color: var(--color-white);
-}
-
-.customize aside svg {
-  height: var(--btn-s);
-  width: var(--btn-s);
 }
 
 /* --------------------
@@ -71,4 +58,9 @@ FOOT
   margin-top: var(--pad-xl);
   padding: var(--pad-s);
   padding-bottom: var(--pad-xxl);
+}
+
+.customize .customize-foot .btn.btn-rect {
+  background: var(--color-blue);
+  color: var(--color-white);
 }
