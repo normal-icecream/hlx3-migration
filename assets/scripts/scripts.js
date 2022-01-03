@@ -184,7 +184,7 @@ function decorateBlocks(main) {
  * @param {string} blockName name of the block
  * @param {any} content two dimensional array or string or object of content
  */
-function buildBlock(blockName, content) {
+export function buildBlock(blockName, content) {
   const table = Array.isArray(content) ? content : [[content]];
   // build image block nested div structure
   const blockEl = createEl('div', {
@@ -505,6 +505,20 @@ export async function fetchCatalog() {
   return window.catalog;
 }
 
+export async function fetchMenu() {
+  if (!window.menu) {
+    const resp = await fetch('/_admin/menu.json');
+    if (resp.ok) {
+      let json = await resp.json();
+      if (json.data) {
+        json = json.data; // helix quirk, difference between live and local
+      }
+      window.menu = json;
+    }
+  }
+  return window.menu;
+}
+
 export function buildGQs(params) {
   let qs = '';
   Object.keys(params).forEach((key) => {
@@ -781,12 +795,12 @@ export async function getHoursOfOperation() {
 export async function getOpenStatus(day) {
   const timeObj = await getHoursOfOperation();
   const now = new Date();
-  const currentTime = `${now.getHours()}${now.getMinutes()}`;
+  const currentTime = Number(`${now.getHours()}${now.getMinutes()}`);
   const openObj = {};
-  if (currentTime < timeObj[day].open.string) {
+  if (currentTime < Number(timeObj[day].open.string)) {
     openObj.open = false;
     openObj.text = 'before open';
-  } else if (currentTime < timeObj[day].close.string) {
+  } else if (currentTime < Number(timeObj[day].close.string)) {
     openObj.open = true;
     openObj.text = 'after open, before close';
   } else {

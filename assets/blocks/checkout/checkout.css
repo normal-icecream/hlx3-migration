@@ -178,12 +178,10 @@ FOOT
 ----------------------- */
 .checkout .checkout-foot {
   margin-top: var(--pad-xl);
-  /* padding: var(--pad-s); */
-  padding-bottom: var(--pad-xxl);
+  padding-bottom: calc(var(--pad-xxl) * 2);
 }
 
 .checkout .checkout-foot p {
-  /* color: red; */
   font-weight: var(--weight-bold);
 }
 

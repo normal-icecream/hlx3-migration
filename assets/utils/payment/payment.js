@@ -20,6 +20,16 @@ import {
   removeScreensaver,
 } from '../screensaver/screensaver.js';
 
+import {
+  getSubmissionData,
+} from '../forms/forms.js';
+
+import {
+  addToShippingSheet,
+  sendEmail,
+  sendText,
+} from '../admin/admin.js';
+
 function getStyles(style) {
   const styles = getComputedStyle(document.body);
   return styles.getPropertyValue(`--${toClassName(style)}`).trim();
@@ -38,6 +48,7 @@ function getData() {
   const tFoot = document.querySelector('.checkout .checkout-table-foot');
   if (tFoot) {
     data.reference_id = tFoot.getAttribute('data-ref');
+    data.order_id = tFoot.getAttribute('data-id');
   }
   return data;
 }
@@ -130,6 +141,7 @@ async function createPayment(token) {
     source_id: token,
     location_id: window.location_id,
     reference_id: data.reference_id,
+    order_id: data.order_id,
   });
   const paymentResponse = await fetch(`${url}?${qs}`, {
     method: 'POST',
@@ -175,14 +187,38 @@ export function hidePaymentForm() {
   }
 }
 
+async function storeSpecificResults(info, results, cart) {
+  const store = getCurrentStore();
+  switch (store) {
+    case 'store':
+      // send text
+      await sendText(`+1${info.cell}`, { confirmation: true });
+      // send email
+      await sendEmail(info, results);
+      break;
+    case 'lab':
+      // send email
+      await sendEmail(info, results);
+      break;
+    case 'shipping':
+      // add to shipping sheet
+      await addToShippingSheet(info, results.payment.receipt_number, cart);
+      // send email
+      await sendEmail(info, results);
+      break;
+    default:
+      break;
+  }
+}
+
 async function displaySuccessMessage(results) {
   const foot = document.querySelector('.checkout .checkout-foot');
   if (foot) {
     const store = getCurrentStore();
-    const labels = await fetchLabels();
     const wrapper = createEl('div', {
       class: 'payment-success-message',
     });
+    const labels = await fetchLabels();
     const message = labels[`${store}_thankyou`].split('\n');
     message.forEach((line) => {
       const p = createEl('p', {
@@ -215,21 +251,19 @@ async function displaySuccessMessage(results) {
 // Helper method for displaying the Payment Status on the screen.
 // status is either SUCCESS or FAILURE;
 async function displayPaymentResults(status, results) {
-  const statusContainer = document.getElementById(
-    'payment-status-container',
-  );
+  const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
+    const customerInfo = getSubmissionData(document.querySelector('form.checkout-form'));
     hidePaymentForm();
-    // send email
-    // send text
-    // empty cart
     await setupCart();
-    window.cart.empty();
-    updateCartItems();
+    await storeSpecificResults(customerInfo, results, window.cart.line_items);
     // display message
     await displaySuccessMessage(results);
+    // empty cart
+    window.cart.empty();
+    updateCartItems();
     removeScreensaver();
   } else {
     statusContainer.classList.remove('is-success');
