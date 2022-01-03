@@ -795,12 +795,12 @@ export async function getHoursOfOperation() {
 export async function getOpenStatus(day) {
   const timeObj = await getHoursOfOperation();
   const now = new Date();
-  const currentTime = `${now.getHours()}${now.getMinutes()}`;
+  const currentTime = Number(`${now.getHours()}${now.getMinutes()}`);
   const openObj = {};
-  if (currentTime < timeObj[day].open.string) {
+  if (currentTime < Number(timeObj[day].open.string)) {
     openObj.open = false;
     openObj.text = 'before open';
-  } else if (currentTime < timeObj[day].close.string) {
+  } else if (currentTime < Number(timeObj[day].close.string)) {
     openObj.open = true;
     openObj.text = 'after open, before close';
   } else {

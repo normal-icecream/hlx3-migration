@@ -26,6 +26,7 @@ import {
 
 import {
   addToShippingSheet,
+  sendEmail,
   sendText,
 } from '../admin/admin.js';
 
@@ -47,6 +48,7 @@ function getData() {
   const tFoot = document.querySelector('.checkout .checkout-table-foot');
   if (tFoot) {
     data.reference_id = tFoot.getAttribute('data-ref');
+    data.order_id = tFoot.getAttribute('data-id');
   }
   return data;
 }
@@ -139,6 +141,7 @@ async function createPayment(token) {
     source_id: token,
     location_id: window.location_id,
     reference_id: data.reference_id,
+    order_id: data.order_id,
   });
   const paymentResponse = await fetch(`${url}?${qs}`, {
     method: 'POST',
@@ -191,14 +194,17 @@ async function storeSpecificResults(info, results, cart) {
       // send text
       await sendText(`+1${info.cell}`, { confirmation: true });
       // send email
+      await sendEmail(info, results);
       break;
     case 'lab':
       // send email
+      await sendEmail(info, results);
       break;
     case 'shipping':
       // add to shipping sheet
       await addToShippingSheet(info, results.payment.receipt_number, cart);
       // send email
+      await sendEmail(info, results);
       break;
     default:
       break;
@@ -251,18 +257,13 @@ async function displayPaymentResults(status, results) {
     statusContainer.classList.add('is-success');
     const customerInfo = getSubmissionData(document.querySelector('form.checkout-form'));
     hidePaymentForm();
-    console.log('results:', results);
-    console.log('customer info:', customerInfo);
-    console.log('cart:', window.cart.line_items);
-    // send email
-    // send text
     await setupCart();
     await storeSpecificResults(customerInfo, results, window.cart.line_items);
+    // display message
+    await displaySuccessMessage(results);
     // empty cart
     window.cart.empty();
     updateCartItems();
-    // display message
-    await displaySuccessMessage(results);
     removeScreensaver();
   } else {
     statusContainer.classList.remove('is-success');

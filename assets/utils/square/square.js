@@ -44,6 +44,7 @@ import {
 import {
   hidePaymentForm,
 } from '../payment/payment.js';
+
 class Cart {
   constructor(body) {
     this.body = body;
@@ -651,7 +652,7 @@ export function getOrderCredentials(store = getCurrentStore()) {
     window.location_id = '6EXJXZ644ND0E';
     return {
       name: store,
-      endpoint: 'AKfycbzUhTchLex797fGwLdR89pl1lNW3gkyHq8rMtCYiH0rhX_4RXHnO2Mefazuot8_WKRl',
+      endpoint: 'AKfycbwJ0dVqTMxEeQzgig0HjEMHnv7qnTEXOkU-Cx34fy2LBP2h25Gv-uddrhfb4EhtuJxs',
       location: '6EXJXZ644ND0E',
     };
   }
@@ -659,7 +660,7 @@ export function getOrderCredentials(store = getCurrentStore()) {
     window.location_id = '3HQZPV73H8BHM';
     return {
       name: store,
-      endpoint: 'AKfycbz_2aLiMbIMciqN-PbhNOClNBsyT2Umt6pWq58anI43WOOcYmFvZmpXU7h_OTv6B-70',
+      endpoint: 'AKfycbzkoBbEjpuGjyC5OOKMSBoYhVJtHr41NJXib2JmvZoCirYCBdWjDUU8KJe836I80Ihk',
       location: '3HQZPV73H8BHM',
     };
   }
@@ -667,7 +668,7 @@ export function getOrderCredentials(store = getCurrentStore()) {
     window.location_id = 'WPBKJEG0HRQ9F';
     return {
       name: store,
-      endpoint: 'AKfycbzyy_MT_0zTLymkVO0cqci1IbKxDdDnvETcCarSLGgowAG69xkKNt4gcmTeyZszo164hg',
+      endpoint: 'AKfycbwvQgotisCVo9XpkhVstWXRonQsUx0zqP2ykikZLyMQuFTl4lIzK2KeKJU_0kgpNy_C7w',
       location: 'WPBKJEG0HRQ9F',
     };
   }
@@ -746,7 +747,6 @@ export async function submitOrder(data) {
   const store = getCurrentStore();
   const cred = getOrderCredentials(store);
   const url = buildGScriptLink(cred.endpoint);
-
   const orderObj = await fetch(`${url}?${qs}`, {
     method: 'GET',
     headers: {

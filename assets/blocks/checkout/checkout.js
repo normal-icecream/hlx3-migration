@@ -205,6 +205,7 @@ function updateCheckoutTable(order) {
   const tFoot = document.querySelector('.checkout .checkout-table-foot');
   if (tFoot) {
     tFoot.setAttribute('data-ref', order.reference_id);
+    tFoot.setAttribute('data-id', order.id);
     // tip
     const tipTR = createEl('tr');
     const tipLabel = createEl('td', {
@@ -320,7 +321,7 @@ export function populateCheckoutFoot() {
         const form = document.querySelector('form.checkout-form');
         const valid = validateForm(form);
         if (valid) {
-          buildScreensaver(`submitting your ${getCurrentStore()} order...`);
+          buildScreensaver(`placing your ${getCurrentStore()} order...`);
           const data = getSubmissionData(form);
           saveToLocalStorage(form);
           const order = await submitOrder(data);

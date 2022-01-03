@@ -188,14 +188,13 @@ async function getPickupDates() {
   const now = today.toString().toLowerCase().substring(0, 3);
   const openStatus = await getOpenStatus(now);
   const pickupDays = [];
-  let i = 1;
   if (openStatus.open || openStatus.text === 'before open') { // BEFORE CLOSE
     pickupDays.push({
       text: 'today',
       value: today.toISOString(),
     });
   }
-  for (i; i < 8; i += 1) {
+  for (let i = 1; i < 8; i += 1) {
     const temp = new Date();
     const next = temp.setDate(today.getDate() + i);
     const nextObj = new Date(next);
