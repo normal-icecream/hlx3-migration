@@ -408,6 +408,35 @@ export function validateForm(form) {
   return false;
 }
 
+export function validateShippingForm(form) {
+  const carousels = form.querySelectorAll('.carousel');
+  let completePacks = 0;
+  const incompletePacks = [];
+  carousels.forEach((carousel) => {
+    const limitHit = carousel.getAttribute('data-limit-hit');
+    if (limitHit) {
+      completePacks += 1;
+    } else {
+      incompletePacks.push(`.${[...carousel.classList].join('.')}`);
+    }
+  });
+  // add invalid class
+  incompletePacks.forEach((selector) => {
+    const incomplete = document.querySelector(selector);
+    const slides = incomplete.querySelector('.carousel-slides');
+    slides.classList.add('invalid-field');
+  });
+  setTimeout(() => {
+    const invalids = document.querySelectorAll('.invalid-field');
+    if (invalids) {
+      invalids.forEach((i) => {
+        i.classList.remove('invalid-field');
+      });
+    }
+  }, 1000); // remove this class after the animation runs
+  return carousels.length === completePacks;
+}
+
 export async function validateDiscount(text) {
   const { discounts } = await fetchCatalog();
   const match = Object.keys(discounts).find((key) => {
@@ -420,6 +449,20 @@ export async function validateDiscount(text) {
     name: match,
     id: discounts[match] ? discounts[match].id : null,
   };
+}
+
+export function getShippingData(form) {
+  const data = {};
+  const id = form.getAttribute('data-id');
+  const name = form.getAttribute('data-name');
+  data[name] = id;
+  const selectedMods = form.querySelectorAll('[data-mod-selected="true"]');
+  selectedMods.forEach((mod) => {
+    const modId = mod.getAttribute('data-mod-id');
+    const modName = mod.getAttribute('data-mod-name');
+    data[modName] = modId;
+  });
+  return data;
 }
 
 export function getSubmissionData(form) {

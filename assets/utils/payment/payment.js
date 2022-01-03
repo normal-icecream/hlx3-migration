@@ -20,6 +20,15 @@ import {
   removeScreensaver,
 } from '../screensaver/screensaver.js';
 
+import {
+  getSubmissionData,
+} from '../forms/forms.js';
+
+import {
+  addToShippingSheet,
+  sendText,
+} from '../admin/admin.js';
+
 function getStyles(style) {
   const styles = getComputedStyle(document.body);
   return styles.getPropertyValue(`--${toClassName(style)}`).trim();
@@ -175,14 +184,35 @@ export function hidePaymentForm() {
   }
 }
 
+async function storeSpecificResults(info, results, cart) {
+  const store = getCurrentStore();
+  switch (store) {
+    case 'store':
+      // send text
+      await sendText(`+1${info.cell}`, { confirmation: true });
+      // send email
+      break;
+    case 'lab':
+      // send email
+      break;
+    case 'shipping':
+      // add to shipping sheet
+      await addToShippingSheet(info, results.payment.receipt_number, cart);
+      // send email
+      break;
+    default:
+      break;
+  }
+}
+
 async function displaySuccessMessage(results) {
   const foot = document.querySelector('.checkout .checkout-foot');
   if (foot) {
     const store = getCurrentStore();
-    const labels = await fetchLabels();
     const wrapper = createEl('div', {
       class: 'payment-success-message',
     });
+    const labels = await fetchLabels();
     const message = labels[`${store}_thankyou`].split('\n');
     message.forEach((line) => {
       const p = createEl('p', {
@@ -215,17 +245,20 @@ async function displaySuccessMessage(results) {
 // Helper method for displaying the Payment Status on the screen.
 // status is either SUCCESS or FAILURE;
 async function displayPaymentResults(status, results) {
-  const statusContainer = document.getElementById(
-    'payment-status-container',
-  );
+  const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
+    const customerInfo = getSubmissionData(document.querySelector('form.checkout-form'));
     hidePaymentForm();
+    console.log('results:', results);
+    console.log('customer info:', customerInfo);
+    console.log('cart:', window.cart.line_items);
     // send email
     // send text
-    // empty cart
     await setupCart();
+    await storeSpecificResults(customerInfo, results, window.cart.line_items);
+    // empty cart
     window.cart.empty();
     updateCartItems();
     // display message

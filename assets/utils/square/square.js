@@ -2,10 +2,15 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-param-reassign */
 import {
+  buildBlock,
   buildGScriptLink,
   buildGQs,
+  createEl,
+  createSVG,
   fetchCatalog,
+  fetchMenu,
   getCurrentStore,
+  loadBlock,
   toClassName,
 } from '../../scripts/scripts.js';
 
@@ -23,19 +28,22 @@ import {
 
 import {
   buildSquareForm,
+  getShippingData,
   getSubmissionData,
   validateDiscount,
   validateForm,
+  validateShippingForm,
 } from '../forms/forms.js';
 
 import {
+  buildScreensaver,
   makeScreensaverError,
+  removeScreensaver,
 } from '../screensaver/screensaver.js';
 
 import {
   hidePaymentForm,
 } from '../payment/payment.js';
-
 class Cart {
   constructor(body) {
     this.body = body;
@@ -64,6 +72,14 @@ class Cart {
       });
     }
     this.store();
+  };
+
+  addShippingModQuantities = (vari, mods, data) => {
+    const li = this.find(vari, mods);
+    if (li) {
+      li.modQuantities = data;
+      this.store();
+    }
   };
 
   find = (vari, mods) => {
@@ -187,7 +203,6 @@ export async function populateSquareBody(item) {
   const body = document.querySelector('.customize .customize-body');
   if (body) {
     const catalog = await fetchCatalog();
-    // const { id } = item;
     const data = item.item_data;
     const { name, variations } = data;
     const label = writeLabelText(name, variations[0].item_variation_data.name);
@@ -263,6 +278,200 @@ export async function populateSquareBody(item) {
   }
 }
 
+function getLimits(id) {
+  const target = document.querySelector(`[data-id="${id}"]`).parentNode.previousElementSibling;
+  const options = target.textContent.replace('select ', '').split(',').map((t) => t.trim());
+  const limits = {};
+  options.forEach((option) => {
+    const limit = Number(option.match(/\d+/)[0]);
+    const text = option.replace(limit, '').trim();
+    limits[text] = limit;
+  });
+  return limits;
+}
+
+function getCarouselSum(carousel) {
+  const allVals = [...carousel.querySelectorAll('.customize-item-quantity')].map((v) => Number(v.textContent));
+  return allVals.reduce((a, b) => a + b);
+}
+
+function validateLimit(limit, carousel) {
+  const sum = getCarouselSum(carousel);
+  return sum < limit;
+}
+
+function updateCounter(carousel) {
+  const counter = carousel.querySelector('.carousel-head-count');
+  counter.textContent = getCarouselSum(carousel);
+}
+
+function customizeBtn(e) {
+  const op = e.target.getAttribute('data-op');
+  const wrapper = e.target.closest('.customize-btn-wrapper');
+  const carousel = e.target.closest('.carousel');
+  const slide = e.target.closest('.carousel-slide');
+  if (op && wrapper && carousel && slide) {
+    const limit = carousel.getAttribute('data-limit');
+    const valid = validateLimit(limit, carousel);
+    if (!valid) {
+      carousel.setAttribute('data-limit-hit', true);
+    } else {
+      carousel.removeAttribute('data-limit-hit');
+    }
+    const currentEl = wrapper.querySelector('.customize-item-quantity');
+    const currentVal = Number(currentEl.textContent);
+    if (op === 'plus' && valid) {
+      currentEl.textContent = currentVal + 1;
+      slide.setAttribute('data-mod-selected', true);
+      updateCounter(carousel);
+      const stillValid = validateLimit(limit, carousel);
+      if (!stillValid) {
+        carousel.setAttribute('data-limit-hit', true);
+      }
+    } else if (op === 'minus' && currentVal > 0) {
+      currentEl.textContent = currentVal - 1;
+      if (currentVal - 1 === 0) {
+        slide.removeAttribute('data-mod-selected');
+      }
+      updateCounter(carousel);
+      carousel.removeAttribute('data-limit-hit');
+    }
+  }
+}
+
+function buildMinus() {
+  const btn = createEl('span', {
+    class: 'customize-btn customize-minus',
+    'data-op': 'minus',
+    text: '-',
+    title: 'remove item from pack',
+  });
+  btn.addEventListener('click', customizeBtn);
+  return btn;
+}
+
+function buildPlus() {
+  const btn = createEl('span', {
+    class: 'customize-btn customize-plus',
+    'data-op': 'plus',
+    text: '+',
+    title: 'add another item to pack',
+  });
+  btn.addEventListener('click', customizeBtn);
+  return btn;
+}
+
+function buildShippingBtns(carousel) {
+  const type = carousel.getAttribute('data-item-type');
+  const slides = carousel.querySelectorAll('.carousel-slide');
+  slides.forEach((slide) => {
+    const id = slide.getAttribute('data-mod-id');
+    const wrapper = createEl('div', {
+      class: 'customize-btn-wrapper',
+      'data-item-type': type,
+    });
+    const minusBtn = buildMinus();
+    const plusBtn = buildPlus();
+    const quantity = createEl('span', {
+      class: 'customize-item-quantity',
+      text: 0,
+      'data-mod-id': id,
+    });
+    wrapper.append(minusBtn, quantity, plusBtn);
+    slide.append(wrapper);
+  });
+}
+
+function buildHeadCounter(carousel, limit) {
+  const head = carousel.querySelector('.carousel-head > div');
+  const counter = createEl('p', {
+    class: 'carousel-head-counter',
+    html: `<span class="carousel-head-count">0</span>/${limit}`,
+  });
+  head.append(counter);
+}
+
+export async function populateShippingBody(item) {
+  clearCustomizeBody();
+  const body = document.querySelector('.customize .customize-body');
+  if (body) {
+    const limits = getLimits(item.id);
+    const catalog = await fetchCatalog();
+    const menu = await fetchMenu();
+    const data = item.item_data;
+    const { name, variations } = data;
+    body.setAttribute('data-name', toClassName(name));
+    body.setAttribute('data-id', variations[0].id);
+    const mods = data.modifier_list_info;
+    mods.forEach(async (mod) => { // loop through pack options
+      const modCat = catalog.byId[mod.modifier_list_id];
+      const modName = modCat.modifier_list_data.name.replace('SHIPPING', '').trim();
+      const modNameSingle = modName.substring(0, modName.length - 1);
+      // build carousel title row
+      const wrapper = createEl('div');
+      const h2 = createEl('div', {
+        html: `<div><h2>select ${limits[modName]} ${modName}</h2></div>`,
+      });
+      wrapper.append(h2);
+      // populate elems for buildBlock
+      const elems = [wrapper.outerHTML];
+      const catMods = modCat.modifier_list_data.modifiers;
+      catMods.forEach((i) => { // loop through option items
+        const iName = i.modifier_data.name;
+        const match = menu.find((m) => {
+          if ((m.name === iName && m.type === modNameSingle) || `${m.name} ${m.type}` === iName) {
+            return m;
+          }
+          return false;
+        });
+        if (match) {
+          // build slide for item
+          const slideWrapper = createEl('div');
+          const slide = createEl('div', {
+            'data-mod-id': i.id,
+            'data-mod-name': toClassName(iName),
+          });
+          const img = createEl('p', {
+            html: `<picture>
+              <img src=${match.image} alt="${match.name} ${match.type}" />
+            </picture>`,
+          });
+          const h3 = createEl('h3', {
+            id: toClassName(match.name),
+            text: match.name,
+          });
+          if (match.allergies) {
+            const allergies = match.allergies.split(',').map((a) => a.trim());
+            allergies.forEach((a) => {
+              const svg = createSVG(a);
+              h3.append(svg);
+            });
+          }
+          slide.append(img, h3);
+          if (match.description) {
+            const p = createEl('p', {
+              text: match.description,
+            });
+            slide.append(p);
+          }
+          slideWrapper.append(slide);
+          elems.push(slideWrapper.outerHTML);
+        }
+      });
+      const block = buildBlock('carousel', { elems });
+      const carousel = block.firstChild.firstChild;
+      carousel.classList.add('carousel', 'block');
+      carousel.setAttribute('data-block-name', 'carousel');
+      carousel.setAttribute('data-item-type', modName);
+      carousel.setAttribute('data-limit', limits[modName]);
+      body.append(carousel);
+      await loadBlock(carousel);
+      buildHeadCounter(carousel, limits[modName]);
+      buildShippingBtns(carousel);
+    });
+  }
+}
+
 export async function addConfigToCart(data) {
   let vari;
   const mods = [];
@@ -287,6 +496,25 @@ export async function addConfigToCart(data) {
   updateCartItems();
 }
 
+async function addShippingConfigToCart(data, form) {
+  await setupCart();
+  const fp = Object.keys(data).map((key) => data[key]);
+  const vari = fp[0];
+  const mods = fp.slice(1);
+  const selectedMods = form.querySelectorAll('[data-mod-selected="true"]');
+  const modData = {};
+  selectedMods.forEach((mod) => {
+    const id = mod.getAttribute('data-mod-id');
+    const name = mod.querySelector('h3').textContent;
+    const quantity = Number(mod.querySelector('.customize-item-quantity').textContent);
+    modData[id] = {
+      name,
+      quantity,
+    };
+  });
+  window.cart.addShippingModQuantities(vari, mods, modData);
+}
+
 export function populateSquareFoot() {
   const foot = document.querySelector('.customize .customize-foot');
   if (foot) {
@@ -298,6 +526,25 @@ export function populateSquareFoot() {
         if (valid) {
           const data = getSubmissionData(form);
           addConfigToCart(data);
+          hideCustomize();
+        }
+      });
+    }
+  }
+}
+
+function populateShippingFoot() {
+  const foot = document.querySelector('.customize .customize-foot');
+  if (foot) {
+    const btn = foot.querySelector('a');
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        const form = document.querySelector('form.customize-body');
+        const valid = validateShippingForm(form);
+        if (valid) {
+          const data = getShippingData(form);
+          await addConfigToCart(data);
+          await addShippingConfigToCart(data, form);
           hideCustomize();
         }
       });
@@ -317,6 +564,18 @@ export async function configItem(item) {
   showCustomize();
 }
 
+export async function configShippingItem(item) {
+  buildScreensaver('prepping your pack options...');
+  const itemName = item.item_data.name.trim();
+  populateCustomizeBasics(`customize your ${removeStoreFromString(itemName)} pack`, {
+    text: 'add to cart',
+  });
+  await populateShippingBody(item);
+  populateShippingFoot();
+  await showCustomize();
+  removeScreensaver();
+}
+
 export async function addToCart(e) {
   const { target } = e;
   const id = target.getAttribute('data-id');
@@ -325,7 +584,9 @@ export async function addToCart(e) {
     const catalog = await fetchCatalog();
     const obj = catalog.byId[id];
     if (obj.type === 'ITEM') {
-      if (
+      if (obj.item_data && obj.item_data.category_id === '5AIFY5WMTNJLS5RBZAPWL4YJ') {
+        configShippingItem(obj);
+      } else if (
         obj.item_data.modifier_list_info
         || obj.item_data.variations.length > 1
       ) {
@@ -406,7 +667,7 @@ export function getOrderCredentials(store = getCurrentStore()) {
     window.location_id = 'WPBKJEG0HRQ9F';
     return {
       name: store,
-      endpoint: 'AKfycbw2EFpwWNEQ7KYvUMkxxOlJUHWCijzrJn_O73s3hyBUJ68yVBzd8337yKRjz84cS8kwJg',
+      endpoint: 'AKfycbzyy_MT_0zTLymkVO0cqci1IbKxDdDnvETcCarSLGgowAG69xkKNt4gcmTeyZszo164hg',
       location: 'WPBKJEG0HRQ9F',
     };
   }
@@ -453,8 +714,9 @@ async function buildOrderParams(data) {
     }
   }
   params.reference_id = generateId(data);
-  params.line_items = [];
 
+  params.line_items = [];
+  params.mod_qs = '';
   await setupCart();
   window.cart.line_items.forEach((li) => {
     const mods = li.mods.map((mod) => ({ catalog_object_id: mod }));
@@ -463,8 +725,18 @@ async function buildOrderParams(data) {
       quantity: li.quantity.toString(),
     };
     if (mods.length) { lineItem.modifiers = mods; }
+    if (li.modQuantities) {
+      Object.keys(li.modQuantities).forEach((id) => {
+        if (li.modQuantities[id].quantity > 1) {
+          params.mod_qs += `${li.modQuantities[id].quantity} ${li.modQuantities[id].name.replace('the ', '')},`;
+        }
+      });
+    }
     params.line_items.push(lineItem);
   });
+  if (params.mod_qs === '') {
+    delete params.mod_qs;
+  }
   return params;
 }
 

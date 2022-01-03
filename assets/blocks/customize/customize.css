@@ -64,3 +64,51 @@ FOOT
   background: var(--color-blue);
   color: var(--color-white);
 }
+
+/* --------------------
+CAROUSEL BUTTONS
+----------------------- */
+.customize .customize-btn-wrapper {
+  /* background: gold; */
+  font-family: acumin-pro-extra-condensed;
+  font-weight: var(--weight-bold);
+  font-size: var(--heading-size-xs);
+}
+.customize .customize-btn-wrapper .customize-btn {
+  display: inline-block;
+  height: var(--btn-xxs);
+  width: var(--btn-xxs);
+  margin: 0 var(--pad-s);
+  background: var(--color-blue);
+  color: var(--color-white);
+  border-radius: 50%;
+  font-family: 'Poppins';
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.customize .carousel[data-limit-hit] .customize-btn-wrapper .customize-btn.customize-plus {
+  background: var(--color-dk-gray);
+  cursor: not-allowed;
+}
+
+.customize .carousel[data-limit-hit] .customize-btn-wrapper .customize-btn.customize-plus:hover,
+.customize .carousel[data-limit-hit] .customize-btn-wrapper .customize-btn.customize-plus:focus {
+  transform: scale(1);
+}
+
+.customize .customize-btn-wrapper .customize-btn.customize-plus:hover,
+.customize .customize-btn-wrapper .customize-btn.customize-plus:focus {
+  background: var(--color-green);
+}
+
+.customize .customize-btn-wrapper .customize-btn.customize-minus:hover,
+.customize .customize-btn-wrapper .customize-btn.customize-minus:focus {
+  background: var(--color-red);
+}
+
+.customize .customize-btn-wrapper .customize-btn:hover,
+.customize .customize-btn-wrapper .customize-btn:focus {
+  transform: scale(1.1);
+}

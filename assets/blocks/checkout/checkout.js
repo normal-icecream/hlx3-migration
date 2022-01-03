@@ -130,17 +130,23 @@ export async function populateCheckoutTable() {
             const variName = vari.item_variation_data.name; // for use with mods
             const itemName = catalog.byId[vari.item_variation_data.item_id].item_data.name;
             const mods = li.mods.map((m) => catalog.byId[m].modifier_data.name);
-            let itemText;
-            if (mods.length >= 1 && (variName === removeStoreFromString(itemName))) {
-              itemText = `${variName}, ${mods.join(', ')}`;
+            // write item description
+            let itemDesc;
+            if (li.modQuantities) { // shipping mod quantities
+              itemDesc = removeStoreFromString(itemName);
+              Object.keys(li.modQuantities).forEach((id) => {
+                itemDesc += `, <span data-mod-id="${id}"data-mod-name="${li.modQuantities[id].name}"data-mod-quantity="${li.modQuantities[id].quantity}">${li.modQuantities[id].name} (×${li.modQuantities[id].quantity})</span>`;
+              });
+            } else if (mods.length >= 1 && (variName === removeStoreFromString(itemName))) {
+              itemDesc = `${variName}, ${mods.join(', ')}`;
             } else if (mods.length >= 1) {
-              itemText = `${variName} ${removeStoreFromString(itemName)}, ${mods.join(', ')}`;
+              itemDesc = `${variName} ${removeStoreFromString(itemName)}, ${mods.join(', ')}`;
             } else {
-              itemText = itemName;
+              itemDesc = itemName;
             }
             const tdi = createEl('td', {
               class: 'checkout-table-body-item',
-              text: itemText,
+              html: itemDesc,
             });
             // price
             const tdp = createEl('td', {
@@ -275,7 +281,7 @@ function hideCheckoutForm() {
 export function resetCheckoutFootBtn() {
   const footDiv = document.querySelector('.checkout .checkout-foot');
   if (footDiv) {
-    // clear foot, replace with order btn
+    // clear foot, replace with or∫der btn
     footDiv.innerHTML = '';
     const a = createEl('a', {
       class: 'btn btn-rect',
@@ -410,16 +416,22 @@ export default async function decorateCheckout(block) {
     wrapper.append(newTable);
   }
   const form = wrapper.querySelector('.checkout-form');
+  const formFields = ['contact', 'discount'];
+  if (store === 'shipping') {
+    formFields.push('address');
+  } else {
+    formFields.push('pickup');
+  }
   if (!form) {
     const newForm = createEl('form', {
       class: 'checkout-form',
     });
     wrapper.append(newForm);
-    await buildForm(newForm, ['contact', 'pickup', 'discount']);
+    await buildForm(newForm, formFields);
     getContactFromLocalStorage(newForm);
     await setupDiscountField();
   } else {
-    await buildForm(form, ['contact', 'pickup', 'discount']);
+    await buildForm(form, formFields);
     getContactFromLocalStorage(form);
     await setupDiscountField();
   }
