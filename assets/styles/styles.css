@@ -90,7 +90,7 @@ html, body {
 }
 
 h1, h2, h3, h4, h5 {
-  font-family: 'Impact', sans-serif;
+  font-family: 'Arial Narrow', sans-serif;
   line-height: 1;
   letter-spacing: 1px;
   padding-top: var(--pad-m);
