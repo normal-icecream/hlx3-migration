@@ -25,6 +25,7 @@ import {
 } from '../forms/forms.js';
 
 import {
+  addToClubSheet,
   addToShippingSheet,
   sendEmail,
   sendText,
@@ -35,7 +36,7 @@ function getStyles(style) {
   return styles.getPropertyValue(`--${toClassName(style)}`).trim();
 }
 
-function getData() {
+function getPaymentData() {
   const data = {};
   const tipEl = document.querySelector('.checkout-foot-tip');
   if (tipEl) {
@@ -50,6 +51,12 @@ function getData() {
     data.reference_id = tFoot.getAttribute('data-ref');
     data.order_id = tFoot.getAttribute('data-id');
   }
+  return data;
+}
+
+function getCardData() {
+  const form = document.querySelector('form.checkout-form');
+  const data = getSubmissionData(form);
   return data;
 }
 
@@ -131,18 +138,30 @@ async function initializeGiftCard(payments) {
 // to the project server code so that a payment can be created with
 // Payments API
 async function createPayment(token) {
-  const store = getCurrentStore();
-  const cred = getOrderCredentials(store);
+  const currentStore = window.cart.current_store;
+  const cred = getOrderCredentials(currentStore);
   const url = buildGScriptLink(cred.endpoint);
-  const data = getData();
-  const qs = buildGQs({
-    order_amount: data.order_amount,
-    tip_amount: data.tip_amount,
+  const params = {
     source_id: token,
     location_id: window.location_id,
-    reference_id: data.reference_id,
-    order_id: data.order_id,
-  });
+  };
+  if (currentStore.pint_type !== 'monthly') {
+    // qs for orders
+    const data = getPaymentData();
+    params.order_amount = data.order_amount;
+    params.tip_amount = data.tip_amount;
+    params.reference_id = data.reference_id;
+    params.order_id = data.order_id;
+  } else {
+    // qs for card
+    const data = getCardData();
+    params.customer_id = currentStore.customer_id;
+    params.method = currentStore.pint_method;
+    params.name = data.name;
+    params.email = data.email;
+    params.cell = data.cell;
+  }
+  const qs = buildGQs(params);
   const paymentResponse = await fetch(`${url}?${qs}`, {
     method: 'POST',
     headers: {
@@ -206,6 +225,10 @@ async function storeSpecificResults(info, results, cart) {
       // send email
       await sendEmail(info, results);
       break;
+    case 'pint club':
+      // add to club sheet
+      await addToClubSheet(info, results, cart);
+      break;
     default:
       break;
   }
@@ -219,7 +242,7 @@ async function displaySuccessMessage(results) {
       class: 'payment-success-message',
     });
     const labels = await fetchLabels();
-    const message = labels[`${store}_thankyou`].split('\n');
+    const message = labels[`${store.replace(/ /g, '-')}_thankyou`].split('\n');
     message.forEach((line) => {
       const p = createEl('p', {
         text: line,
@@ -254,7 +277,13 @@ async function displayPaymentResults(status, results) {
   const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
     statusContainer.classList.remove('is-failure');
-    statusContainer.classList.add('is-success');
+    if (results.result === 'error' || results.subscription) {
+      statusContainer.classList.remove('is-success');
+      statusContainer.classList.add('is-pending');
+    } else {
+      statusContainer.classList.remove('is-pending');
+      statusContainer.classList.add('is-success');
+    }
     const customerInfo = getSubmissionData(document.querySelector('form.checkout-form'));
     hidePaymentForm();
     await setupCart();
@@ -267,6 +296,7 @@ async function displayPaymentResults(status, results) {
     removeScreensaver();
   } else {
     statusContainer.classList.remove('is-success');
+    statusContainer.classList.remove('is-pending');
     statusContainer.classList.add('is-failure');
     removeScreensaver();
   }

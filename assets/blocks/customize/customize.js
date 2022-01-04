@@ -4,15 +4,6 @@ import {
   noScroll,
 } from '../../scripts/scripts.js';
 
-// import {
-//   buildForm,
-//   buildSquareForm,
-// } from '../../utils/forms/forms.js';
-
-// import {
-//   buildShippingCarouselMenu
-// } from '../carousel-menu/carousel-menu.js';
-
 export function showCustomize() {
   const customize = document.querySelector('.customize-container');
   if (customize) {
@@ -60,6 +51,9 @@ export function populateCustomizeBasics(title, btnInfo) {
     h2.textContent = title;
     const a = customize.querySelector('.customize-foot a');
     a.textContent = btnInfo.text;
+    if (btnInfo.data) {
+      a.setAttribute('data-info', btnInfo.data);
+    }
   }
 }
 

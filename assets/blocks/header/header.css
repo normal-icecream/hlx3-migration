@@ -75,6 +75,10 @@ CART
   transform: translateX(-50%);
 }
 
+.header-cart.header-cart-hide {
+  visibility: hidden;
+}
+
 .header-cart.header-cart-fixed {
   position: fixed;
   right: 5%;

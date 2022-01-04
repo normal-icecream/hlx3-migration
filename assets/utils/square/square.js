@@ -52,6 +52,10 @@ class Cart {
 
   line_items = [];
 
+  shipping_item = {};
+
+  current_store = {};
+
   add = async (vari, mods = []) => {
     const li = this.find(vari, mods);
     if (li) {
@@ -75,6 +79,36 @@ class Cart {
     this.store();
   };
 
+  addShipping = async (vari, q) => {
+    const si = this.shipping_item;
+    if (si.fp === vari) {
+      si.quantity += q;
+    } else {
+      const catalog = await fetchCatalog();
+      const fp = vari;
+      const price = catalog.byId[fp].item_variation_data.price_money.amount;
+      this.shipping_item = {
+        fp,
+        variation: vari,
+        mods: [],
+        quantity: q,
+        price,
+      };
+    }
+    this.store();
+  };
+
+  addClubDetails = (vari, data, type) => {
+    const li = this.find(vari);
+    if (li) {
+      li.clubDetails = data;
+      if (type) {
+        li.clubDetails.type = type;
+      }
+      this.store();
+    }
+  };
+
   addShippingModQuantities = (vari, mods, data) => {
     const li = this.find(vari, mods);
     if (li) {
@@ -83,7 +117,23 @@ class Cart {
     }
   };
 
-  find = (vari, mods) => {
+  setShipping = (vari, mods = []) => {
+    const li = this.find(vari, mods);
+    if (li) {
+      li.shipped = true;
+      this.store();
+    }
+  };
+
+  checkShipping = () => {
+    const shipped = this.line_items.find((li) => li.shipped);
+    if (!shipped) {
+      this.removeShipping();
+    }
+    return !!shipped;
+  };
+
+  find = (vari, mods = []) => {
     let fp = vari;
     mods.forEach((mod) => {
       fp += `-${mod}`;
@@ -95,7 +145,7 @@ class Cart {
     const store = getCurrentStore();
     const cartObj = JSON.parse(localStorage.getItem(`cart-${store}`));
     this.line_items = [];
-    // cart.shipping_quantities = [];
+    this.shipping_item = {};
     if (cartObj && cartObj.line_items) {
       const catalog = await fetchCatalog();
       cartObj.line_items.forEach(async (li) => {
@@ -108,18 +158,29 @@ class Cart {
         }
       });
     }
+    if (cartObj && cartObj.shipping_item) {
+      this.shipping_item = cartObj.shipping_item;
+    }
+    if (cartObj && cartObj.current_store) {
+      this.current_store = cartObj.current_store;
+    }
   };
 
   empty = () => {
     this.line_items = [];
-    // this.shipping_quantities = [];
-    // this.shipping_item = {};
+    this.shipping_item = {};
+    this.resetStore();
     this.store();
   };
 
   remove = (fp) => {
     const i = this.line_items.findIndex((li) => fp === li.fp);
     this.line_items.splice(i, 1);
+    this.store();
+  };
+
+  removeShipping = () => {
+    this.shipping_item = {};
     this.store();
   };
 
@@ -133,11 +194,28 @@ class Cart {
     }
   };
 
+  setStore = () => {
+    const store = getCurrentStore();
+    this.current_store = { store };
+  };
+
+  setStoreParams = (params) => {
+    this.current_store = { ...this.current_store, ...params };
+    this.store();
+  };
+
+  resetStore = () => {
+    this.current_store = {};
+    this.setStore();
+  };
+
   store = () => {
     const store = getCurrentStore();
     const cartObj = {
       last_update: new Date(),
       line_items: this.line_items,
+      shipping_item: this.shipping_item,
+      current_store: this.current_store,
     };
     localStorage.setItem(`cart-${store}`, JSON.stringify(cartObj));
   };
@@ -152,6 +230,17 @@ class Cart {
     return total;
   };
 
+  totalAmountShipped = () => {
+    let total = 0;
+    this.line_items.forEach((li) => {
+      if (li.quantity > 0) {
+        total += li.price * li.quantity;
+      }
+    });
+    total += (this.shipping_item.price * this.shipping_item.quantity);
+    return total;
+  };
+
   totalItems = () => {
     let total = 0;
     this.line_items.forEach((li) => {
@@ -159,15 +248,10 @@ class Cart {
         total += li.quantity;
       }
     });
+    if (total < 1) {
+      this.removeShipping();
+    }
     return total;
-    // const total = 0;
-    // cart.line_items.forEach((li) => {
-    //   // don't count out-of-stock
-    //   if (li.quantity) {
-    //     total += li.quantity;
-    //   }
-    // });
-    // return total;
   };
 }
 
@@ -555,8 +639,6 @@ function populateShippingFoot() {
 
 export async function configItem(item) {
   const itemName = item.item_data.name.trim();
-  // const paths = window.location.pathname.split('/').filter((i) => i);
-
   populateCustomizeBasics(`customize your ${removeStoreFromString(itemName)}`, {
     text: 'add to cart',
   });
@@ -585,7 +667,8 @@ export async function addToCart(e) {
     const catalog = await fetchCatalog();
     const obj = catalog.byId[id];
     if (obj.type === 'ITEM') {
-      if (obj.item_data && obj.item_data.category_id === '5AIFY5WMTNJLS5RBZAPWL4YJ') {
+      const SHIPPING_ID = '5AIFY5WMTNJLS5RBZAPWL4YJ';
+      if (obj.item_data && obj.item_data.category_id === SHIPPING_ID) {
         configShippingItem(obj);
       } else if (
         obj.item_data.modifier_list_info
@@ -607,6 +690,7 @@ export async function setupCart() {
   if (!window.cart) {
     window.cart = await new Cart(document.querySelector('main'));
   }
+  window.cart.setStore();
   await window.cart.load();
 }
 
@@ -647,8 +731,8 @@ function generateId(data) {
   return id;
 }
 
-export function getOrderCredentials(store = getCurrentStore()) {
-  if (store === 'store') {
+export function getOrderCredentials(store) {
+  if (store.store === 'store' || store.type === 'store') {
     window.location_id = '6EXJXZ644ND0E';
     return {
       name: store,
@@ -656,7 +740,7 @@ export function getOrderCredentials(store = getCurrentStore()) {
       location: '6EXJXZ644ND0E',
     };
   }
-  if (store === 'lab') {
+  if (store.store === 'lab' || store.type === 'lab') {
     window.location_id = '3HQZPV73H8BHM';
     return {
       name: store,
@@ -664,11 +748,19 @@ export function getOrderCredentials(store = getCurrentStore()) {
       location: '3HQZPV73H8BHM',
     };
   }
-  if (store === 'shipping') {
+  if (store.store === 'shipping' || store.type === 'shipping') {
     window.location_id = 'WPBKJEG0HRQ9F';
     return {
       name: store,
       endpoint: 'AKfycbwvQgotisCVo9XpkhVstWXRonQsUx0zqP2ykikZLyMQuFTl4lIzK2KeKJU_0kgpNy_C7w',
+      location: 'WPBKJEG0HRQ9F',
+    };
+  }
+  if (store.store === 'pint club' && store.pint_type === 'monthly') {
+    window.location_id = 'WPBKJEG0HRQ9F';
+    return {
+      name: store,
+      endpoint: 'AKfycbxQSGSH3hT7vkujzXPVme2EN5Ux_DMczr67svPbcCw8aCcXeE_7TSYdgV5jRixaJEV5', // see admin.js, club
       location: 'WPBKJEG0HRQ9F',
     };
   }
@@ -744,8 +836,7 @@ async function buildOrderParams(data) {
 export async function submitOrder(data) {
   const params = await buildOrderParams(data);
   const qs = buildGQs(params);
-  const store = getCurrentStore();
-  const cred = getOrderCredentials(store);
+  const cred = getOrderCredentials(window.cart.current_store);
   const url = buildGScriptLink(cred.endpoint);
   const orderObj = await fetch(`${url}?${qs}`, {
     method: 'GET',

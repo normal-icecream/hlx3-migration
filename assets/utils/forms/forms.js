@@ -335,12 +335,19 @@ export function cleanStr(str) {
 }
 
 export function validateForm(form) {
-  const required = form.querySelectorAll('[required]');
-  const radios = form.querySelectorAll('[type=radio]');
-  const selects = form.querySelectorAll('select');
+  const hidden = form.querySelectorAll('.form-field-hide');
+  const required = form.querySelectorAll('[required]:not(.form-field-hide)');
+  const radios = form.querySelectorAll('[type=radio]:not(.form-field-hide)');
+  const selects = form.querySelectorAll('select:not(.form-field-hide)');
 
   const invalidFieldsById = []; // inputs and selects go here
   const invalidRadiosByName = [];
+
+  if (hidden) {
+    hidden.forEach((h) => {
+      h.required = false;
+    });
+  }
 
   if (required) {
     required.forEach((f) => {
@@ -491,7 +498,7 @@ export function getSubmissionData(form) {
   return data;
 }
 
-export function getContactFromLocalStorage(form) {
+export function getFromLocalStorage(form) {
   const fieldsToStore = form.querySelectorAll('[data-store="true"]');
   if (fieldsToStore) {
     fieldsToStore.forEach((field) => {

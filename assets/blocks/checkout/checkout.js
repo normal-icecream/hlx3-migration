@@ -20,7 +20,7 @@ import {
 import {
   buildForm,
   buildPaymentForm,
-  getContactFromLocalStorage,
+  getFromLocalStorage,
   getSubmissionData,
   saveToLocalStorage,
   setupDiscountField,
@@ -85,7 +85,7 @@ function buildPlus() {
   return btn;
 }
 
-function disableCartEdits() {
+export function disableCartEdits() {
   const cartBtns = document.querySelectorAll('.checkout-btn');
   if (cartBtns) {
     cartBtns.forEach((btn) => {
@@ -123,8 +123,10 @@ export async function populateCheckoutTable() {
               class: 'checkout-table-body-quantity',
               html: `<span class="checkout-quantity">${li.quantity}</span>`,
             });
-            tdq.prepend(plus);
-            tdq.append(minus);
+            if (getCurrentStore() !== 'pint club') {
+              tdq.prepend(plus);
+              tdq.append(minus);
+            }
             // item
             const vari = catalog.byId[li.variation];
             const variName = vari.item_variation_data.name; // for use with mods
@@ -132,7 +134,63 @@ export async function populateCheckoutTable() {
             const mods = li.mods.map((m) => catalog.byId[m].modifier_data.name);
             // write item description
             let itemDesc;
-            if (li.modQuantities) { // shipping mod quantities
+            if (li.clubDetails) { // pint club details
+              const d = li.clubDetails;
+              itemDesc = `<span data-type="${d.type}">${d.type}</span>`;
+              if (d['customize-pints']) {
+                itemDesc = '';
+                d['customize-pints'].forEach((p) => {
+                  itemDesc += `${p}, `;
+                });
+                itemDesc = itemDesc.substring(0, itemDesc.length - 2);
+                itemDesc += ` <span data-customize="${d['customize-pints'].join(',')}">
+                  ${itemName}
+                </span>`;
+              } else {
+                itemDesc += ` ${itemName}`;
+              }
+              if (d.method) {
+                itemDesc += ` <span data-method="${d.method}">${d.method}`;
+              }
+              if (!d['gift-option'] && d.method === 'shipping') {
+                itemDesc += ` to <span 
+                data-addr1="${d.addr1}" 
+                data-addr2="${d.addr2 || ''}" 
+                data-city="${d.city}" 
+                data-state="${d.state}" 
+                data-zip="${d.zip}">
+                  ${d.addr1}
+                </span>`;
+              }
+              if (d['gift-option'] && d.method === 'pickup') {
+                itemDesc += ` gift for <span 
+                  data-recipient-name="${d['recipient-name']}" 
+                  data-recipient-email="${d['recipient-email']}" 
+                  data-recipient-cell="${d['recipient-cell']}">
+                    ${d['recipient-name']}
+                  </span>`;
+              } else if (d['gift-option'] && d.method === 'shipping') {
+                itemDesc += ` gift for <span 
+                  data-recipient-name="${d['recipient-name']}" 
+                  data-recipient-email="${d['recipient-email']}" 
+                  data-recipient-cell="${d['recipient-cell']}">
+                    ${d['recipient-name']}
+                  </span> at <span 
+                    data-addr1="${d.addr1}" 
+                    data-addr2="${d.addr2 || ''}" 
+                    data-city="${d.city}" 
+                    data-state="${d.state}" 
+                    data-zip="${d.zip}">
+                      ${d.addr1}
+                    </span>`;
+              }
+              if (d['prepay-months']) {
+                itemDesc += `, <span data-term="${d['prepay-months']}">${d['prepay-months']}</span> months`;
+              }
+              if (d.allergies) {
+                itemDesc += ` (<span data-allergy="${d.allergies}">${d.allergies} allergy</span>)`;
+              }
+            } else if (li.modQuantities) { // shipping mod quantities
               itemDesc = removeStoreFromString(itemName);
               Object.keys(li.modQuantities).forEach((id) => {
                 itemDesc += `, <span data-mod-id="${id}"data-mod-name="${li.modQuantities[id].name}"data-mod-quantity="${li.modQuantities[id].quantity}">${li.modQuantities[id].name} (×${li.modQuantities[id].quantity})</span>`;
@@ -157,6 +215,28 @@ export async function populateCheckoutTable() {
             body.append(tr);
           }
         });
+        const isShipped = window.cart.checkShipping();
+        if (isShipped) {
+          const si = window.cart.shipping_item;
+          const tr = createEl('tr', {
+            'data-fp': si.fp,
+          });
+          const tdq = createEl('td', {
+            class: 'checkout-table-shipping-quantity',
+            html: `<span class="checkout-shipping-quantity">${si.quantity}</span>`,
+          });
+          const tdi = createEl('td', {
+            class: 'checkout-table-body-item',
+            html: `${catalog.byId[si.variation].item_variation_data.name} shipping`,
+          });
+          // price
+          const tdp = createEl('td', {
+            class: 'checkout-table-body-price',
+            text: `$${formatMoney(si.price * si.quantity)}`,
+          });
+          tr.append(tdq, tdi, tdp);
+          body.append(tr);
+        }
         // build total row
         const tr = createEl('tr');
         // total label
@@ -165,9 +245,10 @@ export async function populateCheckoutTable() {
           text: 'total',
         });
         // total amount
+        const total = isShipped ? window.cart.totalAmountShipped() : window.cart.totalAmount();
         const tda = createEl('td', {
           class: 'checkout-foot-total',
-          text: `$${formatMoney(window.cart.totalAmount())}`,
+          text: `$${formatMoney(total)}`,
         });
         tr.append(tdt, tda);
         foot.append(tr);
@@ -272,7 +353,7 @@ function showCheckoutForm() {
   }
 }
 
-function hideCheckoutForm() {
+export function hideCheckoutForm() {
   const form = document.querySelector('form.checkout-form');
   if (form) {
     form.classList.add('form-hide');
@@ -282,7 +363,7 @@ function hideCheckoutForm() {
 export function resetCheckoutFootBtn() {
   const footDiv = document.querySelector('.checkout .checkout-foot');
   if (footDiv) {
-    // clear foot, replace with or∫der btn
+    // clear foot, replace with order btn
     footDiv.innerHTML = '';
     const a = createEl('a', {
       class: 'btn btn-rect',
@@ -310,13 +391,13 @@ export function clearCheckoutFoot() {
   }
 }
 
-export function populateCheckoutFoot() {
+export function populateCheckoutFoot(btnText = 'place order') {
   resetCheckoutFootBtn();
   const foot = document.querySelector('.checkout .checkout-foot');
   if (foot) {
     const a = foot.querySelector('a');
     if (a) {
-      a.textContent = 'place order';
+      a.textContent = btnText;
       a.addEventListener('click', async () => {
         const form = document.querySelector('form.checkout-form');
         const valid = validateForm(form);
@@ -429,11 +510,11 @@ export default async function decorateCheckout(block) {
     });
     wrapper.append(newForm);
     await buildForm(newForm, formFields);
-    getContactFromLocalStorage(newForm);
+    getFromLocalStorage(newForm);
     await setupDiscountField();
   } else {
     await buildForm(form, formFields);
-    getContactFromLocalStorage(form);
+    getFromLocalStorage(form);
     await setupDiscountField();
   }
   const foot = wrapper.querySelector('.checkout-foot');

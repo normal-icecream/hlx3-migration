@@ -15,11 +15,13 @@ import {
 function getGId(type) {
   switch (type) {
     case 'email':
-      return 'AKfycbyzcWnp5rgMMP7Wd9TiQVJGp71gKmMn2LJwS9RyngBoO-1xRGWA4OQ_exW1nNufQsGDVA';
+      return 'AKfycbzHfg45o-Uw2_NwYNjfz9jpJc-kf61FIW8fX_V8tKM5kkTy3Bm2usT481WM6lQFv_Hq8g';
     case 'text':
       return 'AKfycbxgG4Ihj7PsSRdemmBYVmp0Q0dQUHHkWwA_TdCqysRT9IBNxGV3mnuXhZNovmun8NA9xA';
     case 'shipping':
       return 'AKfycbzsC2PCET2DvZk9UFG5L591i0nUS_DGrzHSmQoQGCc6tgI5FQ3RQ2AeP_0kJeCD5MOmQQ';
+    case 'club': // see square.js
+      return 'AKfycbxQSGSH3hT7vkujzXPVme2EN5Ux_DMczr67svPbcCw8aCcXeE_7TSYdgV5jRixaJEV5';
     default:
       return false;
   }
@@ -118,6 +120,71 @@ export async function addToShippingSheet(info, receiptNum, cart) {
     notes: note,
   });
   const resp = await fetch(`${url}?${qs}`, { method: 'POST' });
+  if (resp.ok) {
+    const json = await resp.json();
+    if (json['error-text']) {
+      // eslint-disable-next-line no-console
+      console.error(json);
+    }
+  }
+}
+
+export async function createCustomer(data, info) {
+  const id = getGId('club');
+  const url = buildGScriptLink(id);
+  const qs = buildGQs({ ...data, ...info });
+  const resp = await fetch(`${url}?${qs}`, { method: 'POST' });
+  if (resp.ok) {
+    const json = await resp.json();
+    if (json['error-text']) {
+      // eslint-disable-next-line no-console
+      console.error(json);
+      return false;
+    }
+    return { ...json, ...data, ...info };
+  }
+  return false;
+}
+
+function buildClubParams(info, results, cart) {
+  const d = cart[0].clubDetails;
+  const params = { sign_up: true };
+  if (d && info) {
+    params.name = d['gift-option'] ? d['recipient-name'] : info.name;
+    params.email = d['gift-option'] ? d['recipient-email'] : info.email;
+    params.cell = d['gift-option'] ? d['recipient-cell'] : info.cell;
+    if (d.addr2) {
+      params.address = `${d.addr1}, ${d.addr2}, ${d.city}, ${d.state} ${d.zip}`;
+    } else if (d.addr1) {
+      params.address = `${d.addr1}, ${d.city}, ${d.state} ${d.zip}`;
+    }
+    params.method = d.method;
+    params.plan = d['prepay-months'] ? `${d.type} ${d['prepay-months']}` : d.type;
+    if (d['customize-pints']) {
+      params.customize_pints = d['customize-pints'].join(',').replace('®', '');
+    } else {
+      params.customize_pints = 'keep it normal';
+    }
+    if (d.allergies) {
+      params.allergy = d.allergies;
+    }
+    if (d['gift-option']) {
+      params.gift = true;
+      params.notes = `this is a gift from ${info.name} (${info.cell}, ${info.email})`;
+    }
+  }
+  if (results && results.subscription && results.subscription.customer_id) {
+    params.customer_id = results.subscription.customer_id;
+  }
+  return params;
+}
+
+export async function addToClubSheet(info, results, cart) {
+  const id = getGId('club');
+  const url = buildGScriptLink(id);
+  const params = buildClubParams(info, results, cart);
+  const qs = buildGQs(params);
+  const resp = await fetch(`${url}?${qs}`, { method: 'GET' });
   if (resp.ok) {
     const json = await resp.json();
     if (json['error-text']) {

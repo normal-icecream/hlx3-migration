@@ -94,9 +94,26 @@ export function getMetadata(name) {
   return meta && meta.content;
 }
 
+function getLastStore() {
+  const last = localStorage.getItem('normal-lastVisited');
+  return last || 'store'; // default
+}
+
 export function getCurrentStore() {
   const paths = window.location.pathname.split('/').filter((i) => i);
-  return paths[paths.length - 1].replace(/-/g, ' ');
+  if (paths.length) {
+    const path = paths[paths.length - 1].replace(/-/g, ' ');
+    const CONFIGURED_STORES = ['store', 'lab', 'shipping', 'pint club'];
+    if (CONFIGURED_STORES.includes(path)) {
+      return path;
+    }
+  }
+  return getLastStore(); // default
+}
+
+function setLastStore() {
+  const store = getCurrentStore();
+  localStorage.setItem('normal-lastVisited', store);
 }
 
 /**
@@ -856,6 +873,7 @@ function loadDelayed() {
   fetchFormFields();
   loadCSS('/assets/utils/forms/forms.css');
   fetchCatalog();
+  setLastStore();
 }
 
 /**
