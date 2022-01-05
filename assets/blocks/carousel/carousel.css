@@ -113,6 +113,16 @@ DEFAULT CAROUSEL
   color: var(--color-white);
 }
 
+.carousel .carousel-slides .carousel-slide img:hover,
+.carousel .carousel-slides .carousel-slide img:focus {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.carousel .carousel-slides .carousel-slide:nth-child(even) img:hover,
+.carousel .carousel-slides .carousel-slide:nth-child(even) img:focus {
+  transform: scale(1.1) rotate(-3deg);
+}
+
 /* --------------------
 SPECIAL CAROUSEL STYLES
 ----------------------- */

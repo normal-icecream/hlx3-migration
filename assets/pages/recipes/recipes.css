@@ -1,0 +1,40 @@
+html.recipes .section-wrapper.section-wrapper-filled {
+  background: var(--color-blue);
+  color: var(--color-white);
+  fill: var(--color-white);
+  width: var(--block-m);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--pad-xl);
+  padding: var(--pad-xl) var(--pad-s);
+}
+
+html.recipes .section-wrapper.section-wrapper-filled > div {
+  width: var(--block-s);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html.recipes .section-wrapper.section-wrapper-filled h3 {
+  margin-bottom: var(--pad-s);
+}
+
+html.recipes .section-wrapper.section-wrapper-filled h3 + p {
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--pad-s);
+}
+
+html.recipes .section-wrapper.section-wrapper-filled a:not(.btn) {
+  color: var(--color-white);
+}
+
+html.recipes .section-wrapper.section-wrapper-filled ul {
+  margin-bottom: var(--pad-l);
+}
+
+html.recipes .section-wrapper.section-wrapper-filled ol li ,
+html.recipes .section-wrapper.section-wrapper-filled ul li {
+  margin-bottom: var(--pad-xs);
+}

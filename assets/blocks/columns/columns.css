@@ -6,6 +6,11 @@
   text-decoration: none;
 }
 
+.columns > div > div > svg.icon.icon-reg {
+  height: 1rem;
+  width: 0.5rem;
+}
+
 .columns > div {
   display: flex;
   flex-direction: column;

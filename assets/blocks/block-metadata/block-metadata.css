@@ -1,4 +1,11 @@
 /* --------------------
+ALIGNMENT 
+----------------------- */
+[data-block-meta].align-content-bottom > div {
+  align-items: flex-end;
+}
+
+/* --------------------
 BACKGROUND
 ----------------------- */
 [data-block-meta].background-blue {
