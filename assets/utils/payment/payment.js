@@ -206,6 +206,22 @@ export function hidePaymentForm() {
   }
 }
 
+async function displayMerchMessage(type) {
+  const successWrapper = document.querySelector('.checkout .payment-success-message');
+  if (successWrapper) {
+    const labels = await fetchLabels();
+    const p = createEl('p', { // new item
+      text: labels[`merch_${type}`],
+    });
+    const btn = successWrapper.querySelector('.btn.btn-rect');
+    if (btn) {
+      successWrapper.insertBefore(p, btn);
+    } else {
+      successWrapper.append(p);
+    }
+  }
+}
+
 async function storeSpecificResults(info, results, cart) {
   const store = getCurrentStore();
   switch (store) {
@@ -228,6 +244,21 @@ async function storeSpecificResults(info, results, cart) {
     case 'pint club':
       // add to club sheet
       await addToClubSheet(info, results, cart);
+      break;
+    case 'merch':
+      if (info['pickup-time']) { // store-like
+        // send text
+        await sendText(`+1${info.cell}`, { confirmation: true });
+        // send email
+        await sendEmail(info, results);
+        await displayMerchMessage('pickup');
+      } else if (info.addr1) { // shipping-like
+        // add to shipping sheet
+        await addToShippingSheet(info, results.payment.receipt_number, cart);
+        // send email
+        await sendEmail(info, results);
+        await displayMerchMessage('shipped');
+      }
       break;
     default:
       break;
@@ -287,9 +318,9 @@ async function displayPaymentResults(status, results) {
     const customerInfo = getSubmissionData(document.querySelector('form.checkout-form'));
     hidePaymentForm();
     await setupCart();
-    await storeSpecificResults(customerInfo, results, window.cart.line_items);
     // display message
     await displaySuccessMessage(results);
+    await storeSpecificResults(customerInfo, results, window.cart.line_items);
     // empty cart
     window.cart.empty();
     updateCartItems();

@@ -2,6 +2,7 @@ import {
   buildGQs,
   buildGScriptLink,
   getCurrentStore,
+  getMetadata,
 } from '../../scripts/scripts.js';
 
 // function setAuthToken() {
@@ -15,9 +16,9 @@ import {
 function getGId(type) {
   switch (type) {
     case 'email':
-      return 'AKfycbzHfg45o-Uw2_NwYNjfz9jpJc-kf61FIW8fX_V8tKM5kkTy3Bm2usT481WM6lQFv_Hq8g';
+      return 'AKfycbwgQ3cEgPfJvDk_AEhntT-Loedg-LMYStzuNVRtMI9V_K9cdYlntTRpwaefyQq0QYO4KA';
     case 'text':
-      return 'AKfycbxgG4Ihj7PsSRdemmBYVmp0Q0dQUHHkWwA_TdCqysRT9IBNxGV3mnuXhZNovmun8NA9xA';
+      return 'AKfycbyXI3yziD7CX59KHPJpZEXXbmuTDFChok0QC94ToTnUMFPrp5TkatlsDppq4gyuYOdg9w';
     case 'shipping':
       return 'AKfycbzsC2PCET2DvZk9UFG5L591i0nUS_DGrzHSmQoQGCc6tgI5FQ3RQ2AeP_0kJeCD5MOmQQ';
     case 'club': // see square.js
@@ -52,9 +53,16 @@ function buildEmailParams(store, info, results) {
   params.store = store;
   params.order_id = results.payment.receipt_number;
   params.receipt_url = results.payment.receipt_url;
-  if (store === 'store' || store === 'lab') {
+  let merchShip = false;
+  let merchPickup = false;
+  if (store === 'merch') {
+    if (info['merch-ship'] && info['merch-ship'].includes('true')) {
+      merchShip = true;
+    } else { merchPickup = true; }
+  }
+  if (store === 'store' || store === 'lab' || merchPickup) {
     params.pickup_at = info['pickup-time'];
-  } else if (store === 'shipping') {
+  } else if (store === 'shipping' || merchShip) {
     let addrStr = info.addr1;
     if (info.addr2) {
       addrStr += `, ${info.addr2}`;
@@ -100,6 +108,10 @@ function writeCartNote(cart) {
       });
     }
   });
+  const store = getCurrentStore();
+  if (store === 'merch') {
+    note += 'merch order';
+  }
   return note;
 }
 

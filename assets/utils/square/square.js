@@ -79,7 +79,7 @@ class Cart {
     this.store();
   };
 
-  addShipping = async (vari, q) => {
+  addShipping = async (vari, q = 1) => {
     const si = this.shipping_item;
     if (si.fp === vari) {
       si.quantity += q;
@@ -121,6 +121,14 @@ class Cart {
     const li = this.find(vari, mods);
     if (li) {
       li.shipped = true;
+      this.store();
+    }
+  };
+
+  unsetShipping = (vari, mods = []) => {
+    const li = this.find(vari, mods);
+    if (li) {
+      delete li.shipped;
       this.store();
     }
   };
@@ -330,35 +338,37 @@ export async function populateSquareBody(item) {
       fields.push(field);
     }
     const modifiers = data.modifier_list_info;
-    modifiers.forEach((mod) => {
-      const modData = catalog.byId[mod.modifier_list_id].modifier_list_data;
-      const modName = modData.name;
-      const modLabel = writeLabelText(modName);
-      const fieldType = modName.includes('topping') ? 'checkbox' : 'radio';
-      const field = {
-        category: 'square-modifier',
-        label: modLabel,
-        options: [],
-        required: (fieldType === 'radio'),
-        store: false,
-        title: toClassName(modName),
-        type: fieldType,
-      };
-      const modMods = modData.modifiers;
-      modMods.forEach((m) => {
-        const mName = m.modifier_data.name;
-        if (fieldType === 'radio' || (fieldType === 'checkbox' && !mName.startsWith('no '))) {
-          const mId = m.id;
-          const option = {
-            id: mId,
-            name: mName,
-            price: formatMoney(m.modifier_data.price_money.amount),
-          };
-          field.options.push(option);
-        }
+    if (modifiers) {
+      modifiers.forEach((mod) => {
+        const modData = catalog.byId[mod.modifier_list_id].modifier_list_data;
+        const modName = modData.name;
+        const modLabel = writeLabelText(modName);
+        const fieldType = modName.includes('topping') ? 'checkbox' : 'radio';
+        const field = {
+          category: 'square-modifier',
+          label: modLabel,
+          options: [],
+          required: (fieldType === 'radio'),
+          store: false,
+          title: toClassName(modName),
+          type: fieldType,
+        };
+        const modMods = modData.modifiers;
+        modMods.forEach((m) => {
+          const mName = m.modifier_data.name;
+          if (fieldType === 'radio' || (fieldType === 'checkbox' && !mName.startsWith('no '))) {
+            const mId = m.id;
+            const option = {
+              id: mId,
+              name: mName,
+              price: formatMoney(m.modifier_data.price_money.amount),
+            };
+            field.options.push(option);
+          }
+        });
+        fields.push(field);
       });
-      fields.push(field);
-    });
+    }
     await buildSquareForm(body, fields);
   }
 }
@@ -827,6 +837,18 @@ async function buildOrderParams(data) {
     }
     params.line_items.push(lineItem);
   });
+  // add shipping item to line items
+  if (window.cart.checkShipping() && window.cart.shipping_item) {
+    const si = window.cart.shipping_item;
+    const mods = si.mods.map((mod) => ({ catalog_object_id: mod }));
+    const shipItem = {
+      catalog_object_id: si.variation,
+      quantity: si.quantity.toString(),
+    };
+    if (mods.length) { shipItem.modifiers = mods; }
+    params.line_items.push(shipItem);
+  }
+  // if no mod_qs, remove from params
   if (params.mod_qs === '') {
     delete params.mod_qs;
   }

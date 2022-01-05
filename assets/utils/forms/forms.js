@@ -12,8 +12,12 @@ import {
 } from '../../scripts/scripts.js';
 
 import {
-  formatMoney,
+  formatMoney, setupCart,
 } from '../square/square.js';
+
+import {
+  populateCheckoutTable,
+} from '../../blocks/checkout/checkout.js';
 
 function toggle(e) {
   const expanded = e.target.getAttribute('aria-expanded');
@@ -338,7 +342,7 @@ export function validateForm(form) {
   const hidden = form.querySelectorAll('.form-field-hide');
   const required = form.querySelectorAll('[required]:not(.form-field-hide)');
   const radios = form.querySelectorAll('[type=radio]:not(.form-field-hide)');
-  const selects = form.querySelectorAll('select:not(.form-field-hide)');
+  const selects = form.querySelectorAll('select');
 
   const invalidFieldsById = []; // inputs and selects go here
   const invalidRadiosByName = [];
@@ -376,8 +380,11 @@ export function validateForm(form) {
   }
   if (selects) {
     selects.forEach((s) => {
-      if (s.value === '') {
-        invalidFieldsById.push(s.id);
+      // ignore hidden selects
+      if (![...s.parentNode.classList].includes('form-field-hide')) {
+        if (s.value === '') {
+          invalidFieldsById.push(s.id);
+        }
       }
     });
   }
@@ -627,6 +634,69 @@ export async function setupDiscountField() {
         const check = document.querySelector('aside.discount-valid');
         if (check) { check.remove(); }
       }
+    });
+  }
+}
+
+function markItemsAsShipped(lis) {
+  lis.forEach((li) => {
+    window.cart.setShipping(li.variation, li.mods);
+  });
+}
+
+function unmarkItemsAsShipped(lis) {
+  lis.forEach((li) => {
+    window.cart.unsetShipping(li.variation, li.mods);
+  });
+}
+
+async function toggleMerchShipView(checked = true) {
+  const addressInfo = document.querySelectorAll('input[data-category="address"');
+  const pickupInfo = document.querySelectorAll('[name^="pickup"]');
+  await setupCart();
+  const SHIPPING_VARI_ID = 'X3E6SVSEI2JPN3HGOW3LEQVK';
+  if (!checked) {
+    // remove shipping from cart
+    window.cart.removeShipping();
+    unmarkItemsAsShipped(window.cart.line_items);
+    window.cart.setStoreParams({ type: 'store' });
+    // update view
+    await populateCheckoutTable();
+    pickupInfo.forEach((field) => {
+      field.parentNode.classList.remove('form-field-hide');
+      field.required = true;
+    });
+    addressInfo.forEach((field) => {
+      field.classList.add('form-field-hide');
+      field.value = '';
+      field.required = false;
+    });
+  } else {
+    // add shipping to cart
+    await window.cart.addShipping(SHIPPING_VARI_ID);
+    markItemsAsShipped(window.cart.line_items);
+    window.cart.setStoreParams({ type: 'shipping' });
+    // update view
+    await populateCheckoutTable();
+    pickupInfo.forEach((field) => {
+      field.parentNode.classList.add('form-field-hide');
+      field.value = '';
+      field.required = false;
+    });
+    addressInfo.forEach((field) => {
+      field.classList.remove('form-field-hide');
+      if (field.id !== 'addr2') { field.required = true; }
+    });
+    getFromLocalStorage(addressInfo[0].parentElement);
+  }
+}
+
+export function setupMerchShipField() {
+  const merchShip = document.getElementById('get-it-shipped-');
+  if (merchShip) {
+    toggleMerchShipView(merchShip.checked);
+    merchShip.addEventListener('change', async (e) => {
+      toggleMerchShipView(e.target.checked);
     });
   }
 }

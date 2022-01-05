@@ -103,7 +103,7 @@ export function getCurrentStore() {
   const paths = window.location.pathname.split('/').filter((i) => i);
   if (paths.length) {
     const path = paths[paths.length - 1].replace(/-/g, ' ');
-    const CONFIGURED_STORES = ['store', 'lab', 'shipping', 'pint club'];
+    const CONFIGURED_STORES = ['store', 'lab', 'shipping', 'pint club', 'merch', 'abnormal'];
     if (CONFIGURED_STORES.includes(path)) {
       return path;
     }
@@ -597,7 +597,7 @@ async function squarify(main) {
 }
 
 async function pagify(main) {
-  const configured = ['about', 'legal', 'order', 'pint-club'];
+  const configured = ['about', 'legal', 'order', 'pint-club', 'recipes'];
   const paths = window.location.pathname.split('/').filter((i) => i);
   paths.forEach(async (path) => {
     if (configured.includes(path)) {

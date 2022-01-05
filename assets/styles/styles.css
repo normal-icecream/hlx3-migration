@@ -338,6 +338,7 @@ BUTTONS
   justify-content: center;
   height: var(--btn-l);
   width: var(--btn-l);
+  padding: var(--pad-xs);
   border-radius: 50%;
   font-weight: var(--weight-bold);
   line-height: 1;

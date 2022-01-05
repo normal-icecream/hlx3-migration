@@ -82,6 +82,10 @@ html.order.abnormal .title {
   }
 }
 
+html.order.abnormal svg.icon.icon-store {
+  transform: rotate(-3deg);
+}
+
 html.order .section-wrapper:first-of-type svg:not(.icon-close) {
   margin-bottom: var(--pad-xl);
 }

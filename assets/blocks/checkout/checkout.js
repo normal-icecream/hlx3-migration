@@ -24,6 +24,7 @@ import {
   getSubmissionData,
   saveToLocalStorage,
   setupDiscountField,
+  setupMerchShipField,
   validateForm,
 } from '../../utils/forms/forms.js';
 
@@ -227,7 +228,7 @@ export async function populateCheckoutTable() {
           });
           const tdi = createEl('td', {
             class: 'checkout-table-body-item',
-            html: `${catalog.byId[si.variation].item_variation_data.name} shipping`,
+            html: `${catalog.byId[si.variation].item_variation_data.name} shipping + handling`,
           });
           // price
           const tdp = createEl('td', {
@@ -504,6 +505,9 @@ export default async function decorateCheckout(block) {
   } else {
     formFields.push('pickup');
   }
+  if (store === 'merch') {
+    formFields.push('merch-ship', 'address');
+  }
   if (!form) {
     const newForm = createEl('form', {
       class: 'checkout-form',
@@ -512,10 +516,12 @@ export default async function decorateCheckout(block) {
     await buildForm(newForm, formFields);
     getFromLocalStorage(newForm);
     await setupDiscountField();
+    await setupMerchShipField();
   } else {
     await buildForm(form, formFields);
     getFromLocalStorage(form);
     await setupDiscountField();
+    await setupMerchShipField();
   }
   const foot = wrapper.querySelector('.checkout-foot');
   if (!foot) {
