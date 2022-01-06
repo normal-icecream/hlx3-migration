@@ -1,0 +1,211 @@
+/* --------------------
+BUTTON WRAPPER & BUTTONS
+----------------------- */
+.instafeed .instafeed-btn-wrapper > * {
+  display: inline-block;
+  width: 100%;
+  padding: var(--pad-l);
+  border: 1px solid var(--color-blue);
+  background: var(--color-lt-gray);
+  font-family: 'acumin-pro-extra-condensed';
+  font-size: var(--heading-size-xs);
+  font-weight: var(--weight-bold);
+  text-align: center;
+  transition: letter-spacing 0.2s;
+}
+
+@media (min-width: 464px) {
+  .instafeed .instafeed-btn-wrapper > * {
+    width: 50%;
+  }
+}
+
+.instafeed .instafeed-btn-wrapper > *:hover,
+.instafeed .instafeed-btn-wrapper > *:focus {
+  letter-spacing: 1px;
+}
+
+.instafeed .instafeed-btn-wrapper .instafeed-active {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+.instafeed > div:not(.instafeed-btn-wrapper) {
+  visibility: hidden;
+  display: none;
+  width: 100%;
+  padding: var(--pad-l);
+}
+
+.instafeed > div.instafeed-active {
+  visibility: visible;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.instafeed .instafeed-carousel,
+.instafeed .instafeed-feed {
+  border: 1px solid;
+  border-top: 0;
+}
+
+/* --------------------
+CAROUSEL 
+----------------------- */
+.instafeed .instafeed-carousel .instafeed-form {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  font-family: 'acumin-pro-extra-condensed';
+  font-size: var(--heading-size-xs);
+}
+
+.instafeed .instafeed-carousel .instafeed-form input {
+  flex-grow: 2;
+  min-width: 50%;
+  padding: var(--pad-s) var(--pad-l);
+  padding-right: var(--pad-s);
+  border: 1px solid;
+  font-size: var(--heading-size-xs);
+}
+
+@media (min-width: 464px) {
+  .instafeed .instafeed-carousel .instafeed-form input {
+    flex-grow: 1;
+    min-width: 30%;
+  }
+}
+
+.instafeed .instafeed-carousel .instafeed-form input:hover,
+.instafeed .instafeed-carousel .instafeed-form input:focus {
+  font-size: var(--heading-size-xs);
+}
+
+.instafeed .instafeed-carousel .instafeed-form button {
+  padding: var(--pad-s) var(--pad-m);
+  color: var(--color-white);
+  transition: letter-spacing 0.2s;
+}
+
+.instafeed .instafeed-carousel .instafeed-form button:hover,
+.instafeed .instafeed-carousel .instafeed-form button:focus {
+  letter-spacing: 1px;
+}
+
+.instafeed .instafeed-carousel .instafeed-form button.instafeed-form-reorder {
+  background: var(--color-blue);
+}
+
+.instafeed .instafeed-carousel .instafeed-form button.instafeed-form-remove {
+  background: var(--color-red);
+}
+
+@media (min-width: 464px) {
+  .instafeed .instafeed-carousel .instafeed-form button.instafeed-form-reorder span::after {
+    content: 'reorder';
+    padding-left: var(--pad-s);
+  }
+
+  .instafeed .instafeed-carousel .instafeed-form button.instafeed-form-remove span::after {
+    content: 'remove';
+    padding-left: var(--pad-s);
+  }
+}
+
+/* --------------------
+FEED 
+----------------------- */
+.instafeed .instafeed-feed button.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  font-family: 'acumin-pro-extra-condensed';
+  font-size: var(--heading-size-xs);
+  font-weight: var(--weight-bold);
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-add::before {
+  content: '';
+  background-color: var(--color-white);
+  width: 16px;
+  height: 16px;
+  margin-right: var(--pad-s);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM5.70711 4.29289C5.31658 3.90237 4.68342 3.90237 4.29289 4.29289C3.90237 4.68342 3.90237 5.31658 4.29289 5.70711L6.58579 8L4.29289 10.2929C3.90237 10.6834 3.90237 11.3166 4.29289 11.7071C4.68342 12.0976 5.31658 12.0976 5.70711 11.7071L8 9.41421L10.2929 11.7071C10.6834 12.0976 11.3166 12.0976 11.7071 11.7071C12.0976 11.3166 12.0976 10.6834 11.7071 10.2929L9.41421 8L11.7071 5.70711C12.0976 5.31658 12.0976 4.68342 11.7071 4.29289C11.3166 3.90237 10.6834 3.90237 10.2929 4.29289L8 6.58579L5.70711 4.29289Z' fill='black' fill-opacity='0.9'/%3E%3C/svg%3E%0A");
+  mask: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM5.70711 4.29289C5.31658 3.90237 4.68342 3.90237 4.29289 4.29289C3.90237 4.68342 3.90237 5.31658 4.29289 5.70711L6.58579 8L4.29289 10.2929C3.90237 10.6834 3.90237 11.3166 4.29289 11.7071C4.68342 12.0976 5.31658 12.0976 5.70711 11.7071L8 9.41421L10.2929 11.7071C10.6834 12.0976 11.3166 12.0976 11.7071 11.7071C12.0976 11.3166 12.0976 10.6834 11.7071 10.2929L9.41421 8L11.7071 5.70711C12.0976 5.31658 12.0976 4.68342 11.7071 4.29289C11.3166 3.90237 10.6834 3.90237 10.2929 4.29289L8 6.58579L5.70711 4.29289Z' fill='black' fill-opacity='0.9'/%3E%3C/svg%3E%0A");
+  transform: rotate(45deg);
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-add::after {
+  content: 'add to carousel';
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-added {
+  background: var(--color-green);
+  cursor: not-allowed;
+  transition: background 0.2s;
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-added:hover,
+.instafeed .instafeed-feed button.btn.instafeed-added:focus {
+  letter-spacing: unset;
+  background: var(--color-dk-gray);
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-added::before {
+  content: '';
+  background-color: var(--color-white);
+  width: 16px;
+  height: 16px;
+  margin-right: var(--pad-s);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM11.7071 6.70711C12.0968 6.31744 12.0978 5.68597 11.7093 5.29509C11.3208 4.90422 10.6894 4.90128 10.2973 5.28852L11 6C10.2973 5.28852 10.2973 5.28853 10.2973 5.28856L10.2971 5.28866L10.2967 5.28908L10.2951 5.29071L10.2886 5.29714L10.2632 5.32224L10.166 5.41826L9.81199 5.76861C9.51475 6.06294 9.10795 6.46627 8.66977 6.90213C8.11075 7.4582 7.49643 8.07141 6.99329 8.57908L5.70711 7.29289C5.31658 6.90237 4.68342 6.90237 4.29289 7.29289C3.90237 7.68342 3.90237 8.31658 4.29289 8.70711L6.29289 10.7071C6.68342 11.0976 7.31658 11.0976 7.70711 10.7071L11.7071 6.70711Z' fill='black' fill-opacity='0.9'/%3E%3C/svg%3E");
+  mask: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM11.7071 6.70711C12.0968 6.31744 12.0978 5.68597 11.7093 5.29509C11.3208 4.90422 10.6894 4.90128 10.2973 5.28852L11 6C10.2973 5.28852 10.2973 5.28853 10.2973 5.28856L10.2971 5.28866L10.2967 5.28908L10.2951 5.29071L10.2886 5.29714L10.2632 5.32224L10.166 5.41826L9.81199 5.76861C9.51475 6.06294 9.10795 6.46627 8.66977 6.90213C8.11075 7.4582 7.49643 8.07141 6.99329 8.57908L5.70711 7.29289C5.31658 6.90237 4.68342 6.90237 4.29289 7.29289C3.90237 7.68342 3.90237 8.31658 4.29289 8.70711L6.29289 10.7071C6.68342 11.0976 7.31658 11.0976 7.70711 10.7071L11.7071 6.70711Z' fill='black' fill-opacity='0.9'/%3E%3C/svg%3E");
+}
+
+.instafeed .instafeed-feed button.btn.instafeed-added::after {
+  content: 'added to carousel';
+}
+
+/* --------------------
+FIGURE
+----------------------- */
+.instafeed .instafeed-figure {
+  margin-bottom: var(--pad-l);
+  width: 100%;
+}
+
+.instafeed .instafeed-figure:last-child {
+  margin-bottom: 0;
+}
+
+.instafeed .instafeed-figure .instafeed-media {
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .instafeed .instafeed-figure {
+    width: calc((100% / 2) - (var(--pad-l) / 2));
+  }
+
+  .instafeed .instafeed-figure {
+    margin-right: var(--pad-l);
+  }
+  
+  .instafeed .instafeed-figure:nth-child(even) {
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .instafeed .instafeed-figure {
+    width: calc((100% / 3) - (var(--pad-l) / 1.5));
+  }
+  
+  .instafeed .instafeed-figure:nth-child(even) {
+    margin-right: var(--pad-l);
+  }
+
+  .instafeed .instafeed-figure:nth-child(3n) {
+    margin-right: 0;
+  }
+}

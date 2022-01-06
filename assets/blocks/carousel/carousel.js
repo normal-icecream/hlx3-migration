@@ -50,7 +50,7 @@ function buildNavBtn(direction) {
   return btn;
 }
 
-function buildCarouselNav(carousel) {
+export function buildCarouselNav(carousel) {
   const leftBtn = buildNavBtn('left');
   const rightBtn = buildNavBtn('right');
   carousel.prepend(leftBtn, rightBtn);

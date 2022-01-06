@@ -1,0 +1,56 @@
+.auth-container[aria-expanded=true] {
+  visibility: unset;
+  display: unset;
+  animation-name: fadeIn;
+  animation-timing-function: ease-in;
+  animation-duration: 0.2s;
+  z-index: 8;
+}
+
+.auth-container[aria-expanded=true] + * {
+  visibility: hidden !important;
+  display: none !important;
+}
+  
+.auth-container[aria-expanded=true] .auth {
+  margin-top: var(--pad-xl);
+  padding: var(--pad-xl) 0;
+}
+
+.auth-hide {
+  visibility: hidden !important;
+  display: none !important;
+}
+
+.auth .auth-form {
+  margin: 0 auto;
+  border: 1px solid;
+  font-family: 'acumin-pro-extra-condensed';
+  font-size: var(--heading-size-xs);
+}
+
+@media (min-width: 464px) {
+  .auth .auth-form {
+    max-width: var(--block-xs);
+  }
+}
+
+.auth .auth-form input,
+.auth .auth-form button {
+  width: 100%;
+  text-align: center;
+}
+
+.auth .auth-form .auth-btn {
+  padding: var(--pad-m);
+  background: var(--color-blue);
+  color: var(--color-white);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: letter-spacing 0.2s;
+}
+
+.auth .auth-form .auth-btn:hover,
+.auth .auth-form .auth-btn:focus {
+  letter-spacing: 1px;
+}

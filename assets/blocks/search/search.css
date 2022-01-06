@@ -70,16 +70,6 @@
   }
 }
 
-@media (min-width: 1200px) {
-  .search .search-form input {
-    /* flex-grow: 3; */
-  }
-
-  .search .search-form button {
-    /* flex-grow: 1; */
-  }
-}
-
 .search .search-form button:hover,
 .search .search-form button:focus,
 .search-results-grid div h4 a:hover,

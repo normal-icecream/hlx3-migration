@@ -256,6 +256,22 @@ export async function loadBlock(block) {
  * @param {Element} main The container element
  */
 async function loadBlocks(main) {
+  const delayed = ['instafeed', 'messages'];
+  main
+    .querySelectorAll('div.section-wrapper > div > .block')
+    .forEach(async (block) => {
+      const name = block.getAttribute('data-block-name');
+      if (!delayed.includes(name)) {
+        loadBlock(block);
+      }
+    });
+}
+
+/**
+ * Loads JS and CSS for all blocks in a container element.
+ * @param {Element} main The container element
+ */
+async function loadBlocksDelayed(main) {
   main
     .querySelectorAll('div.section-wrapper > div > .block')
     .forEach(async (block) => loadBlock(block));
@@ -416,6 +432,27 @@ function decoratePictures(main) {
 
 export function noScroll() {
   window.scrollTo(0, 0);
+}
+
+/**
+ * Builds auth block.
+ * @param {Element} main The container element
+ */
+function buildAuthBlock(main) {
+  const authBlock = buildBlock('auth', {
+    elems: [
+      '<form class="auth-form">',
+    ],
+  });
+  authBlock.classList.add('block');
+  authBlock.setAttribute('data-block-name', 'auth');
+  const wrapper = createEl('div', {
+    class: 'section-wrapper auth-container',
+  });
+  wrapper.setAttribute('aria-expanded', true);
+  wrapper.append(authBlock);
+  main.insertBefore(wrapper, main.children[1]);
+  loadBlock(authBlock);
 }
 
 /**
@@ -664,10 +701,14 @@ function updateImages(main) {
 function buildAutoBlocks(main) {
   try {
     const metaHide = getMetadata('hide');
+    const metaAuth = getMetadata('auth');
     if (!metaHide || !metaHide.includes('cart')) {
       buildCustomizeBlock(main);
       buildCheckoutBlock(main);
       loadScript('https://web.squarecdn.com/v1/square.js');
+    }
+    if (metaAuth && metaAuth === 'required') {
+      buildAuthBlock(main);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -702,7 +743,7 @@ export function decorateMain(main) {
   decorateBlocks(main);
 }
 
-const LCP_BLOCKS = ['index', 'carousel', 'popup']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['auth', 'index', 'carousel', 'popup']; // add your LCP blocks to the list
 
 /**
  * loads everything needed to get to LCP.
@@ -869,6 +910,7 @@ export async function fetchFormFields() {
  */
 function loadDelayed() {
   // load anything that can be postponed to the latest here
+  loadBlocksDelayed(document.querySelector('main'));
   loadFooter();
   fetchFormFields();
   loadCSS('/assets/utils/forms/forms.css');

@@ -2,19 +2,12 @@ import {
   buildGQs,
   buildGScriptLink,
   getCurrentStore,
-  getMetadata,
 } from '../../scripts/scripts.js';
-
-// function setAuthToken() {
-
-// }
-
-// function getAuthToken() {
-
-// }
 
 function getGId(type) {
   switch (type) {
+    case 'auth':
+      return 'AKfycbxX6iCeru2Y3sS5z-GHT-a3lzsAGLGz_6SbNjdDL1lz2mBKfCfytL8RPTnKtntf7--D';
     case 'email':
       return 'AKfycbwgQ3cEgPfJvDk_AEhntT-Loedg-LMYStzuNVRtMI9V_K9cdYlntTRpwaefyQq0QYO4KA';
     case 'text':
@@ -26,6 +19,50 @@ function getGId(type) {
     default:
       return false;
   }
+}
+
+export async function setAuthToken(data) {
+  const id = getGId('auth');
+  const url = buildGScriptLink(id);
+  const qs = buildGQs(data);
+  const resp = await fetch(`${url}?${qs}`, { method: 'POST' });
+  if (resp.ok) {
+    const json = await resp.json();
+    if (json['error-text']) {
+      // eslint-disable-next-line no-console
+      console.error(json);
+    } else if (json.token) {
+      sessionStorage.setItem('normal-token', json.token);
+      return json.token;
+    }
+  }
+  return false;
+}
+
+export function getAuthToken() {
+  return sessionStorage.getItem('normal-token') || false;
+}
+
+export function removeAuthToken() {
+  sessionStorage.removeItem('normal-token');
+}
+
+export async function checkAuthToken(token) {
+  const id = getGId('auth');
+  const url = buildGScriptLink(id);
+  const qs = buildGQs({ token });
+  const resp = await fetch(`${url}?${qs}`, { method: 'POST' });
+  if (resp.ok) {
+    const json = await resp.json();
+    if (json.result === 'error' || !json.valid) {
+      // eslint-disable-next-line no-console
+      console.error(json);
+      removeAuthToken();
+    } else if (json.result === 'success' && json.valid) {
+      return json.valid;
+    }
+  }
+  return false;
 }
 
 export async function sendText(num, data) {
@@ -151,7 +188,6 @@ export async function createCustomer(data, info) {
     if (json['error-text']) {
       // eslint-disable-next-line no-console
       console.error(json);
-      return false;
     }
     return { ...json, ...data, ...info };
   }
