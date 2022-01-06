@@ -1,3 +1,8 @@
+.contact .contact-head,
+.contact .contact-body p {
+  text-align: center;
+}
+
 .contact .contact-head {
   margin-bottom: var(--pad-l);
 }

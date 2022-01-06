@@ -37,12 +37,12 @@ function buildNav(nav) {
   });
 }
 
-export async function fetchCarousel(url = '/_admin/carousel-builder-tool.json') {
+export async function fetchCarousel() {
   const options = {
     cache: 'no-store',
     headers: { 'Cache-Control': 'no-cache' },
   };
-  const resp = await fetch(url, options);
+  const resp = await fetch('/_admin/carousel-builder-tool.json', options);
   if (resp.ok) {
     delete window.carousel;
     const json = await resp.json();
@@ -80,9 +80,8 @@ export function buildMedia(media, type = 'index') {
   return mediaEl;
 }
 
-async function buildCarousel(el, src) {
-  const { pathname } = new URL(src);
-  const data = await fetchCarousel(pathname);
+async function buildCarousel(el) {
+  const data = await fetchCarousel();
   if (data) {
     const wrapper = createEl('div', {
       class: 'index-carousel-slides',

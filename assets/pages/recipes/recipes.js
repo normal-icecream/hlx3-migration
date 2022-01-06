@@ -1,8 +1,3 @@
-// import {
-//   createEl,
-//   createSVG,
-// } from '../../scripts/scripts.js';
-
 export default async function decorateOrder(main) {
   main.querySelectorAll('.section-wrapper').forEach((wrapper) => {
     const firstEl = wrapper.firstChild.querySelector(':scope > *:first-child');

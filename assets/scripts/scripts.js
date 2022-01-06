@@ -256,22 +256,6 @@ export async function loadBlock(block) {
  * @param {Element} main The container element
  */
 async function loadBlocks(main) {
-  const delayed = ['instafeed', 'messages'];
-  main
-    .querySelectorAll('div.section-wrapper > div > .block')
-    .forEach(async (block) => {
-      const name = block.getAttribute('data-block-name');
-      if (!delayed.includes(name)) {
-        loadBlock(block);
-      }
-    });
-}
-
-/**
- * Loads JS and CSS for all blocks in a container element.
- * @param {Element} main The container element
- */
-async function loadBlocksDelayed(main) {
   main
     .querySelectorAll('div.section-wrapper > div > .block')
     .forEach(async (block) => loadBlock(block));
@@ -910,7 +894,6 @@ export async function fetchFormFields() {
  */
 function loadDelayed() {
   // load anything that can be postponed to the latest here
-  loadBlocksDelayed(document.querySelector('main'));
   loadFooter();
   fetchFormFields();
   loadCSS('/assets/utils/forms/forms.css');
