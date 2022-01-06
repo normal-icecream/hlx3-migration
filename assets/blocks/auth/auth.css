@@ -4,7 +4,6 @@
   animation-name: fadeIn;
   animation-timing-function: ease-in;
   animation-duration: 0.2s;
-  z-index: 8;
 }
 
 .auth-container[aria-expanded=true] + * {

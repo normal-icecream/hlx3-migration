@@ -227,7 +227,7 @@ async function storeSpecificResults(info, results, cart) {
   switch (store) {
     case 'store':
       // send text
-      await sendText(`+1${info.cell}`, { confirmation: true });
+      await sendText({ num: `+1${info.cell}`, store, confirmation: true });
       // send email
       await sendEmail(info, results);
       break;
@@ -248,7 +248,7 @@ async function storeSpecificResults(info, results, cart) {
     case 'merch':
       if (info['pickup-time']) { // store-like
         // send text
-        await sendText(`+1${info.cell}`, { confirmation: true });
+        await sendText({ num: `+1${info.cell}`, store, confirmation: true });
         // send email
         await sendEmail(info, results);
         await displayMerchMessage('pickup');

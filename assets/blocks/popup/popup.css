@@ -10,7 +10,7 @@ main .popup {
   background: var(--color-pink);
   text-align: center;
   overflow-y: scroll;
-  z-index: 10;
+  z-index: 6;
 }
 
 .popup .popup-wrapper {
