@@ -238,7 +238,7 @@ h5 {
 /* --------------------
 CUSTOMIZE & CHECKOUT MENUS
 ----------------------- */
-.customize-container, .checkout-container {
+.customize-container, .checkout-container, .auth-container {
   visibility: hidden;
   display: none;
 }

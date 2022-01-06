@@ -3,6 +3,10 @@ import {
   createSVG,
 } from '../../scripts/scripts.js';
 
+import {
+  buildCarouselNav,
+} from '../carousel/carousel.js';
+
 export function buildTitle(nav) {
   const titleBlock = nav.querySelector('h1');
   titleBlock.classList.add('title-wrapper');
@@ -33,81 +37,80 @@ function buildNav(nav) {
   });
 }
 
-async function buildCarousel(carousel) {
-  carousel.classList.add('index-carousel');
-  const as = carousel.querySelectorAll('a');
-  const { pathname } = new URL(as[0].href);
-  const attr = as[1];
-  const resp = await fetch(pathname);
+export async function fetchCarousel(url = '/_admin/carousel-builder-tool.json') {
+  const options = {
+    cache: 'no-store',
+    headers: { 'Cache-Control': 'no-cache' },
+  };
+  const resp = await fetch(url, options);
   if (resp.ok) {
+    delete window.carousel;
     const json = await resp.json();
     const data = json.data.sort((a, b) => ((a.order > b.order) ? 1 : -1));
-    const wrapper = createEl('div', {
-      class: 'index-carousel-media',
+    window.carousel = data;
+  }
+  return window.carousel;
+}
+
+export function buildMedia(media, type = 'index') {
+  let mediaEl;
+  if (media.type === 'VIDEO') {
+    mediaEl = createEl('video', {
+      class: `${type}-media`,
+      type: 'video/mp4',
     });
-    carousel.innerHTML = '';
-    data.forEach((row) => {
+    mediaEl.playsinline = true;
+    mediaEl.autoplay = true;
+    mediaEl.loop = true;
+    mediaEl.muted = true;
+    const mediaSrc = createEl('source', {
+      src: media.source,
+    });
+    mediaEl.append(mediaSrc);
+  } else {
+    mediaEl = createEl('picture', {
+      class: `${type}-media`,
+    });
+    const mediaSrc = createEl('img', {
+      src: media.source,
+      alt: media.caption ? `${media.caption} | media from instagram` : 'media from instagram',
+    });
+    mediaEl.append(mediaSrc);
+  }
+  return mediaEl;
+}
+
+async function buildCarousel(el, src) {
+  const { pathname } = new URL(src);
+  const data = await fetchCarousel(pathname);
+  if (data) {
+    const wrapper = createEl('div', {
+      class: 'index-carousel-slides',
+    });
+    data.forEach((d) => {
+      const media = buildMedia(d, 'index');
       const a = createEl('a', {
-        href: row.link,
+        class: 'index-carousel-slide carousel-slide',
+        href: d.link,
         target: '_blank',
       });
-      let media;
-      if (row.type === 'VIDEO') {
-        media = createEl('video', {
-          type: 'video/mp4',
-        });
-        media.playsinline = true;
-        media.autoplay = true;
-        media.loop = true;
-        media.muted = true;
-        const postSrc = createEl('source', {
-          src: row.url,
-        });
-        media.append(postSrc);
-      } else {
-        media = createEl('picture');
-        const postSrc = createEl('img', {
-          src: row.url,
-        });
-        media.append(postSrc);
-      }
       a.append(media);
       wrapper.append(a);
     });
-    attr.classList.add('index-carousel-attr');
-    const arrow = createSVG('arrow-right');
-    attr.append(arrow);
-    carousel.append(wrapper, attr);
+    if (data.length > 1) {
+      buildCarouselNav(wrapper);
+    }
+    el.parentNode.replaceChild(wrapper, el);
+    wrapper.parentNode.classList.add('index-carousel-wrapper', 'carousel');
   } else {
-    carousel.innerHTML = '';
-    // eslint-disable-next-line no-console
-    console.warn('could not load carousel media');
+    el.remove();
   }
 }
 
-function buildNavBtn(direction) {
-  const btn = createEl('button', {
-    class: `cnav cnav-${direction}`,
-    title: `scroll ${direction}`,
-  });
-  const arrow = createSVG(`arrow-${direction}`);
-  btn.append(arrow);
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const carousel = document.querySelector('.index-carousel-media');
-    if (direction === 'right') {
-      carousel.scrollLeft += (carousel.offsetWidth / 1.2);
-    } else {
-      carousel.scrollLeft -= (carousel.offsetWidth / 1.2);
-    }
-  });
-  return btn;
-}
-
-function buildCarouselNav(carousel) {
-  const leftBtn = buildNavBtn('left');
-  const rightBtn = buildNavBtn('right');
-  carousel.prepend(leftBtn, rightBtn);
+async function buildCarouselBlock(block) {
+  const [media, attr] = block.querySelectorAll('a');
+  attr.parentNode.remove();
+  await buildCarousel(media.parentNode, media.href);
 }
 
 export default async function decorateIndex(block) {
@@ -118,6 +121,5 @@ export default async function decorateIndex(block) {
   buildTitle(nav);
   buildNav(nav);
   const carousel = block.firstChild.lastChild;
-  await buildCarousel(carousel);
-  buildCarouselNav(carousel);
+  await buildCarouselBlock(carousel);
 }

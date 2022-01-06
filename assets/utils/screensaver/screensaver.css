@@ -49,11 +49,12 @@ ERROR
 
 .screensaver.screensaver-error .screensaver-message .btn.screensaver-btn {
   color: var(--color-red);
+  background: var(--color-yellow);
 }
 
 .screensaver.screensaver-error .screensaver-message .btn.screensaver-btn:hover,
 .screensaver.screensaver-error .screensaver-message .btn.screensaver-btn:focus {
-  background: var(--color-yellow);
+  background: var(--color-yellow-alt);
 }
 
 .screensaver.screensaver-error .screensaver-box svg {

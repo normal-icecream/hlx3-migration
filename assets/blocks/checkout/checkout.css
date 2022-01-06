@@ -6,7 +6,6 @@
 }
 
 .checkout-container[aria-expanded=true] {
-/* .checkout-container { */
   visibility: unset;
   display: unset;
   position: fixed;
@@ -18,7 +17,6 @@
 }
 
 .checkout-container[aria-expanded=true] .checkout {
-/* .checkout-container .checkout { */
   height: 100vh;
   padding: var(--pad-xl) var(--pad-s);
 }

@@ -302,6 +302,7 @@ BUTTONS
 
 .btn.btn-fixed {
   display: block;
+  width: 100%;
 }
 
 .btn.btn-disable {
@@ -450,9 +451,9 @@ CLS STUFF
   display: none;
 }
 
-header, .accordion, .big-text,
-.carousel, .collapse, .columns, 
-.contact, .index, .search {
+header, .accordion, .auth, .big-text,
+.carousel, .collapse, .columns, .contact, 
+.index, .instafeed, .search {
   visibility: hidden;
 }
 

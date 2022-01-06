@@ -736,7 +736,7 @@ function generateId(data) {
   const b = data.email.match(/@./)[0].replace('@', day); // first char of email domain
   const c = now.match(/T[0-9]{1,}/)[0].replace('T', a); // digits from date
   const d = now.match(/[0-9]{1,}Z/)[0].replace('Z', b); // digits from time
-  const e = navigator.userAgent.substring(0, 1); // first chart of user agent
+  const e = navigator.userAgentData.platform.substring(0, 1); // first chart of user agent platform
   const id = `${c}${d}${e}`.toUpperCase().replace(/[^0-9a-z]/gi, 'N'); // replace nonalphanumeric with N
   return id;
 }
