@@ -10,8 +10,8 @@ function getGId(type) {
       return 'AKfycbxX6iCeru2Y3sS5z-GHT-a3lzsAGLGz_6SbNjdDL1lz2mBKfCfytL8RPTnKtntf7--D';
     case 'email':
       return 'AKfycbwgQ3cEgPfJvDk_AEhntT-Loedg-LMYStzuNVRtMI9V_K9cdYlntTRpwaefyQq0QYO4KA';
-    case 'text':
-      return 'AKfycbyXI3yziD7CX59KHPJpZEXXbmuTDFChok0QC94ToTnUMFPrp5TkatlsDppq4gyuYOdg9w';
+    case 'text': // see messages.js
+      return 'AKfycbyj25ygCc6SvxJ9KCzdQSmiqz3emxuIJdNVzTXKjw3F88gdxClNLtq3PyNGgB2ca7FELA';
     case 'shipping':
       return 'AKfycbzsC2PCET2DvZk9UFG5L591i0nUS_DGrzHSmQoQGCc6tgI5FQ3RQ2AeP_0kJeCD5MOmQQ';
     case 'club': // see square.js
@@ -65,12 +65,9 @@ export async function checkAuthToken(token) {
   return false;
 }
 
-export async function sendText(num, data) {
-  const store = getCurrentStore();
+export async function sendText(params) {
   const id = getGId('text');
   const url = buildGScriptLink(id);
-  const params = { store, num };
-  if (data.confirmation) { params.confirmation = true; }
   const qs = buildGQs(params);
   const resp = await fetch(`${url}?${qs}`, { method: 'POST' });
   if (resp.ok) {
@@ -79,7 +76,9 @@ export async function sendText(num, data) {
       // eslint-disable-next-line no-console
       console.error(json);
     }
+    return json;
   }
+  return false;
 }
 
 function buildEmailParams(store, info, results) {

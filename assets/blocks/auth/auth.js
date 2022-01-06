@@ -67,6 +67,9 @@ export default async function decorateAuth(block) {
             input.value = '';
           });
         } else {
+          form.querySelectorAll('input').forEach((input) => {
+            input.value = '';
+          });
           wrapper.setAttribute('aria-expanded', false);
         }
         removeScreensaver();

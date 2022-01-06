@@ -13,7 +13,7 @@
   animation-name: fadeIn;
   animation-timing-function: ease-in;
   animation-duration: 0.2s;
-  z-index: 8;
+  z-index: 4;
 }
 
 .customize-container[aria-expanded=true] .customize {
