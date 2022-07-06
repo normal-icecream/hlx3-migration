@@ -142,7 +142,7 @@ a:any-link {
   word-break: break-word;
 }
 
-a:hover {
+a[href]:hover {
   border-bottom: 2px solid;
 }
 
