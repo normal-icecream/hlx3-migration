@@ -9,7 +9,7 @@ header .header > div {
   align-items: center;
   width: 100%;
   max-width: 1200px;
-  height: var(--nav-height);
+  height: var(--header-height);
   margin: 0 auto;
   padding: 2rem;
 }
