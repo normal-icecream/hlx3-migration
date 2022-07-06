@@ -41,6 +41,7 @@ header .header-brand a {
 }
 
 header .header-brand a:hover {
+  border: 0;
   transform: rotate(13deg);
 }
 
