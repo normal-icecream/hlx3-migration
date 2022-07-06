@@ -1,9 +1,9 @@
-# Your Project's Title...
-Under construction
+# Normal Ice Cream Staging
 
 ## Environments
 - Preview: https://main--hlx3-migration--normal-icecream.hlx3.page/
 - Live: https://main--hlx3-migration--normal-icecream.hlx.live/
+Your project's description...
 
 ## Installation
 
@@ -11,10 +11,16 @@ Under construction
 npm i
 ```
 
+## Tests
+
+```sh
+npm tst
+```
+
 ## Local development
 
-1. Create a new repository based on the `helix-pages-starter` template and add a mountpoint in the `fstab.yaml`
-2. Add the [helix-bot](https://github.com/apps/helix-bot) to the repository
-3. Install the [Helix CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/helix-cli`
-4. Start Helix Pages Proxy: `hlx up` (opens your browser at `http://localhost:3000`)
-5. Open the `hlx3-migration` directory in your favorite IDE and start coding :)
+1. Create a new repository based on the `helix-project-boilerplate` template and add a mountpoint in the `fstab.yaml`
+1. Add the [helix-bot](https://github.com/apps/helix-bot) to the repository
+1. Install the [Helix CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/helix-cli`
+1. Start Helix Pages Proxy: `hlx up` (opens your browser at `http://localhost:3000`)
+1. Open the `{repo}` directory in your favorite IDE and start coding :)

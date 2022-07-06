@@ -11,6 +11,61 @@
  */
 
 /**
+ * log RUM if part of the sample.
+ * @param {string} checkpoint identifies the checkpoint in funnel
+ * @param {Object} data additional data for RUM sample
+ */
+export function sampleRUM(checkpoint, data = {}) {
+  try {
+    window.hlx = window.hlx || {};
+    if (!window.hlx.rum) {
+      const usp = new URLSearchParams(window.location.search);
+      const weight = (usp.get('rum') === 'on') ? 1 : 100; // with parameter, weight is 1. Defaults to 100.
+      // eslint-disable-next-line no-bitwise
+      const hashCode = (s) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+      const id = `${hashCode(window.location.href)}-${new Date().getTime()}-${Math.random().toString(16).substr(2, 14)}`;
+      const random = Math.random();
+      const isSelected = (random * weight < 1);
+      // eslint-disable-next-line object-curly-newline
+      window.hlx.rum = { weight, id, random, isSelected };
+    }
+    const { random, weight, id } = window.hlx.rum;
+    if (random && (random * weight < 1)) {
+      const sendPing = () => {
+        // eslint-disable-next-line object-curly-newline, max-len, no-use-before-define
+        const body = JSON.stringify({ weight, id, referer: window.location.href, generation: RUM_GENERATION, checkpoint, ...data });
+        const url = `https://rum.hlx.page/.rum/${weight}`;
+        // eslint-disable-next-line no-unused-expressions
+        navigator.sendBeacon(url, body);
+      };
+      sendPing();
+      // special case CWV
+      if (checkpoint === 'cwv') {
+        // use classic script to avoid CORS issues
+        const script = createEl('script', {
+          src: 'https://rum.hlx.page/.rum/web-vitals/dist/web-vitals.iife.js',
+        });
+        script.onload = () => {
+          const storeCWV = (measurement) => {
+            data.cwv = {};
+            data.cwv[measurement.name] = measurement.value;
+            sendPing();
+          };
+            // When loading `web-vitals` using a classic script, all the public
+            // methods can be found on the `webVitals` global namespace.
+          window.webVitals.getCLS(storeCWV);
+          window.webVitals.getFID(storeCWV);
+          window.webVitals.getLCP(storeCWV);
+        };
+        document.head.appendChild(script);
+      }
+    }
+  } catch (error) {
+    // something went wrong
+  }
+}
+
+/**
  * Builds an HTML DOM element.
  * @param {string} tag The type of element
  * @param {object} params Additional parameters for element
@@ -33,87 +88,34 @@ export function createEl(tag, params) {
 }
 
 /**
- * Creates an SVG tag using the specified ID.
- * @param {string} name The ID
- * @returns {element} The SVG tag
- */
-export function createSVG(name) {
-  // eslint-disable-next-line no-param-reassign
-  name = name.replace(/\s+/g, '-').toLowerCase();
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `/assets/icons/icons.svg#${name}`);
-  svg.classList.add('icon', `icon-${name}`);
-  svg.appendChild(use);
-  return svg;
-}
-
-/**
  * Loads a CSS file.
  * @param {string} href The path to the CSS file
  */
-export function loadCSS(href) {
+export function loadCSS(href, callback) {
   if (!document.querySelector(`head > link[href="${href}"]`)) {
     const link = createEl('link', {
       rel: 'stylesheet',
       href,
     });
-    link.onload = () => {
-    };
-    link.onerror = () => {
-    };
+    if (typeof callback === 'function') {
+      link.onload = (e) => callback(e.type);
+      link.onerror = (e) => callback(e.type);
+    }
     document.head.appendChild(link);
+  } else if (typeof callback === 'function') {
+    callback('noop');
   }
 }
 
 /**
- * loads a script by adding a script tag to the head.
- * @param {string} url URL of the js file
- * @param {Function} callback callback on load
- * @param {string} type type attribute of script tag
- * @returns {Element} script element
- */
-export function loadScript(url, callback, type) {
-  const head = document.querySelector('head');
-  const props = { src: url };
-  if (type) { props.type = type; }
-  const script = createEl('script', props);
-  head.append(script);
-  script.onload = callback;
-  return script;
-}
-
-/**
- * Retrieves the content of a metadata tag.
+ * Retrieves the content of metadata tags.
  * @param {string} name The metadata name (or property)
- * @returns {string} The metadata value
+ * @returns {string} The metadata value(s)
  */
 export function getMetadata(name) {
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const meta = document.head.querySelector(`meta[${attr}="${name}"]`);
-  return meta && meta.content;
-}
-
-function getLastStore() {
-  const last = localStorage.getItem('normal-lastVisited');
-  return last || 'store'; // default
-}
-
-export function getCurrentStore() {
-  const paths = window.location.pathname.split('/').filter((i) => i);
-  if (paths.length) {
-    const path = paths[paths.length - 1].replace(/-/g, ' ');
-    const CONFIGURED_STORES = ['store', 'lab', 'shipping', 'pint club', 'merch', 'abnormal'];
-    if (CONFIGURED_STORES.includes(path)) {
-      return path;
-    }
-  }
-  return getLastStore(); // default
-}
-
-function setLastStore() {
-  const store = getCurrentStore();
-  localStorage.setItem('normal-lastVisited', store);
+  const meta = [...document.head.querySelectorAll(`meta[${attr}="${name}"]`)].map((m) => m.content).join(', ');
+  return meta || null;
 }
 
 /**
@@ -124,7 +126,7 @@ export function addPublishDependencies(url) {
   const urls = Array.isArray(url) ? url : [url];
   window.hlx = window.hlx || {};
   if (window.hlx.dependencies && Array.isArray(window.hlx.dependencies)) {
-    window.hlx.dependencies.concat(urls);
+    window.hlx.dependencies = window.hlx.dependencies.concat(urls);
   } else {
     window.hlx.dependencies = urls;
   }
@@ -132,7 +134,7 @@ export function addPublishDependencies(url) {
 
 /**
  * Sanitizes a name for use as class name.
- * @param {*} name The unsanitized name
+ * @param {string} name The unsanitized name
  * @returns {string} The class name
  */
 export function toClassName(name) {
@@ -141,23 +143,70 @@ export function toClassName(name) {
     : '';
 }
 
-/**
- * Wraps each section in an additional {@code div}.
- * @param {[Element]} sections The sections
+/*
+ * Sanitizes a name for use as a js property name.
+ * @param {string} name The unsanitized name
+ * @returns {string} The camelCased name
  */
-function wrapSections(sections) {
-  sections.forEach((div) => {
-    if (div.childNodes.length === 0) {
-      // remove empty sections
-      div.remove();
-    } else if (!div.id) {
-      const wrapper = createEl('div', {
-        class: 'section-wrapper',
-      });
-      div.parentNode.appendChild(wrapper);
-      wrapper.appendChild(div);
+export function toCamelCase(name) {
+  return toClassName(name).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+/**
+ * Replace icons with inline SVG and prefix with codeBasePath.
+ * @param {Element} element
+ */
+export function decorateIcons(element = document) {
+  element.querySelectorAll('span.icon').forEach(async (span) => {
+    if (span.classList.length < 2 || !span.classList[1].startsWith('icon-')) {
+      return;
+    }
+    const icon = span.classList[1].substring(5);
+    // eslint-disable-next-line no-use-before-define
+    const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
+    if (resp.ok) {
+      const iconHTML = await resp.text();
+      if (iconHTML.match(/<style/i)) {
+        const img = createEl('img', {
+          src: `data:image/svg+xml,${encodeURIComponent(iconHTML)}`,
+        })
+        span.appendChild(img);
+      } else {
+        span.innerHTML = iconHTML;
+      }
     }
   });
+}
+
+/**
+ * Gets placeholders object
+ * @param {string} prefix
+ */
+export async function fetchPlaceholders(prefix = 'default') {
+  window.placeholders = window.placeholders || {};
+  const loaded = window.placeholders[`${prefix}-loaded`];
+  if (!loaded) {
+    window.placeholders[`${prefix}-loaded`] = new Promise((resolve, reject) => {
+      try {
+        fetch(`${prefix === 'default' ? '' : prefix}/placeholders.json`)
+          .then((resp) => resp.json())
+          .then((json) => {
+            const placeholders = {};
+            json.data.forEach((placeholder) => {
+              placeholders[toCamelCase(placeholder.Key)] = placeholder.Text;
+            });
+            window.placeholders[prefix] = placeholders;
+            resolve();
+          });
+      } catch (error) {
+        // error loading placeholders
+        window.placeholders[prefix] = {};
+        reject();
+      }
+    });
+  }
+  await window.placeholders[`${prefix}-loaded`];
+  return (window.placeholders[prefix]);
 }
 
 /**
@@ -165,34 +214,124 @@ function wrapSections(sections) {
  * @param {Element} block The block element
  */
 export function decorateBlock(block) {
-  const classes = Array.from(block.classList.values());
-  let blockName = classes[0];
-  if (!blockName) return;
-  const section = block.closest('.section-wrapper');
-  if (section) {
-    section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
+  const shortBlockName = block.classList[0];
+  if (shortBlockName) {
+    block.classList.add('block');
+    block.setAttribute('data-block-name', shortBlockName);
+    block.setAttribute('data-block-status', 'initialized');
+    const blockWrapper = block.parentElement;
+    blockWrapper.classList.add(`${shortBlockName}-wrapper`);
+    const section = block.closest('.section');
+    if (section) section.classList.add(`${shortBlockName}-container`);
   }
-  const variants = ['carousel'];
-  variants.forEach((b) => {
-    if (blockName.startsWith(`${b}-`)) {
-      const options = blockName.substring(b.length + 1).split('-').filter((opt) => !!opt);
-      blockName = b;
-      block.classList.add(b);
-      block.classList.add(...options);
+}
+
+/**
+ * Extracts the config from a block.
+ * @param {Element} block The block element
+ * @returns {object} The block config
+ */
+export function readBlockConfig(block) {
+  const config = {};
+  block.querySelectorAll(':scope > div').forEach((row) => {
+    if (row.children) {
+      const cols = [...row.children];
+      if (cols[1]) {
+        const col = cols[1];
+        const name = toClassName(cols[0].textContent);
+        let value = '';
+        if (col.querySelector('a')) {
+          const as = [...col.querySelectorAll('a')];
+          if (as.length === 1) {
+            value = as[0].href;
+          } else {
+            value = as.map((a) => a.href);
+          }
+        } else if (col.querySelector('img')) {
+          const imgs = [...col.querySelectorAll('img')];
+          if (imgs.length === 1) {
+            value = imgs[0].src;
+          } else {
+            value = imgs.map((img) => img.src);
+          }
+        } else if (col.querySelector('p')) {
+          const ps = [...col.querySelectorAll('p')];
+          if (ps.length === 1) {
+            value = ps[0].textContent;
+          } else {
+            value = ps.map((p) => p.textContent);
+          }
+        } else value = row.children[1].textContent;
+        config[name] = value;
+      }
     }
   });
+  return config;
+}
 
-  block.classList.add('block');
-  block.setAttribute('data-block-name', blockName);
+/**
+ * Decorates all sections in a container element.
+ * @param {Element} main The container element
+ */
+export function decorateSections(main) {
+  main.querySelectorAll(':scope > div').forEach((section) => {
+    const wrappers = [];
+    let defaultContent = false;
+    [...section.children].forEach((e) => {
+      if (e.tagName === 'DIV' || !defaultContent) {
+        const wrapper = createEl('div');
+        wrappers.push(wrapper);
+        defaultContent = e.tagName !== 'DIV';
+        if (defaultContent) wrapper.classList.add('default-content-wrapper');
+      }
+      wrappers[wrappers.length - 1].append(e);
+    });
+    wrappers.forEach((wrapper) => section.append(wrapper));
+    section.classList.add('section');
+    section.setAttribute('data-section-status', 'initialized');
+
+    /* process section metadata */
+    const sectionMeta = section.querySelector('div.section-metadata');
+    if (sectionMeta) {
+      const meta = readBlockConfig(sectionMeta);
+      const keys = Object.keys(meta);
+      keys.forEach((key) => {
+        if (key === 'style') section.classList.add(toClassName(meta.style));
+        else section.dataset[toCamelCase(key)] = meta[key];
+      });
+      sectionMeta.remove();
+    }
+  });
+}
+
+/**
+ * Updates all section status in a container element.
+ * @param {Element} main The container element
+ */
+export function updateSectionsStatus(main) {
+  const sections = [...main.querySelectorAll(':scope > div.section')];
+  for (let i = 0; i < sections.length; i += 1) {
+    const section = sections[i];
+    const status = section.getAttribute('data-section-status');
+    if (status !== 'loaded') {
+      const loadingBlock = section.querySelector('.block[data-block-status="initialized"], .block[data-block-status="loading"]');
+      if (loadingBlock) {
+        section.setAttribute('data-section-status', 'loading');
+        break;
+      } else {
+        section.setAttribute('data-section-status', 'loaded');
+      }
+    }
+  }
 }
 
 /**
  * Decorates all blocks in a container element.
  * @param {Element} main The container element
  */
-function decorateBlocks(main) {
+export function decorateBlocks(main) {
   main
-    .querySelectorAll('div.section-wrapper > div > div')
+    .querySelectorAll('div.section div[class]')
     .forEach((block) => decorateBlock(block));
 }
 
@@ -203,10 +342,8 @@ function decorateBlocks(main) {
  */
 export function buildBlock(blockName, content) {
   const table = Array.isArray(content) ? content : [[content]];
+  const blockEl = createEl('div', { class: blockName });
   // build image block nested div structure
-  const blockEl = createEl('div', {
-    class: blockName,
-  });
   table.forEach((row) => {
     const rowEl = createEl('div');
     row.forEach((col) => {
@@ -232,22 +369,35 @@ export function buildBlock(blockName, content) {
  * Loads JS and CSS for a block.
  * @param {Element} block The block element
  */
-export async function loadBlock(block) {
-  if (!block.getAttribute('data-loaded')) {
+export async function loadBlock(block, eager = false) {
+  if (!(block.getAttribute('data-block-status') === 'loading' || block.getAttribute('data-block-status') === 'loaded')) {
+    block.setAttribute('data-block-status', 'loading');
     const blockName = block.getAttribute('data-block-name');
-
+    console.log('blockname:', blockName);
     try {
-      const mod = await import(`/assets/blocks/${blockName}/${blockName}.js`);
-      if (mod.default) {
-        await mod.default(block, blockName, document);
-      }
-    } catch (err) {
+      const cssLoaded = new Promise((resolve) => {
+        loadCSS(`${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`, resolve);
+      });
+      const decorationComplete = new Promise((resolve) => {
+        (async () => {
+          try {
+            const mod = await import(`../blocks/${blockName}/${blockName}.js`);
+            if (mod.default) {
+              await mod.default(block, blockName, document, eager);
+            }
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log(`failed to load module for ${blockName}`, error);
+          }
+          resolve();
+        })();
+      });
+      await Promise.all([cssLoaded, decorationComplete]);
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`failed to load module for ${blockName}`, err);
+      console.log(`failed to load block ${blockName}`, error);
     }
-
-    loadCSS(`/assets/blocks/${blockName}/${blockName}.css`);
-    block.setAttribute('data-loaded', true);
+    block.setAttribute('data-block-status', 'loaded');
   }
 }
 
@@ -255,66 +405,14 @@ export async function loadBlock(block) {
  * Loads JS and CSS for all blocks in a container element.
  * @param {Element} main The container element
  */
-async function loadBlocks(main) {
-  main
-    .querySelectorAll('div.section-wrapper > div > .block')
-    .forEach(async (block) => loadBlock(block));
-}
-
-/**
- * Build header
- */
-function loadHeader() {
-  const header = document.querySelector('header');
-  header.setAttribute('data-block-name', 'header');
-  header.setAttribute('data-source', '/header');
-  loadBlock(header);
-}
-
-/**
- * Build footer
- */
-function loadFooter() {
-  const footer = document.querySelector('footer');
-  footer.setAttribute('data-block-name', 'footer');
-  footer.setAttribute('data-source', '/footer');
-  loadBlock(footer);
-}
-
-/**
- * Extracts the config from a block.
- * @param {Element} block The block element
- * @returns {object} The block config
- */
-export function readBlockConfig(block) {
-  const config = {};
-  block.querySelectorAll(':scope>div').forEach((row) => {
-    if (row.children) {
-      const cols = [...row.children];
-      if (cols[1]) {
-        const valueEl = cols[1];
-        const name = toClassName(cols[0].textContent);
-        let value = '';
-        if (valueEl.querySelector('a')) {
-          const as = [...valueEl.querySelectorAll('a')];
-          if (as.length === 1) {
-            value = as[0].href;
-          } else {
-            value = as.map((a) => a.href);
-          }
-        } else if (valueEl.querySelector('p')) {
-          const ps = [...valueEl.querySelectorAll('p')];
-          if (ps.length === 1) {
-            value = ps[0].textContent;
-          } else {
-            value = ps.map((p) => p.textContent);
-          }
-        } else value = row.children[1].textContent;
-        config[name] = value;
-      }
-    }
-  });
-  return config;
+export async function loadBlocks(main) {
+  updateSectionsStatus(main);
+  const blocks = [...main.querySelectorAll('div.block')];
+  for (let i = 0; i < blocks.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await loadBlock(blocks[i]);
+    updateSectionsStatus(main);
+  }
 }
 
 /**
@@ -349,9 +447,9 @@ export function createOptimizedPicture(src, alt = '', eager = false, breakpoints
       picture.appendChild(source);
     } else {
       const img = createEl('img', {
-        src: `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
-        loading: `${eager ? 'eager' : 'lazy'}`,
+        loading: eager ? 'eager' : 'lazy',
         alt,
+        src: `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
       });
       picture.appendChild(img);
     }
@@ -361,23 +459,9 @@ export function createOptimizedPicture(src, alt = '', eager = false, breakpoints
 }
 
 /**
- * Removes formatting from images.
- * @param {Element} main The container element
- */
-function removeStylingFromImages(main) {
-  // remove styling from images, if any
-  const imgs = [...main.querySelectorAll('strong picture'), ...main.querySelectorAll('em picture')];
-  imgs.forEach((img) => {
-    const parentEl = img.closest('p');
-    parentEl.prepend(img);
-    parentEl.lastChild.remove();
-  });
-}
-
-/**
  * Normalizes all headings within a container element.
  * @param {Element} el The container element
- * @param {[string]]} allowedHeadings The list of allowed headings (h1 ... h6)
+ * @param {[string]} allowedHeadings The list of allowed headings (h1 ... h6)
  */
 export function normalizeHeadings(el, allowedHeadings) {
   const allowed = allowedHeadings.map((h) => h.toLowerCase());
@@ -396,286 +480,162 @@ export function normalizeHeadings(el, allowedHeadings) {
         }
       }
       if (level !== 7) {
-        tag.outerHTML = `<h${level}>${tag.textContent}</h${level}>`;
+        tag.outerHTML = `<h${level} id="${tag.id}">${tag.textContent}</h${level}>`;
       }
     }
   });
 }
 
 /**
- * Decorates the picture elements.
- * @param {Element} main The container element
+ * Set template (page structure) and theme (page styles).
  */
-function decoratePictures(main) {
-  main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
-    const newPicture = createOptimizedPicture(img.src, img.alt, !i);
-    const picture = img.closest('picture');
-    if (picture) picture.parentElement.replaceChild(newPicture, picture);
-  });
-}
-
-export function noScroll() {
-  window.scrollTo(0, 0);
+function decorateTemplateAndTheme() {
+  const template = getMetadata('template');
+  if (template) document.body.classList.add(toClassName(template));
+  const theme = getMetadata('theme');
+  if (theme) document.body.classList.add(toClassName(theme));
 }
 
 /**
- * Builds auth block.
- * @param {Element} main The container element
+ * decorates paragraphs containing a single link as buttons.
+ * @param {Element} element container element
  */
-function buildAuthBlock(main) {
-  const authBlock = buildBlock('auth', {
-    elems: [
-      '<form class="auth-form">',
-    ],
-  });
-  authBlock.classList.add('block');
-  authBlock.setAttribute('data-block-name', 'auth');
-  const wrapper = createEl('div', {
-    class: 'section-wrapper auth-container',
-  });
-  wrapper.setAttribute('aria-expanded', true);
-  wrapper.append(authBlock);
-  main.insertBefore(wrapper, main.children[1]);
-  loadBlock(authBlock);
-}
-
-/**
- * Builds checkout block.
- * @param {Element} main The container element
- */
-function buildCheckoutBlock(main) {
-  const checkoutBlock = buildBlock('checkout', {
-    elems: [
-      '<aside class="btn btn-back">',
-      '<div class="checkout-head"><h2>',
-      '<table class="checkout-table"><tbody class="checkout-table-body"><tfoot class="checkout-table-foot">',
-      '<form class="checkout-form">',
-      '<div class="checkout-foot"><a class="btn btn-rect">',
-    ],
-  });
-  checkoutBlock.setAttribute('data-block-name', 'checkout');
-  const wrapper = createEl('div', {
-    class: 'section-wrapper checkout-container',
-  });
-  wrapper.append(checkoutBlock);
-  main.append(wrapper);
-  loadBlock(checkoutBlock);
-}
-
-/**
- * Builds customize block.
- * @param {Element} main The container element
- */
-function buildCustomizeBlock(main) {
-  const customizeBlock = buildBlock('customize', {
-    elems: [
-      '<aside class="btn btn-close">',
-      '<div class="customize-head"><h2>',
-      '<form class="customize-body">',
-      '<div class="customize-foot"><a class="btn btn-rect">',
-    ],
-  });
-  customizeBlock.setAttribute('data-block-name', 'customize');
-  const wrapper = createEl('div', {
-    class: 'section-wrapper customize-container',
-  });
-  wrapper.append(customizeBlock);
-  main.append(wrapper);
-  loadBlock(customizeBlock);
-}
-
-function classify(main) {
-  const paths = window.location.pathname.split('/').filter((i) => i);
-  if (paths.length) {
-    paths.forEach((path) => {
-      main.parentElement.parentElement.classList.add(path);
-    });
-  }
-}
-
-/**
- * Fetchs catalog JSON.
- * @returns {object}
- */
-export async function fetchCatalog() {
-  if (!window.catalog) {
-    const resp = await fetch('https://www.normal.club/catalog.json', { cache: 'reload' });
-    if (resp.ok) {
-      const json = await resp.json();
-      const catalog = {
-        byId: {},
-        items: [],
-        categories: [],
-        discounts: {},
-      };
-      json.forEach((e) => {
-        if (!catalog.byId[e.id]) {
-          catalog.byId[e.id] = e;
+export function decorateButtons(element) {
+  element.querySelectorAll('a').forEach((a) => {
+    a.title = a.title || a.textContent;
+    if (a.href !== a.textContent) {
+      const up = a.parentElement;
+      const twoup = a.parentElement.parentElement;
+      if (!a.querySelector('img')) {
+        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+          a.className = 'button primary'; // default
+          up.classList.add('button-container');
         }
-        if (e.type === 'ITEM') {
-          catalog.items.push(e);
-          if (e.item_data.variations) {
-            e.item_data.variations.forEach((v) => {
-              catalog.byId[v.id] = v;
-            });
-          }
+        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
+            && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
+          a.className = 'button primary';
+          twoup.classList.add('button-container');
         }
-        if (e.type === 'MODIFIER_LIST') {
-          if (e.modifier_list_data.modifiers) {
-            e.modifier_list_data.modifiers.forEach((m) => {
-              m.modifier_data.modifier_list_id = e.id;
-              catalog.byId[m.id] = m;
-            });
-          }
+        if (up.childNodes.length === 1 && up.tagName === 'EM'
+            && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
+          a.className = 'button secondary';
+          twoup.classList.add('button-container');
         }
-        if (e.type === 'DISCOUNT') {
-          if (e.discount_data.name) {
-            catalog.discounts[e.discount_data.name.toLowerCase()] = { id: e.id };
-          }
-        }
-        if (e.type === 'CATEGORY') {
-          catalog.categories.push(e);
-        }
-      });
-      window.catalog = catalog;
-    }
-  }
-  return window.catalog;
-}
-
-export async function fetchMenu() {
-  if (!window.menu) {
-    const resp = await fetch('/_admin/menu.json');
-    if (resp.ok) {
-      let json = await resp.json();
-      if (json.data) {
-        json = json.data; // helix quirk, difference between live and local
       }
-      window.menu = json;
-    }
-  }
-  return window.menu;
-}
-
-export function buildGQs(params) {
-  let qs = '';
-  Object.keys(params).forEach((key) => {
-    if (key in params) {
-      if (key === 'line_items') {
-        qs += `${key}=${encodeURIComponent(JSON.stringify(params[key]))}`;
-      } else {
-        qs += `${key}=${encodeURIComponent(params[key])}`;
-      }
-      qs += '&';
     }
   });
-  return qs;
-}
-
-export function buildGScriptLink(id) {
-  return `https://script.google.com/macros/s/${id}/exec`;
 }
 
 /**
- * Decorates single Square link.
- * @param {Element} a Anchor element to be decorated
+ * Adds the favicon.
+ * @param {string} href The favicon URL
  */
-function decorateSquareLink(a) {
-  a.classList.add('btn', 'btn-rect', 'btn-cart');
-  const squarePrefix = 'https://squareup.com/dashboard/items/library/';
-  const giftcardPrefix = 'https://squareup.com/gift/';
-  const href = a.getAttribute('href');
-  if (href.startsWith(squarePrefix)) {
-    const id = href.substr(squarePrefix.length);
-    a.setAttribute('data-id', id);
-    a.removeAttribute('href');
-  } else if (href.includes(giftcardPrefix)) {
-    a.target = '_blank';
+export function addFavIcon(href) {
+  const link = createEl('link', {
+    rel: 'icon',
+    type: 'image/svg+xml',
+    href
+  });
+  const existingLink = document.querySelector('head link[rel="icon"]');
+  if (existingLink) {
+    existingLink.parentElement.replaceChild(link, existingLink);
+  } else {
+    document.getElementsByTagName('head')[0].appendChild(link);
   }
 }
 
-async function squarify(main) {
-  const metaHide = getMetadata('hide');
-  if (!metaHide || !metaHide.includes('cart')) {
-    const squareLink = main.querySelector('a[href^="https://squareup"');
-    if (squareLink) {
-      main.querySelectorAll('a').forEach((a) => {
-        decorateSquareLink(a);
-      });
+/**
+ * load LCP block and/or wait for LCP in default content.
+ */
+async function waitForLCP() {
+  // eslint-disable-next-line no-use-before-define
+  const lcpBlocks = LCP_BLOCKS;
+  const block = document.querySelector('.block');
+  const hasLCPBlock = (block && lcpBlocks.includes(block.getAttribute('data-block-name')));
+  if (hasLCPBlock) await loadBlock(block, true);
+
+  document.querySelector('body').classList.add('appear');
+  const lcpCandidate = document.querySelector('main img');
+  await new Promise((resolve) => {
+    if (lcpCandidate && !lcpCandidate.complete) {
+      lcpCandidate.setAttribute('loading', 'eager');
+      lcpCandidate.addEventListener('load', () => resolve());
+      lcpCandidate.addEventListener('error', () => resolve());
+    } else {
+      resolve();
     }
-    const square = 'square'; // lost a fight with eslint
+  });
+}
+
+/**
+ * Decorates the page.
+ */
+async function loadPage(doc) {
+  // eslint-disable-next-line no-use-before-define
+  await loadEager(doc);
+  // eslint-disable-next-line no-use-before-define
+  await loadLazy(doc);
+  // eslint-disable-next-line no-use-before-define
+  loadDelayed(doc);
+}
+
+export function initHlx() {
+  window.hlx = window.hlx || {};
+  window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
+  window.hlx.codeBasePath = '';
+
+  const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
+  if (scriptEl) {
     try {
-      const mod = await import(`/assets/utils/${square}/${square}.js`);
-      if (mod.default) {
-        await mod.default(main, square, document);
-      }
-    } catch (err) {
+      [window.hlx.codeBasePath] = new URL(scriptEl.src).pathname.split('/scripts/scripts.js');
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`failed to load module for ${square}`, err);
+      console.log(error);
     }
-    await loadScript('https://js.squareup.com/v2/paymentform');
   }
 }
 
-async function pagify(main) {
-  const configured = ['about', 'legal', 'order', 'pint-club', 'recipes'];
-  const paths = window.location.pathname.split('/').filter((i) => i);
-  paths.forEach(async (path) => {
-    if (configured.includes(path)) {
-      try {
-        const mod = await import(`/assets/pages/${path}/${path}.js`);
-        if (mod.default) {
-          await mod.default(main, path, document);
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log(`failed to load module for ${path}`, err);
-      }
+initHlx();
 
-      loadCSS(`/assets/pages/${path}/${path}.css`);
-    }
-  });
-}
-
-function replaceSVGs(main) {
-  main.querySelectorAll('h1, h2, h3, a, p, strong, em, u, span').forEach((el) => {
-    const svgs = el.textContent.trim().match(/<[a-zA-z-]{1,}>/);
-    if (svgs) {
-      svgs.forEach((svg) => {
-        const name = svg
-          .split('<')[1]
-          .replace('>', '');
-        const svgEl = createSVG(name);
-        if (name === 'v') {
-          const title = createEl('title', {
-            text: 'vegan',
-          });
-          svgEl.prepend(title);
-        } else if (name === 'gf') {
-          const title = createEl('title', {
-            text: 'gluten free',
-          });
-          svgEl.prepend(title);
-        }
-        if (el.textContent.trim() === svg) {
-          el.replaceWith(svgEl);
-        }
-      });
-    }
-  });
-}
-
-/**
- * Fixes images in a container element.
- * @param {Element} main The container element
+/*
+ * ------------------------------------------------------------
+ * Edit above at your own risk
+ * ------------------------------------------------------------
  */
-function updateImages(main) {
-  try {
-    removeStylingFromImages(main);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('updating images failed', error);
+
+const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const RUM_GENERATION = 'project-1'; // add your RUM generation information here
+const ICON_ROOT = '/icons';
+
+sampleRUM('top');
+window.addEventListener('load', () => sampleRUM('load'));
+document.addEventListener('click', () => sampleRUM('click'));
+
+loadPage(document);
+
+function buildHeroBlock(main) {
+  const h1 = main.querySelector('h1');
+  const picture = main.querySelector('picture');
+  // eslint-disable-next-line no-bitwise
+  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+    const section = createEl('div');
+    section.append(buildBlock('hero', { elems: [picture, h1] }));
+    main.prepend(section);
   }
+}
+
+function loadHeader(header) {
+  const headerBlock = buildBlock('header', '');
+  header.append(headerBlock);
+  decorateBlock(headerBlock);
+  loadBlock(headerBlock);
+}
+
+function loadFooter(footer) {
+  const footerBlock = buildBlock('footer', '');
+  footer.append(footerBlock);
+  decorateBlock(footerBlock);
+  loadBlock(footerBlock);
 }
 
 /**
@@ -684,30 +644,11 @@ function updateImages(main) {
  */
 function buildAutoBlocks(main) {
   try {
-    const metaHide = getMetadata('hide');
-    const metaAuth = getMetadata('auth');
-    if (!metaHide || !metaHide.includes('cart')) {
-      buildCustomizeBlock(main);
-      buildCheckoutBlock(main);
-      loadScript('https://web.squarecdn.com/v1/square.js');
-    }
-    if (metaAuth && metaAuth === 'required') {
-      buildAuthBlock(main);
-    }
+    buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('autoblocking failed', error);
+    console.error('Auto Blocking failed', error);
   }
-}
-
-/**
- * Removes the empty sections from the container element.
- * @param {Element} main The container element
- */
-function removeEmptySections(main) {
-  main.querySelectorAll(':scope > div:empty').forEach((div) => {
-    div.remove();
-  });
 }
 
 /**
@@ -715,141 +656,24 @@ function removeEmptySections(main) {
  * @param {Element} main The main element
  */
 export function decorateMain(main) {
-  classify(main);
-  loadHeader();
-  squarify(main);
-  replaceSVGs(main);
-  // forward compatible pictures redecoration
-  decoratePictures(main);
-  updateImages(main);
-  removeEmptySections(main);
-  wrapSections(main.querySelectorAll(':scope > div'));
+  // hopefully forward compatible button decoration
+  decorateButtons(main);
+  decorateIcons(main);
+  buildAutoBlocks(main);
+  decorateSections(main);
   decorateBlocks(main);
 }
-
-const LCP_BLOCKS = ['auth', 'index', 'carousel', 'popup']; // add your LCP blocks to the list
 
 /**
  * loads everything needed to get to LCP.
  */
 async function loadEager(doc) {
+  decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
-    await pagify(main);
-    doc.querySelector('body').classList.add('appear');
-
-    const block = doc.querySelector('.block');
-    const hasLCPBlock = (block && LCP_BLOCKS.includes(block.getAttribute('data-block-name')));
-    if (hasLCPBlock) await loadBlock(block, true);
-    const lcpCandidate = doc.querySelector('main img');
-    const loaded = {
-      then: (resolve) => {
-        if (lcpCandidate && !lcpCandidate.complete) {
-          lcpCandidate.addEventListener('load', () => resolve());
-          lcpCandidate.addEventListener('error', () => resolve());
-        } else {
-          resolve();
-        }
-      },
-    };
-    await loaded;
+    await waitForLCP();
   }
-}
-
-export async function fetchLabels() {
-  if (!window.labels) {
-    const resp = await fetch('/_admin/labels.json');
-    if (resp.ok) {
-      let json = await resp.json();
-      if (json.data) {
-        json = json.data; // helix quirk, difference between live and local
-      }
-      const labels = {};
-      json.forEach((label) => {
-        labels[label.key] = label.value;
-      });
-      window.labels = labels;
-    }
-  }
-  return window.labels;
-}
-
-function convertHour(timestamp) {
-  if (timestamp.includes('.')) {
-    // eslint-disable-next-line prefer-const
-    let [hour, minute] = timestamp.split('.');
-    switch (minute) {
-      case '25':
-      case 25:
-        minute = 15;
-        break;
-      case '5':
-      case 5:
-        minute = 30;
-        break;
-      case '75':
-      case 75:
-        minute = 45;
-        break;
-      default:
-        break;
-    }
-    return {
-      hour: parseInt(hour, 10),
-      minute,
-      string: `${hour}${minute}`,
-    };
-  }
-  return {
-    hour: parseInt(timestamp, 10),
-    minute: 0,
-    string: `${parseInt(timestamp, 10) * 100}`,
-  };
-}
-
-export async function getHoursOfOperation() {
-  const labels = await fetchLabels();
-  const store = getCurrentStore();
-  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-  const timesObj = {};
-  if (!labels[`${store}_onlinehoursopen`] && !labels[`${store}_onlinehoursclose`]) {
-    // always open
-    days.forEach((day) => {
-      timesObj[day] = {
-        open: convertHour('0'),
-        close: convertHour('24'),
-      };
-    });
-  } else {
-    const openHours = labels[`${store}_onlinehoursopen`].split(',').map((o) => o.trim());
-    const closeHours = labels[`${store}_onlinehoursclose`].split(',').map((o) => o.trim());
-    days.forEach((day, i) => {
-      timesObj[day] = {
-        open: convertHour(openHours[i]),
-        close: convertHour(closeHours[i]),
-      };
-    });
-  }
-  return timesObj;
-}
-
-export async function getOpenStatus(day) {
-  const timeObj = await getHoursOfOperation();
-  const now = new Date();
-  const currentTime = Number(`${now.getHours()}${now.getMinutes()}`);
-  const openObj = {};
-  if (currentTime < Number(timeObj[day].open.string)) {
-    openObj.open = false;
-    openObj.text = 'before open';
-  } else if (currentTime < Number(timeObj[day].close.string)) {
-    openObj.open = true;
-    openObj.text = 'after open, before close';
-  } else {
-    openObj.open = false;
-    openObj.text = 'after close';
-  }
-  return openObj;
 }
 
 /**
@@ -857,35 +681,17 @@ export async function getOpenStatus(day) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
-  fetchLabels();
-  loadCSS('/assets/styles/lazy-styles.css');
-  loadBlocks(main);
-  buildAutoBlocks(main);
-}
+  await loadBlocks(main);
 
-export async function fetchFormFields() {
-  if (!window.formFields) {
-    const resp = await fetch('/_admin/forms.json');
-    if (resp.ok) {
-      let json = await resp.json();
-      if (json.data) {
-        json = json.data; // helix quirk, difference between live and local
-      }
-      const fields = {};
-      json.forEach((j) => {
-        if (fields[j.category]) {
-          fields[j.category].push(j);
-        } else {
-          fields[j.category] = [j];
-        }
-      });
-      Object.keys(fields).forEach((key) => {
-        fields[key].sort((a, b) => ((a.order > b.order) ? 1 : -1));
-      });
-      window.formFields = fields;
-    }
-  }
-  return window.formFields;
+  const { hash } = window.location;
+  const element = hash ? main.querySelector(hash) : false;
+  if (hash && element) element.scrollIntoView();
+
+  loadHeader(doc.querySelector('header'));
+  loadFooter(doc.querySelector('footer'));
+
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  addFavIcon(`${window.hlx.codeBasePath}/icons/favicon-32x32.png`);
 }
 
 /**
@@ -893,21 +699,7 @@ export async function fetchFormFields() {
  * the user experience.
  */
 function loadDelayed() {
+  // eslint-disable-next-line import/no-cycle
+  window.setTimeout(() => import('../../scripts/delayed.js'), 3000);
   // load anything that can be postponed to the latest here
-  loadFooter();
-  fetchFormFields();
-  loadCSS('/assets/utils/forms/forms.css');
-  fetchCatalog();
-  setLastStore();
 }
-
-/**
- * Decorates the page.
- */
-async function decoratePage(doc) {
-  await loadEager(doc);
-  loadLazy(doc);
-  loadDelayed(doc);
-}
-
-decoratePage(document);

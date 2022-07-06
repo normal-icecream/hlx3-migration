@@ -1,5 +1,5 @@
 version: 1
-# See https://main--helix-home--adobe.hlx.page/docs/setup-indexing.html for more information.
+# See https://www.hlx.live/docs/setup-indexing.
 
 indices:
   site:
@@ -35,10 +35,6 @@ indices:
           attribute(el, 'content')
       topics:
         select: head > meta[name="topics"]
-        value: |
-          attribute(el, 'content')
-      description:
-        select: head > meta[name="description"]
         value: |
           attribute(el, 'content')
       lastModified:
