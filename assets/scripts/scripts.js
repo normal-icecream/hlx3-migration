@@ -373,7 +373,6 @@ export async function loadBlock(block, eager = false) {
   if (!(block.getAttribute('data-block-status') === 'loading' || block.getAttribute('data-block-status') === 'loaded')) {
     block.setAttribute('data-block-status', 'loading');
     const blockName = block.getAttribute('data-block-name');
-    console.log('blockname:', blockName);
     try {
       const cssLoaded = new Promise((resolve) => {
         loadCSS(`${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`, resolve);
@@ -387,7 +386,7 @@ export async function loadBlock(block, eager = false) {
             }
           } catch (error) {
             // eslint-disable-next-line no-console
-            console.log(`failed to load module for ${blockName}`, error);
+            console.warn(`failed to load module for ${blockName}`, error);
           }
           resolve();
         })();
@@ -395,7 +394,7 @@ export async function loadBlock(block, eager = false) {
       await Promise.all([cssLoaded, decorationComplete]);
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`failed to load block ${blockName}`, error);
+      console.warn(`failed to load block ${blockName}`, error);
     }
     block.setAttribute('data-block-status', 'loaded');
   }
@@ -590,7 +589,7 @@ export function initHlx() {
       [window.hlx.codeBasePath] = new URL(scriptEl.src).pathname.split('/scripts/scripts.js');
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(error);
+      console.error(error);
     }
   }
 }
@@ -660,8 +659,8 @@ export function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
-  decorateSections(main);
   decorateBlocks(main);
+  decorateSections(main);
 }
 
 /**
@@ -700,6 +699,6 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('../../scripts/delayed.js'), 3000);
+  window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
 }
