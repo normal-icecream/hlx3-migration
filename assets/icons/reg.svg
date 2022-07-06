@@ -1,0 +1,6 @@
+<svg id="reg" viewBox="0 0 250 400">
+  <g>
+    <circle cx="125" cy="125" r="100" stroke-width="20px" fill="none"/>
+    <text x="125" y="135" text-anchor="middle" font-size="180px" dy=".3em">R</text>
+  </g>
+</svg>
