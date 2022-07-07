@@ -168,7 +168,7 @@ svg#reg {
 }
 
 /* buttons */
-a.button:any-link, button {
+a.button:any-link {
   display: inline-block;
   margin: 16px 0;
   border: 2px solid transparent;
@@ -187,17 +187,17 @@ a.button:any-link, button {
   text-overflow: ellipsis;
 }
 
-a.button:hover, a.button:focus, button:hover, button:focus {
+a.button:hover, a.button:focus {
   background-color: var(--link-hover-color);
   cursor: pointer;
 }
 
 button:disabled, button:disabled:hover {
   background-color: var(--overlay-background-color);
-  cursor: unset;
+  cursor: not-allowed;
 }
 
-a.button.secondary, button.secondary {
+a.button.secondary {
   background-color: unset;
   border: 2px solid currentcolor;
   color: var(--text-color)
@@ -218,6 +218,11 @@ main input {
 
 main input:hover {
   border: 1px solid var(--text-color);
+}
+
+main button {
+  outline: 0;
+  border: 0;
 }
 
 main .section {
@@ -261,16 +266,7 @@ main img {
   height: auto;
 }
 
-@media (min-width: 768px) {
-  :root {
-    --heading-font-size-xxl: 60px;
-    --heading-font-size-xl: 48px;
-    --heading-font-size-l: 36px;
-    --heading-font-size-m: 30px;
-    --heading-font-size-s: 24px;
-    --heading-font-size-xs: 22px;  
-  }
-  
+@media (min-width: 768px) { 
   main .section {
     padding: 64px 32px;
   }
@@ -289,4 +285,45 @@ main .section[data-section-status='initialized'] {
 
 main .section.highlight {
   background-color: var(--highlight-background-color);
+}
+
+/* icons */
+.icon.icon-arrow {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.icon.icon-arrow::after,
+.icon.icon-arrow::before {
+  display: block;
+  position: absolute;
+  content: '';
+}
+
+.icon.icon-arrow::before { /* stem of arrow */
+  bottom: 19px;
+  width: 40px;
+  height: 2px;
+  background: currentColor;
+}
+
+.icon.icon-arrow::after { /* point of arrow */
+  bottom: 12.5px;
+  width: 15px;
+  height: 15px;
+  transform: rotate(45deg);
+}
+
+.icon.icon-arrow-left::after {
+  left: 2px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+
+.icon.icon-arrow-right::after {
+  right: 2px;
+  border-top: 2px solid;
+  border-right: 2px solid;
 }
