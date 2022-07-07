@@ -331,7 +331,7 @@ export function updateSectionsStatus(main) {
  */
 export function decorateBlocks(main) {
   main
-    .querySelectorAll('div.section div[class]')
+    .querySelectorAll('div.section div[class]:not(.default-content-wrapper)')
     .forEach((block) => decorateBlock(block));
 }
 
@@ -637,13 +637,41 @@ function loadFooter(footer) {
   loadBlock(footerBlock);
 }
 
+function decorateIndex(main) {
+  loadCSS(`${window.hlx.codeBasePath}/templates/index/index.css`);
+  const content = main.querySelector('div');
+  // setup title 
+  const wrapper = createEl('section', { class: 'index-title' });
+  const title = content.querySelector('h1');
+  wrapper.append(title);
+  content.append(wrapper);
+  // setup nav
+  const navList = content.querySelector('ul');
+  const nav = createEl('nav', { class: 'index-nav' });
+  nav.append(navList);
+  content.append(nav);
+  // setup carousel
+  const src = content.querySelector('a[href*="/_admin"]');
+  if (src.parentNode.nodeName === 'P') src.parentNode.remove();
+  const carousel = buildBlock('carousel', { elems: [src] });
+  carousel.classList.add('index-carousel');
+  content.append(carousel);
+}
+
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
-    buildHeroBlock(main);
+    // buildHeroBlock(main);
+    const template = getMetadata('template');
+    
+    if (template === 'index') {
+      decorateIndex(main);
+    }
+    
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -659,8 +687,8 @@ export function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
-  decorateBlocks(main);
   decorateSections(main);
+  decorateBlocks(main);
 }
 
 /**
