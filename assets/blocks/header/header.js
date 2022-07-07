@@ -9,7 +9,6 @@ function openCart(e) {
 }
 
 function setupCart(cart) {
-  console.log('cart:', cart);
   const btn = cart.querySelector('a');
   if (btn) {
     // setup button
