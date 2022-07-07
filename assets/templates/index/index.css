@@ -1,0 +1,212 @@
+body.index main .section:first-of-type {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  body.index main .section:first-of-type {
+    display: grid;
+    grid-template-columns: auto 1fr; 
+    grid-template-rows: auto 1fr; 
+    gap: 0 3rem; 
+    grid-template-areas: 
+      'nav carousel';
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  body.index main .section:first-of-type {
+    padding-left: calc((100% - 1200px + 4rem) / 2);;
+  }
+}
+
+body.index .default-content-wrapper {
+  grid-area: nav;
+  margin: 0;
+}
+
+body.index .carousel-wrapper {
+  grid-area: carousel;
+  margin-top: 32px;
+}
+
+@media (min-width: 768px) {
+  body.index .carousel-wrapper {
+    margin-top: 0;
+  }
+}
+
+/* title */
+body.index header .header-title {
+  visibility: hidden;
+}
+
+body.index .index-title {
+  transform: scale(1, 1.3); /* linked to scale */
+}
+
+body.index .index-title h1 {
+  display: inline;
+  position: relative;
+  font-family: var(--brand-font-family);
+  font-size: 72px; /* linked to scale */
+  font-weight: unset;
+}
+
+body.index .index-title h1 .icon {
+  position: absolute;
+  top: calc(36px / 2.5); /* linked to scale */
+  right: calc(-36px / 1.25); /* linked to scale */
+  line-height: 0;
+}
+
+body.index .index-title h1 .icon svg {
+  width: 36px; /* linked to scale */
+  height: 36px; /* linked to scale */
+}
+
+@media (min-width: 576px) {
+  body.index .index-title h1 {
+    font-size: 90px; /* linked to scale */
+  }
+  
+  body.index .index-title h1 .icon {
+    top: calc(45px / 2.5); /* linked to scale */
+    right: calc(-45px / 1.25); /* linked to scale */
+  }
+  
+  body.index .index-title h1 .icon svg {
+    width: 45px; /* linked to scale */
+    height: 45px; /* linked to scale */
+  }
+}
+
+@media (min-width: 768px) {
+  body.index .index-title h1 {
+    font-size: 108px; /* linked to scale */
+  }
+  
+  body.index .index-title h1 .icon {
+    top: calc(54px / 2.5); /* linked to scale */
+    right: calc(-54px / 1.25); /* linked to scale */
+  }
+  
+  body.index .index-title h1 .icon svg {
+    width: 54px; /* linked to scale */
+    height: 54px; /* linked to scale */
+  }
+}
+
+/* nav */
+body.index .index-nav {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-l);
+  font-weight: 600;
+}
+
+body.index .index-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.index .index-nav ul li {
+  border-bottom: 1px solid;
+}
+
+body.index .index-nav ul li a {
+  display: block;
+  position: relative;
+  transition: letter-spacing .2s;
+}
+
+body.index .index-nav ul li a::before,
+body.index .index-nav ul li a::after {
+  display: block;
+  position: absolute;
+  content: '';
+}
+
+body.index .index-nav ul li a::before {
+  top: 50%;
+  right: 2px;
+  width: 40px;
+  height: 2px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+body.index .index-nav ul li a::after {
+  top: 35%;
+  right: 4px;
+  width: 15px;
+  height: 15px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  transform: rotate(45deg);
+}
+
+@media (min-width: 576px) {
+  body.index .index-nav {
+    font-size: var(--heading-font-size-xl);
+  }
+
+  body.index .index-nav ul li a::after {
+    top: 38%;
+  }
+}
+
+body.index .index-nav ul li a:hover {
+  border: 0;
+  letter-spacing: 1px;
+}
+
+/* carousel */
+@media (min-width: 768px) {
+  body.index .index-carousel {
+    height: 50vh;
+    min-height: 460px;
+    max-height: calc(100vh - var(--header-height) - var(--footer-height));
+  }
+
+  body.index .index-carousel .carousel-slide {
+    width: 80%;
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-prev {
+    left: calc(-80% + 1rem);
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-next {
+    left: calc(80% + 1rem);
+  }
+}
+
+@media (min-width: 992px) {
+  body.index .index-carousel .carousel-slide {
+    width: 75%;
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-prev {
+    left: calc(-75% + 1rem);
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-next {
+    left: calc(75% + 1rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  body.index .index-carousel .carousel-slide {
+    width: 66%;
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-prev {
+    left: calc(-66% + 1rem);
+  }
+  
+  body.index .index-carousel .carousel-slide.slide-next {
+    left: calc(66% + 1rem);
+  }
+}
