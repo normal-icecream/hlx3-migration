@@ -1,25 +1,48 @@
-.columns > div {
-    display: flex;
-    flex-direction: column;
+main .columns > div {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
-.columns img {
-    width: 100%;
+main .columns > div:not(:last-of-type) {
+  margin-bottom: 16px;
+}
+
+/* in mobile view, images should always appear above text */
+main .columns > div div { 
+  order: 2;
+}
+
+main .columns > div .columns-img-col { 
+  order: 1;
 }
 
 @media (min-width: 768px) {
-    .columns > div {
-        display: flex;
-        align-items: center;
-        flex-direction: unset;
-    }
+  main .columns > div {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
 
-    .columns > div > div {
-        flex: 1;
-        margin-left: 32px;
-    }
+  /* columns should be evenly split */
+  main .columns > div div { 
+    flex: 0 1 50%;
+    order: unset;
+  }
 
-    .columns > div > div:first-of-type {
-        margin-left: unset;
-    }
+  /* EXCEPT when img only, then take up 60% */
+  main .columns > div .columns-img-col { 
+    flex: 1 0 60%;
+    order: unset;
+  }
+}
+
+main .columns img {
+  width: 100%;
+}
+
+main .columns .icon {
+  display: block;
+  margin: auto;
 }
