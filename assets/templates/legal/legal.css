@@ -1,0 +1,21 @@
+body.legal main .title-container {
+  text-align: center;
+}
+
+body.legal main .section > div {
+  max-width: 576px;
+  margin: auto;
+}
+
+body.legal main a {
+  border-bottom: 1px solid;
+}
+
+body.legal main ol {
+  padding-inline-start: 32px;
+}
+
+body.legal main ol li::marker {
+  font-family: var(--fixed-font-family);
+  font-weight: bold;
+}
