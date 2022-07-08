@@ -1,14 +1,19 @@
-body.legal main .title-container {
-  text-align: center;
-}
-
 body.legal main .section > div {
   max-width: 576px;
   margin: auto;
+  text-align: justify;
+}
+
+body.legal main .section.title-container > div {
+  text-align: center;
 }
 
 body.legal main a {
   border-bottom: 1px solid;
+}
+
+body.legal main a:hover {
+  border-bottom: 2px solid;
 }
 
 body.legal main ol {

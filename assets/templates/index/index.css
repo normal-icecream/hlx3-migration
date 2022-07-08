@@ -102,9 +102,11 @@ body.index main .index-title h1 .icon svg {
 
 /* nav */
 body.index main .index-nav {
+  margin-top: 16px;
   font-family: var(--heading-font-family);
   font-size: var(--heading-font-size-m);
   font-weight: 600;
+  text-align: left;
 }
 
 body.index main .index-nav ul {
@@ -160,7 +162,6 @@ body.index main .index-nav ul li a::after {
 }
 
 body.index main .index-nav ul li a:hover {
-  border: 0;
   letter-spacing: 1px;
 }
 

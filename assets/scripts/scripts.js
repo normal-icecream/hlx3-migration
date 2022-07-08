@@ -643,10 +643,10 @@ function unfixCart() {
   if (header) header.classList.add('unfix-cart');
 }
 
-function hideCart() {
-  const header = document.querySelector('header');
-  if (header) header.classList.add('hide-cart');
-}
+// function hideCart() {
+//   const header = document.querySelector('header');
+//   if (header) header.classList.add('hide-cart');
+// }
 
 function decorateIndex(main) {
   const content = main.querySelector('div');
@@ -683,6 +683,8 @@ function buildAutoBlocks(main) {
       decorateIndex(main);
     } else if (template === 'legal') {
       loadTemplateCSS(template);
+    }
+    if (template !== 'order') {
       unfixCart();
     }
   } catch (error) {

@@ -100,6 +100,7 @@ body {
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
   line-height: 1.6;
+  overflow-x: hidden; /* FIX, hacky */
 }
 
 body.appear {
@@ -126,25 +127,48 @@ h4, h5, h6 {
 }
 
 h1 { font-size: var(--heading-font-size-xxl) }
+h1 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-xxl) / 2.2);
+}
+
 h2 { font-size: var(--heading-font-size-xl) }
+h2 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-xl) / 2.2);
+}
+
 h3 { font-size: var(--heading-font-size-l) }
+h3 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-l) / 2.2);
+}
+
 h4 { font-size: var(--heading-font-size-m) }
+h4 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-m) / 2.2);
+}
+
 h5 { font-size: var(--heading-font-size-s) }
+h5 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-s) / 2.2);
+}
+
 h6 { font-size: var(--heading-font-size-xs) }
+h6 .icon.icon-reg svg {
+  width: calc(var(--heading-font-size-xs) / 2.2);
+}
 
 p, dl, ol, ul, pre, blockquote {
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
+p .icon.icon-reg svg {
+  width: calc(var(--body-font-size-m) / 2.2);
+}
+
 a:any-link {
   color: var(--link-color);
   text-decoration: none;
   word-break: break-word;
-}
-
-a[href]:hover {
-  border-bottom: 2px solid;
 }
 
 code, pre, samp {
@@ -161,6 +185,8 @@ pre {
 }
 
 svg {
+  width: 200px;
+  max-width: 100%;
   fill: currentColor;
 }
 
@@ -233,10 +259,6 @@ main button {
   border: 0;
 }
 
-main .section {
-  padding: 32px 2rem;
-}
-
 main pre {
   border-radius: .25em;
   padding: 1rem;
@@ -268,12 +290,25 @@ main img {
   height: auto;
 }
 
+main .section {
+  padding: 32px 2rem;
+}
+
+main .section > div {
+  text-align: center;
+}
+
+main .section > div.default-content-wrapper p {
+  margin: 1rem auto;
+  max-width: 768px;
+}
+
 @media (min-width: 768px) { 
   main .section {
     padding: 32px 16px;
   }
 
-  .section > div {
+  main .section > div {
     max-width: 992px;
     margin: auto;
   }
@@ -291,10 +326,6 @@ main .section.highlight {
 
 main .section.title-container {
   padding-top: 0;
-}
-
-main .section.title-container h1 {
-  text-align: center
 }
 
 /* icons */
