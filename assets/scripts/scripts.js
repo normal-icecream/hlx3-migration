@@ -11,6 +11,28 @@
  */
 
 /**
+ * Builds an HTML DOM element.
+ * @param {string} tag The type of element
+ * @param {object} params Additional parameters for element
+ * @returns {Element} The block element
+ */
+export function createEl(tag, params) {
+  const el = document.createElement(tag);
+  if (params) {
+    Object.keys(params).forEach((param) => {
+      if (param === 'html') {
+        el.innerHTML = params[param];
+      } else if (param === 'text') {
+        el.textContent = params[param];
+      } else {
+        el.setAttribute(param, params[param]);
+      }
+    });
+  }
+  return el;
+}
+
+/**
  * log RUM if part of the sample.
  * @param {string} checkpoint identifies the checkpoint in funnel
  * @param {Object} data additional data for RUM sample
@@ -63,28 +85,6 @@ export function sampleRUM(checkpoint, data = {}) {
   } catch (error) {
     // something went wrong
   }
-}
-
-/**
- * Builds an HTML DOM element.
- * @param {string} tag The type of element
- * @param {object} params Additional parameters for element
- * @returns {Element} The block element
- */
-export function createEl(tag, params) {
-  const el = document.createElement(tag);
-  if (params) {
-    Object.keys(params).forEach((param) => {
-      if (param === 'html') {
-        el.innerHTML = params[param];
-      } else if (param === 'text') {
-        el.textContent = params[param];
-      } else {
-        el.setAttribute(param, params[param]);
-      }
-    });
-  }
-  return el;
 }
 
 /**
