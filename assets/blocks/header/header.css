@@ -62,6 +62,14 @@ header .header-cart {
   }
 }
 
+header.unfix-cart .header-cart {
+  position: unset;
+}
+
+header.hide-cart .header-cart {
+  visibility: hidden;
+}
+
 header .header-cart #cart {
   display: block;
   position: relative;

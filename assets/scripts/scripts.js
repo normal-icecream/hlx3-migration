@@ -169,7 +169,7 @@ export function decorateIcons(element = document) {
       if (iconHTML.match(/<style/i)) {
         const img = createEl('img', {
           src: `data:image/svg+xml,${encodeURIComponent(iconHTML)}`,
-        })
+        });
         span.appendChild(img);
       } else {
         span.innerHTML = iconHTML;
@@ -533,7 +533,7 @@ export function addFavIcon(href) {
   const link = createEl('link', {
     rel: 'icon',
     type: 'image/svg+xml',
-    href
+    href,
   });
   const existingLink = document.querySelector('head link[rel="icon"]');
   if (existingLink) {
@@ -602,7 +602,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['carousel']; // add your LCP blocks to the list
 const RUM_GENERATION = 'project-1'; // add your RUM generation information here
 const ICON_ROOT = '/icons';
 
@@ -612,15 +612,10 @@ document.addEventListener('click', () => sampleRUM('click'));
 
 loadPage(document);
 
-function buildHeroBlock(main) {
-  const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
-  // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = createEl('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
-    main.prepend(section);
-  }
+function buildTitleBlock(main) {
+  const section = main.querySelector('div');
+  const h1 = section.querySelector('h1');
+  if (h1) section.classList.add('title-container');
 }
 
 function loadHeader(header) {
@@ -637,10 +632,25 @@ function loadFooter(footer) {
   loadBlock(footerBlock);
 }
 
+function loadTemplateCSS(template) {
+  // eslint-disable-next-line no-param-reassign
+  template = toClassName(template);
+  loadCSS(`${window.hlx.codeBasePath}/templates/${template}/${template}.css`);
+}
+
+function unfixCart() {
+  const header = document.querySelector('header');
+  if (header) header.classList.add('unfix-cart');
+}
+
+function hideCart() {
+  const header = document.querySelector('header');
+  if (header) header.classList.add('hide-cart');
+}
+
 function decorateIndex(main) {
-  loadCSS(`${window.hlx.codeBasePath}/templates/index/index.css`);
   const content = main.querySelector('div');
-  // setup title 
+  // setup title
   const wrapper = createEl('section', { class: 'index-title' });
   const title = content.querySelector('h1');
   wrapper.append(title);
@@ -658,7 +668,6 @@ function decorateIndex(main) {
   content.append(carousel);
 }
 
-
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -666,12 +675,16 @@ function decorateIndex(main) {
 function buildAutoBlocks(main) {
   try {
     // buildHeroBlock(main);
+    buildTitleBlock(main);
+
     const template = getMetadata('template');
-    
     if (template === 'index') {
+      loadTemplateCSS(template);
       decorateIndex(main);
+    } else if (template === 'legal') {
+      loadTemplateCSS(template);
+      unfixCart();
     }
-    
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
