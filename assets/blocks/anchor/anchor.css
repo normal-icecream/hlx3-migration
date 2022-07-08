@@ -1,0 +1,161 @@
+.anchor-target {
+  position: relative;
+}
+
+.anchor-target .anchor-wrapper,
+.anchor-target .anchor-wrapper > a {
+  text-align: center;
+}
+
+.anchor-target .anchor-wrapper .anchor {
+  position: relative;
+  height: 200px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform .2s;
+}
+
+@media (min-width: 768px) {
+  .anchor-target {
+    margin-top: 125px !important;
+  }
+
+  .anchor-target .anchor-wrapper .anchor {
+    position: absolute;
+    top: -150px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .anchor-target {
+    margin-top: 83px !important;
+  }
+
+  .anchor-target .anchor-wrapper .anchor {
+    top: -125px;
+  }
+}
+
+/* --------------------
+HOVER
+----------------------- */
+.anchor-target .anchor-wrapper .anchor:hover {
+  transform: rotate(-6deg) scale(1.3);
+}
+
+.anchor-target .anchor-wrapper .anchor:hover .icon {
+  filter: drop-shadow(1px 1px 2px var(--color-lt-gray));
+}
+
+.anchor-target .anchor-wrapper .anchor:hover .icon.icon-starburst {
+  animation-duration: 10s;
+}
+
+.anchor-target .anchor-wrapper .anchor .icon {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 200px;
+  width: 200px;
+  z-index: 1;
+}
+
+.anchor-target .anchor-wrapper .anchor .icon.icon-starburst {
+  animation: starSpin 30s linear infinite;
+}
+
+.anchor-target .anchor-wrapper .anchor .anchor-text {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px;
+  max-height: 110px;
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  font-weight: 600;
+  line-height: 1.1;
+  z-index: 2;
+}
+
+/* --------------------
+POSITION
+----------------------- */
+@media (min-width: 768px) {
+  .anchor-target .anchor-wrapper .anchor.anchor-left {
+    left: 100px;
+  }
+  
+  .anchor-target .anchor-wrapper .anchor.anchor-right {
+    right: 100px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .anchor-target .anchor-wrapper .anchor.anchor-left {
+    left: 2rem;
+  }
+  
+  .anchor-target .anchor-wrapper .anchor.anchor-right {
+    right: 2rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .anchor-target .anchor-wrapper .anchor.anchor-left {
+    left: -25px;
+  }
+  
+  .anchor-target .anchor-wrapper .anchor.anchor-right {
+    right: -25px;
+  }
+}
+
+/* --------------------
+COLOR
+----------------------- */
+.anchor-target .anchor-wrapper .anchor.anchor-blue {
+  color: var(--color-blue);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-blue .anchor-text {
+  color: var(--color-white);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-pink {
+  color: var(--color-pink);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-pink .anchor-text {
+  color: var(--color-blue);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-red {
+  color: var(--color-red);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-red .anchor-text {
+  color: var(--color-yellow);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-yellow-alt {
+  color: var(--color-yellow-alt);
+}
+
+.anchor-target .anchor-wrapper .anchor.anchor-yellow-alt .anchor-text {
+  color: var(--color-blue);
+}
+
+/* --------------------
+ANIMATION
+----------------------- */
+@keyframes starSpin { 
+  100% { 
+    transform: translateX(-50%) rotate(360deg); 
+  } 
+}
