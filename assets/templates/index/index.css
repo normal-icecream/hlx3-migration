@@ -40,7 +40,7 @@ body.index main .carousel-wrapper {
 }
 
 /* title */
-body.index main header .header-title {
+body.index header .header-title {
   visibility: hidden;
 }
 
