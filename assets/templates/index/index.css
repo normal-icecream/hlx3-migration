@@ -21,32 +21,34 @@ body.index main .section:first-of-type {
   }
 }
 
-body.index .default-content-wrapper {
+body.index main .default-content-wrapper {
   grid-area: nav;
+  max-width: unset;
   margin: 0;
 }
 
-body.index .carousel-wrapper {
+body.index main .carousel-wrapper {
   grid-area: carousel;
+  max-width: unset;
   margin-top: 32px;
 }
 
 @media (min-width: 768px) {
-  body.index .carousel-wrapper {
+  body.index main .carousel-wrapper {
     margin-top: 0;
   }
 }
 
 /* title */
-body.index header .header-title {
+body.index main header .header-title {
   visibility: hidden;
 }
 
-body.index .index-title {
+body.index main .index-title {
   transform: scale(1, 1.3); /* linked to scale */
 }
 
-body.index .index-title h1 {
+body.index main .index-title h1 {
   display: inline;
   position: relative;
   font-family: var(--brand-font-family);
@@ -54,81 +56,81 @@ body.index .index-title h1 {
   font-weight: unset;
 }
 
-body.index .index-title h1 .icon {
+body.index main .index-title h1 .icon {
   position: absolute;
   top: calc(36px / 2.5); /* linked to scale */
   right: calc(-36px / 1.25); /* linked to scale */
   line-height: 0;
 }
 
-body.index .index-title h1 .icon svg {
+body.index main .index-title h1 .icon svg {
   width: 36px; /* linked to scale */
   height: 36px; /* linked to scale */
 }
 
 @media (min-width: 576px) {
-  body.index .index-title h1 {
+  body.index main .index-title h1 {
     font-size: 90px; /* linked to scale */
   }
   
-  body.index .index-title h1 .icon {
+  body.index main .index-title h1 .icon {
     top: calc(45px / 2.5); /* linked to scale */
     right: calc(-45px / 1.25); /* linked to scale */
   }
   
-  body.index .index-title h1 .icon svg {
+  body.index main .index-title h1 .icon svg {
     width: 45px; /* linked to scale */
     height: 45px; /* linked to scale */
   }
 }
 
 @media (min-width: 768px) {
-  body.index .index-title h1 {
+  body.index main .index-title h1 {
     font-size: 108px; /* linked to scale */
   }
   
-  body.index .index-title h1 .icon {
+  body.index main .index-title h1 .icon {
     top: calc(54px / 2.5); /* linked to scale */
     right: calc(-54px / 1.25); /* linked to scale */
   }
   
-  body.index .index-title h1 .icon svg {
+  body.index main .index-title h1 .icon svg {
     width: 54px; /* linked to scale */
     height: 54px; /* linked to scale */
   }
 }
 
 /* nav */
-body.index .index-nav {
+body.index main .index-nav {
   font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-l);
+  font-size: var(--heading-font-size-m);
   font-weight: 600;
 }
 
-body.index .index-nav ul {
+body.index main .index-nav ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-body.index .index-nav ul li {
+body.index main .index-nav ul li {
   border-bottom: 1px solid;
 }
 
-body.index .index-nav ul li a {
+body.index main .index-nav ul li a {
   display: block;
   position: relative;
   transition: letter-spacing .2s;
 }
 
-body.index .index-nav ul li a::before,
-body.index .index-nav ul li a::after {
+body.index main .index-nav ul li a::before,
+body.index main .index-nav ul li a::after {
   display: block;
   position: absolute;
   content: '';
 }
 
-body.index .index-nav ul li a::before {
+body.index main .index-nav ul li a::before {
   top: 50%;
   right: 2px;
   width: 40px;
@@ -137,8 +139,8 @@ body.index .index-nav ul li a::before {
   transform: translateY(-50%);
 }
 
-body.index .index-nav ul li a::after {
-  top: 35%;
+body.index main .index-nav ul li a::after {
+  top: 37%;
   right: 4px;
   width: 15px;
   height: 15px;
@@ -148,65 +150,65 @@ body.index .index-nav ul li a::after {
 }
 
 @media (min-width: 576px) {
-  body.index .index-nav {
-    font-size: var(--heading-font-size-xl);
+  body.index main .index-nav {
+    font-size: var(--heading-font-size-l);
   }
 
-  body.index .index-nav ul li a::after {
-    top: 38%;
+  body.index main .index-nav ul li a::after {
+    top: 40%;
   }
 }
 
-body.index .index-nav ul li a:hover {
+body.index main .index-nav ul li a:hover {
   border: 0;
   letter-spacing: 1px;
 }
 
 /* carousel */
 @media (min-width: 768px) {
-  body.index .index-carousel {
+  body.index main .index-carousel {
     height: 50vh;
-    min-height: 460px;
+    min-height: 524px;
     max-height: calc(100vh - var(--header-height) - var(--footer-height));
   }
 
-  body.index .index-carousel .carousel-slide {
+  body.index main .index-carousel .carousel-slide {
     width: 80%;
   }
   
-  body.index .index-carousel .carousel-slide.slide-prev {
+  body.index main .index-carousel .carousel-slide.slide-prev {
     left: calc(-80% + 1rem);
   }
   
-  body.index .index-carousel .carousel-slide.slide-next {
+  body.index main .index-carousel .carousel-slide.slide-next {
     left: calc(80% + 1rem);
   }
 }
 
 @media (min-width: 992px) {
-  body.index .index-carousel .carousel-slide {
+  body.index main .index-carousel .carousel-slide {
     width: 75%;
   }
   
-  body.index .index-carousel .carousel-slide.slide-prev {
+  body.index main .index-carousel .carousel-slide.slide-prev {
     left: calc(-75% + 1rem);
   }
   
-  body.index .index-carousel .carousel-slide.slide-next {
+  body.index main .index-carousel .carousel-slide.slide-next {
     left: calc(75% + 1rem);
   }
 }
 
 @media (min-width: 1200px) {
-  body.index .index-carousel .carousel-slide {
+  body.index main .index-carousel .carousel-slide {
     width: 66%;
   }
   
-  body.index .index-carousel .carousel-slide.slide-prev {
+  body.index main .index-carousel .carousel-slide.slide-prev {
     left: calc(-66% + 1rem);
   }
   
-  body.index .index-carousel .carousel-slide.slide-next {
+  body.index main .index-carousel .carousel-slide.slide-next {
     left: calc(66% + 1rem);
   }
 }
