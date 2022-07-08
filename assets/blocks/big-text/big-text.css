@@ -1,0 +1,11 @@
+main .big-text {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  main .big-text {
+    font-size: var(--heading-font-size-m);
+  }
+}
