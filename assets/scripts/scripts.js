@@ -699,11 +699,11 @@ function buildAutoBlocks(main) {
  */
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
-  decorateButtons(main);
-  decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
+  decorateButtons(main);
+  decorateIcons(main);
 }
 
 /**
@@ -744,4 +744,18 @@ function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
+}
+
+export function debounce(func, wait) {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
