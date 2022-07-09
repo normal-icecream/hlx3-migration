@@ -137,7 +137,7 @@ body.index main .index-nav ul li a::before {
   right: 2px;
   width: 40px;
   height: 2px;
-  background: currentColor;
+  background-color: currentColor;
   transform: translateY(-50%);
 }
 

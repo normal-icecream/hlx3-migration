@@ -329,6 +329,10 @@ main .section.title-container {
 }
 
 /* icons */
+.icon {
+  line-height: 1;
+}
+
 .icon.icon-arrow {
   display: block;
   position: relative;
@@ -347,7 +351,7 @@ main .section.title-container {
   bottom: 19px;
   width: 40px;
   height: 2px;
-  background: currentColor;
+  background-color: currentColor;
 }
 
 .icon.icon-arrow::after { /* point of arrow */
