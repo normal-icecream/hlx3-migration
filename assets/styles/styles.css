@@ -83,6 +83,8 @@
 
 @font-face {
   font-family: 'acumin-pro-extra-condensed-fallback';
+  font-weight: normal;
+  letter-spacing: -1rem;
   size-adjust: 77.82%;
   src: local('Arial');
 }
