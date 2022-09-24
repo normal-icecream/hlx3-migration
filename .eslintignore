@@ -1,0 +1,4 @@
+/assets/_blocks/**/*.js
+/assets/_styles/**/*.js
+/assets/pages/**/*.js
+/assets/utils/**/*.js
