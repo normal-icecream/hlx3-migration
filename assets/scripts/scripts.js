@@ -645,7 +645,7 @@ function loadFooter(footer) {
 function loadTemplateCSS(template) {
   // eslint-disable-next-line no-param-reassign
   template = toClassName(template);
-  loadCSS(`${window.hlx.codeBasePath}/templates/${template}/${template}.css`);
+  loadCSS(`${window.hlx.codeBasePath}/templates/${template}.css`);
 }
 
 function unfixCart() {
@@ -692,6 +692,8 @@ function buildAutoBlocks(main) {
       loadTemplateCSS(template);
       decorateIndex(main);
     } else if (template === 'legal') {
+      loadTemplateCSS(template);
+    } else if (template === 'order') {
       loadTemplateCSS(template);
     }
     if (template !== 'order') {
