@@ -30,7 +30,8 @@
   --link-hover-color: #136ff6;
   --background-color: var(--color-white);
   --overlay-background-color: var(--color-pink);
-  --highlight-background-color: #ccc;
+  --highlight-background-color: var(--color-blue);
+  --highlight-text-color: var(--color-white);
   --text-color: var(--color-blue);
 
   /* fonts */
@@ -198,9 +199,24 @@ svg {
   fill: currentColor;
 }
 
-svg#reg {
+svg#reg, svg#gf, svg#v {
   stroke: currentColor;
+  vertical-align: middle;
+}
+
+svg#reg {
   text-transform: uppercase;
+}
+
+svg#gf, svg#v {
+  margin-left: 2px;
+  height: var(--heading-font-size-m);
+  width: var(--heading-font-size-m);
+}
+
+.icon.icon-gf + .icon.icon-v svg#v,
+.icon.icon-v + .icon.icon-gf svg#gf {
+  margin-left: -8px;
 }
 
 hr {
@@ -406,6 +422,10 @@ main .section > div.default-content-wrapper p {
     max-width: 992px;
     margin: auto;
   }
+}
+
+main .section > div + div {
+  padding-top: 32px;
 }
 
 /* progressive section appearance */
