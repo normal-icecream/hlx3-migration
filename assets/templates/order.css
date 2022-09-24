@@ -1,0 +1,17 @@
+body.order img {
+  width: auto;
+  max-width: 200px;
+  height: auto;
+  max-height: 200px;
+}
+
+body.order .section:not(.title-container):not(.carousel-container):not(.contact-container) > div {
+  padding: 32px 0;
+  background-color: var(--highlight-background-color);
+  color: var(--highlight-text-color);
+}
+
+body.order .section:not(.title-container):not(.carousel-container) > div a {
+  border-bottom: 1px solid;
+  color: var(--highlight-text-color);
+}
