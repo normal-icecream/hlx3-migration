@@ -32,6 +32,16 @@ export function createEl(tag, params) {
   return el;
 }
 
+export function createInput(name, placeholder) {
+  const wrapper = createEl('div', { class: 'input-wrapper' });
+  // eslint-disable-next-line no-use-before-define
+  const input = createEl('input', { id: `input-${toClassName(name)}`, class: 'input', placeholder });
+  // eslint-disable-next-line no-use-before-define
+  const label = createEl('label', { for: `input-${toClassName(name)}`, text: placeholder });
+  wrapper.append(input, label);
+  return wrapper;
+}
+
 /**
  * log RUM if part of the sample.
  * @param {string} checkpoint identifies the checkpoint in funnel
@@ -758,4 +768,23 @@ export function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+export function getFormData(form) {
+  const data = {
+    form: form.id,
+    fields: {},
+  };
+  const inputs = form.querySelectorAll('input');
+  inputs.forEach((input) => {
+    if (input.value && input.value.trim() !== '') {
+      // eslint-disable-next-line eqeqeq
+      const isInt = input.value == Number(input.value);
+      data.fields[input.id] = {
+        value: isInt ? Number(input.value) : input.value.trim(),
+        required: input.required,
+      };
+    }
+  });
+  return data;
 }
