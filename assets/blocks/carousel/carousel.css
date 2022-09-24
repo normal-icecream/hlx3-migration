@@ -189,9 +189,10 @@ main .carousel.carousel-cards .carousel-slide {
   padding: 32px calc(60px - 6px);
 }
 
-main .carousel.carousel-cards .carousel-slide img,
-main .carousel.carousel-cards .carousel-slide .icon {
+main .carousel.carousel-cards .carousel-slide img {
+  width: auto;
   max-width: 200px;
+  height: 200px;
   max-height: 200px;
 }
 
