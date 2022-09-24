@@ -29,7 +29,7 @@
   --link-color: var(--color-blue);
   --link-hover-color: #136ff6;
   --background-color: var(--color-white);
-  --overlay-background-color: #eee;
+  --overlay-background-color: var(--color-pink);
   --highlight-background-color: #ccc;
   --text-color: var(--color-blue);
 
@@ -83,8 +83,8 @@
 
 @font-face {
   font-family: 'acumin-pro-extra-condensed-fallback';
+  font-stretch: extra-condensed;
   font-weight: normal;
-  letter-spacing: -1rem;
   size-adjust: 77.82%;
   src: local('Arial');
 }
@@ -100,9 +100,15 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
+  font-size: var(--body-font-size-s);
   line-height: 1.6;
   overflow-x: hidden; /* FIX, hacky */
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: var(--body-font-size-m);
+  }
 }
 
 body.appear {
@@ -204,61 +210,147 @@ hr {
 }
 
 /* buttons */
-a.button:any-link {
+main button {
+  outline: 0;
+  border: 0;
+}
+
+button.button, a.button:any-link {
   display: inline-block;
   margin: 16px 0;
-  border: 2px solid transparent;
-  border-radius: 30px;
-  padding: 5px 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 24px;
   background-color: var(--link-color);
   color: var(--background-color);
-  font-family: var(--font-family-body);
+  font-family: var(--heading-font-family);
+  font-size: inherit;
   font-style: normal; 
-  font-weight: 600;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
-  cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition-property: box-shadow, border-radius, filter, transform, letter-spacing;
+  transition-duration: .2s;
 }
 
+button.button:hover, button.button:focus,
 a.button:hover, a.button:focus {
-  background-color: var(--link-hover-color);
+  border-radius: 24px;
+  letter-spacing: 1px;
+  box-shadow: 1px 1px 2px var(--color-lt-gray);
+  transform: scale(1.3);
   cursor: pointer;
 }
 
-button:disabled, button:disabled:hover {
+button.button:disabled, button.button:disabled:hover,
+a.button.disabled, a.button.disabled:hover {
   background-color: var(--overlay-background-color);
   cursor: not-allowed;
 }
 
-a.button.secondary {
-  background-color: unset;
-  border: 2px solid currentcolor;
+button.button.secondary, a.button.secondary {
+  border: 1px solid currentColor;
+  background-color: var(--overlay-background-color);
   color: var(--text-color)
 } 
+
+.button-container > .button {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* forms */
+main form.form {
+  border: 1px solid;
+}
+
+main form.form > :first-child,
+main form.form input:first-of-type {
+  border-top: 0;
+}
+
+main form.form > :last-child,
+main form.form input:last-of-type {
+  border-bottom: 0;
+}
+
+main form.form .button-container {
+  display: flex;
+  border-top: 1px solid;
+}
+
+main form.form .button-container > * {
+  flex: 1 1 auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 24px;
+  font-size: 150%;
+}
+
+main form.form .button-container > *:hover,
+main form.form .button-container > *:focus {
+  border-radius: 0;
+  box-shadow: unset;
+  transform: unset;
+}
+
+main form.form .input-wrapper {
+  position: relative;
+}
+
+main form.form .input-wrapper input {
+  transition: padding .2s;
+}
+
+main form.form .input-wrapper input:not(:placeholder-shown) {
+  padding: 30px 8px 15px;
+}
+
+main form.form .input-wrapper input::placeholder {
+  opacity: 0;
+}
+
+main form.form .input-wrapper input:not(:placeholder-shown) + label {
+  top: 8px;
+  transform: unset;
+  color: currentColor;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-xs);
+  opacity: 1;
+}
+
+main form.form .input-wrapper label {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  font-family: var(--heading-font-family);
+  font-size: 150%;
+  transition: top .1s, font-size .2s;
+}
 
 main input {
   display: block;
   width: 100%;
-  max-width: 50rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem 0.6rem;    
-  border: 1px solid var(--text-color);
-  border-radius: 0.25rem;
+  border: 0;
+  border-top: 1px solid var(--text-color);
+  border-bottom: 1px solid var(--text-color);
+  padding: 8px;    
   background-color: var(--background-color);
   color: var(--text-color);
-  font-size: 1.25rem;
+  font-family: var(--heading-font-family);
+  font-size: 150%;
+  transition: background-color 2s;
 }
 
-main input:hover {
-  border: 1px solid var(--text-color);
-}
-
-main button {
+main .input-wrapper:hover input,
+main input:hover, main input:focus {
   outline: 0;
-  border: 0;
+  background-color: var(--color-yellow);
 }
 
 main pre {
@@ -293,7 +385,7 @@ main img {
 }
 
 main .section {
-  padding: 32px 2rem;
+  padding: 32px 16px;
 }
 
 main .section > div {
