@@ -1,0 +1,7 @@
+<svg id="v" viewBox="0 0 250 250">
+  <title>Vegan</title>
+  <g>
+    <circle cx="125" cy="125" r="100" stroke-width="20px" fill="none"/>
+    <text x="125" y="125" text-anchor="middle" font-size="150px" dy=".3em">v</text>
+  </g>
+</svg>
