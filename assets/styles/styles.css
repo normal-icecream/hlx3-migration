@@ -37,7 +37,7 @@
   /* fonts */
   --body-font-family: 'Poppins', 'Poppins-fallback', 'Avenir', 'Century Gothic', sans-serif;
   --heading-font-family: 'acumin-pro-extra-condensed', 'acumin-pro-extra-condensed-fallback', sans-serif;
-  --brand-font-family: 'helvetica neue', Helvetica, Arial, sans-serif;
+  --brand-font-family: Helvetica, Arial, sans-serif;
   --fixed-font-family: monospace;
 
   /* body sizes */
@@ -85,9 +85,8 @@
 @font-face {
   font-family: 'acumin-pro-extra-condensed-fallback';
   font-stretch: extra-condensed;
-  font-weight: normal;
-  size-adjust: 77.82%;
-  src: local('Arial');
+  size-adjust: 72.75%;
+  src: local('Arial Narrow');
 }
 
 *, *::before, *::after {
