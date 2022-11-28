@@ -1,4 +1,4 @@
-import { readBlockConfig, decorateIcons } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, decorateIcons } from '../../scripts/lib.js';
 
 /**
  * collapses all open nav sections
