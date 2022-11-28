@@ -37,8 +37,8 @@
   --heading-font-size-s: 20px;
   --heading-font-size-xs: 18px;
 
-  /* nav height */
-  --nav-height: 64px;
+  /* header height */
+  --header-height: 64px;
 
 }
 
@@ -57,7 +57,7 @@ body.appear {
 }
 
 header {
-  height: var(--nav-height);
+  height: var(--header-height);
 }
 
 h1, h2, h3,
@@ -67,7 +67,7 @@ h4, h5, h6 {
   line-height: 1.25;
   margin-top: 1em;
   margin-bottom: .5em;
-  scroll-margin: calc(var(--nav-height) + 1em);
+  scroll-margin: calc(var(--header-height) + 1em);
 }
 
 h1 { font-size: var(--heading-font-size-xxl) }

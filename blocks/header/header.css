@@ -2,7 +2,7 @@
 header nav {
   display: grid;
   grid-template:
-    'hamburger brand tools' var(--nav-height)
+    'hamburger brand tools' var(--header-height)
     'sections sections sections' 1fr / 50px 1fr 50px;
   align-items: center;
   padding: 0 2rem;
@@ -10,7 +10,7 @@ header nav {
   z-index: 1;
   background-color: var(--background-color);
   width: 100vw;
-  height: var(--nav-height);
+  height: var(--header-height);
   box-sizing: border-box;
   font-family: var(--body-font-family);
 }
@@ -160,7 +160,7 @@ header nav[aria-expanded='true'] .nav-tools li {
   header nav {
     display: flex;
     justify-content: space-between;
-    height: var(--nav-height);
+    height: var(--header-height);
     padding: 16px 2rem;
   }
 

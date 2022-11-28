@@ -17,12 +17,12 @@ function collapseAllNavSections(sections) {
  */
 
 export default async function decorate(block) {
-  const cfg = readBlockConfig(block);
+  const config = readBlockConfig(block);
   block.textContent = '';
 
-  // fetch nav content
-  const navPath = cfg.nav || '/nav';
-  const resp = await fetch(`${navPath}.plain.html`);
+  // fetch header content
+  const headerPath = config.header || '/header';
+  const resp = await fetch(`${headerPath}.plain.html`);
   if (resp.ok) {
     const html = await resp.text();
 
