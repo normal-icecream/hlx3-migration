@@ -1,21 +1,31 @@
-import { readBlockConfig, decorateIcons } from '../../scripts/lib.js';
+import { readBlockConfig, decorateIcons, createEl } from '../../scripts/lib.js';
 
-/**
- * collapses all open nav sections
- * @param {Element} sections The container element
- */
+function decorateCart(section) {
+  const a = section.querySelector('a');
+  if (a) {
+    const btn = createEl('button', {
+      className: 'nav-cart-btn',
+      html: a.innerHTML,
+    });
+    const total = createEl('div', {
+      html: '<p class="nav-cart-total">0</p>',
+      'aria-live': 'polite',
+      'aria-label': 'Items in cart: 0',
+    });
+    btn.prepend(total);
+    a.parentElement.replaceWith(btn);
+  }
+}
 
-function collapseAllNavSections(sections) {
-  sections.querySelectorAll('.nav-sections > ul > li').forEach((section) => {
-    section.setAttribute('aria-expanded', 'false');
-  });
+function decorateBrand(section) {
+  const a = section.querySelector('a');
+  if (a) a.setAttribute('aria-label', 'Homepage');
 }
 
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
-
 export default async function decorate(block) {
   const config = readBlockConfig(block);
   block.textContent = '';
@@ -29,37 +39,19 @@ export default async function decorate(block) {
     // decorate nav DOM
     const nav = document.createElement('nav');
     nav.innerHTML = html;
-    decorateIcons(nav);
 
-    const classes = ['brand', 'sections', 'tools'];
+    const classes = ['brand', 'cart'];
     classes.forEach((e, j) => {
       const section = nav.children[j];
       if (section) section.classList.add(`nav-${e}`);
     });
 
-    const navSections = [...nav.children][1];
-    if (navSections) {
-      navSections.querySelectorAll(':scope > ul > li').forEach((navSection) => {
-        if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-        navSection.addEventListener('click', () => {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          collapseAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        });
-      });
-    }
+    const brand = nav.querySelector('.nav-brand');
+    if (brand) decorateBrand(brand);
 
-    // hamburger for mobile
-    const hamburger = document.createElement('div');
-    hamburger.classList.add('nav-hamburger');
-    hamburger.innerHTML = '<div class="nav-hamburger-icon"></div>';
-    hamburger.addEventListener('click', () => {
-      const expanded = nav.getAttribute('aria-expanded') === 'true';
-      document.body.style.overflowY = expanded ? '' : 'hidden';
-      nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-    });
-    nav.prepend(hamburger);
-    nav.setAttribute('aria-expanded', 'false');
+    const cart = nav.querySelector('.nav-cart');
+    if (cart) decorateCart(cart);
+
     decorateIcons(nav);
     block.append(nav);
   }

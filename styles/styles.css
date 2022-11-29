@@ -22,16 +22,21 @@
   --color-cyan: #07C1C6; /* 065D60 */
   --color-blue: #0C26F9;
   --color-blue-dark: #091DC1;
-
+  
   --background-color: var(--color-white);
   --text-color: var(--color-blue);
   --link-color: var(--text-color);
   --link-hover-color: var(--color-blue-dark);
   --highlight-background-color: var(--color-yellow-alt);
-
+  --highlight-text-color: var(--color-blue);
+  --overlay-background-color: var(--color-blue);
+  --overlay-text-color: var(--color-white);
+  --shadow-light: #E8E5DF66;
+  
   /* fonts */
   --body-font-family: 'Poppins', 'Poppins-fallback', sans-serif;
-  --heading-font-family: 'acumin-pro-extra-condensed', 'acumin-pro-extra-condensed-fallback', sans-serif;;
+  --heading-font-family: 'acumin-pro-extra-condensed', 'acumin-pro-extra-condensed-fallback', sans-serif;
+  --brand-font-family: 'Arial';
   --fixed-font-family: monospace;
 
   /* body sizes */
@@ -42,6 +47,7 @@
   --body-font-size-xs: 14px;
 
   /* heading sizes */
+  --heading-font-size-xxxl: 84px;
   --heading-font-size-xxl: 54px;
   --heading-font-size-xl: 48px;
   --heading-font-size-l: 42px;
@@ -57,18 +63,22 @@
   --pad-s: 4px;
   --pad-xs: 2px;
 
-  /* header height */
-  --header-height: 64px;
+  /* header and footer height */
+  --header-height: 106px;
+  --footer-height: 100px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 700px) {
   :root {
+    --heading-font-size-xxxl: 94px;
     --heading-font-size-xxl: 64px;
     --heading-font-size-xl: 58px;
     --heading-font-size-l: 46px;
     --heading-font-size-m: 36px;
     --heading-font-size-s: 28px;
     --heading-font-size-xs: 20px;
+
+    --footer-height: 55px;
   }
 }
 
@@ -115,6 +125,14 @@ body.appear {
 
 header {
   height: var(--header-height);
+}
+
+footer {
+  height: var(--footer-height);
+}
+
+main {
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
 h1, h2, h3,
@@ -170,10 +188,23 @@ svg {
   fill: currentcolor;
 }
 
+.icon-reg svg {
+  stroke: currentColor;
+  font-family: inherit;
+  font-size: 1.2em;
+  text-transform: uppercase;
+}
+
+span.icon svg {
+  width: .6em;
+  height: .6em;
+}
+
 /* buttons */
-a.button:any-link, button {
+a.button:any-link, button.button {
   box-sizing: border-box;
   display: inline-block;
+  max-width: 100%;
   margin: .5em 0;
   border: 2px solid transparent;
   border-radius: 8px;
@@ -196,19 +227,19 @@ a.button:any-link, button {
   transition: background-color .2s, border-radius .2s;
 }
 
-a.button:hover, button:hover, 
-a.button:focus, button:focus  {
+a.button:hover, button.button:hover, 
+a.button:focus, button.button:focus  {
   border-radius: 2px;
   background-color: var(--link-hover-color);
 }
 
-button:disabled, button:disabled:hover {
+button.button:disabled, button.button:disabled:hover {
   border-radius: 8px;
   background-color: var(--color-gray);
   cursor: not-allowed;
 }
 
-a.button.secondary, button.secondary {
+a.button.secondary, button.button.secondary {
   background-color: unset;
   border: 2px solid currentcolor;
   color: var(--text-color)
@@ -273,7 +304,7 @@ main .section {
   padding: var(--pad-l);
 }
 
-@media (min-width: 600px) {
+@media (min-width: 700px) {
   main .section {
     padding: var(--pad-xl);
   }  
@@ -294,4 +325,21 @@ main .section[data-section-status='initialized'] {
 
 main .section.highlight {
   background-color: var(--highlight-background-color);
+}
+
+/* index template */
+.index h1 {
+  position: relative;
+  font-family: var(--brand-font-family);
+  font-size: var(--heading-font-size-xxxl);
+  font-weight: lighter;
+  transform: scale(1, 1.3);
+}
+
+.index h1 .icon-reg svg {
+  position: absolute;
+  top: 0;
+  transform: scale(1.3, 1);
+  margin-left: -16px;
+  font-family: var(--body-font-family);
 }
