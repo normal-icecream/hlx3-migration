@@ -12,44 +12,101 @@
 
  :root {
   /* colors */
-  --link-color: #035fe6;
-  --link-hover-color: #136ff6;
-  --background-color: #fff;
-  --overlay-background-color: #eee;
-  --highlight-background-color: #ccc;
-  --text-color: #000;
+  --color-black: #010319;
+  --color-gray: #808086;
+  --color-white: #FFFCF3;
+  --color-pink: #FFD4CC; /* FFF0EB */
+  --color-red: #F94F0C; /* 962D03 */
+  --color-yellow: #FFFC93; /* FFF8D6 */
+  --color-yellow-alt: #F7FF24;
+  --color-cyan: #07C1C6; /* 065D60 */
+  --color-blue: #0C26F9;
+  --color-blue-dark: #091DC1;
+
+  --background-color: var(--color-white);
+  --text-color: var(--color-blue);
+  --link-color: var(--text-color);
+  --link-hover-color: var(--color-blue-dark);
+  --highlight-background-color: var(--color-yellow-alt);
 
   /* fonts */
-  --body-font-family: 'helvetica neue', helvetica, ubuntu, roboto, noto, sans-serif;
-  --heading-font-family: var(--body-font-family);
-  --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono', monospace;
+  --body-font-family: 'Poppins', 'Poppins-fallback', sans-serif;
+  --heading-font-family: 'acumin-pro-extra-condensed', 'acumin-pro-extra-condensed-fallback', sans-serif;;
+  --fixed-font-family: monospace;
 
   /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 18px;
+  --body-font-size-xl: 22px;
+  --body-font-size-l: 20px;
+  --body-font-size-m: 18px;
+  --body-font-size-s: 16px;
   --body-font-size-xs: 14px;
 
   /* heading sizes */
-  --heading-font-size-xxl: 48px;
-  --heading-font-size-xl: 40px;
-  --heading-font-size-l: 32px;
-  --heading-font-size-m: 24px;
-  --heading-font-size-s: 20px;
-  --heading-font-size-xs: 18px;
+  --heading-font-size-xxl: 54px;
+  --heading-font-size-xl: 48px;
+  --heading-font-size-l: 42px;
+  --heading-font-size-m: 36px;
+  --heading-font-size-s: 28px;
+  --heading-font-size-xs: 20px;
+
+  /* spacing sizes */
+  --pad-xxl: 64px;
+  --pad-xl: 32px;
+  --pad-l: 16px;
+  --pad-m: 8px;
+  --pad-s: 4px;
+  --pad-xs: 2px;
 
   /* header height */
   --header-height: 64px;
+}
 
+@media (min-width: 900px) {
+  :root {
+    --heading-font-size-xxl: 64px;
+    --heading-font-size-xl: 58px;
+    --heading-font-size-l: 46px;
+    --heading-font-size-m: 36px;
+    --heading-font-size-s: 28px;
+    --heading-font-size-xs: 20px;
+  }
+}
+
+@font-face {
+  font-family: 'Poppins-fallback';
+  size-adjust: 112.5%;
+  src: local('Arial');
+}
+
+@font-face {
+  font-family: 'acumin-pro-extra-condensed';
+  font-stretch: extra-condensed;
+  font-weight: normal;
+  size-adjust: 67.25%;
+  src: local('Arial');
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+	font-family: inherit;
+  font-size: 100%;
+}
+
+html {
+  font-size: 62.5%; /* setting 1rem to 10px */
+  scroll-behavior: smooth;
 }
 
 body {
-  font-size: var(--body-font-size-m);
-  margin: 0;
-  font-family: var(--body-font-family);
-  line-height: 1.6;
-  color: var(--text-color);
-  background-color: var(--background-color);
   display: none;
+  margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-m);
+  line-height: 1.6em;
 }
 
 body.appear {
@@ -62,33 +119,37 @@ header {
 
 h1, h2, h3,
 h4, h5, h6 {
-  font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
-  margin-top: 1em;
-  margin-bottom: .5em;
+  margin: .8em 0;
   scroll-margin: calc(var(--header-height) + 1em);
+  line-height: .8em;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  text-transform: lowercase;
 }
 
-h1 { font-size: var(--heading-font-size-xxl) }
-h2 { font-size: var(--heading-font-size-xl) }
-h3 { font-size: var(--heading-font-size-l) }
-h4 { font-size: var(--heading-font-size-m) }
-h5 { font-size: var(--heading-font-size-s) }
-h6 { font-size: var(--heading-font-size-xs) }
+h1 { font-size: var(--heading-font-size-xxl); }
+h2 { font-size: var(--heading-font-size-xl); }
+h3 { font-size: var(--heading-font-size-l); }
+h4 { font-size: var(--heading-font-size-m); }
+h5 { font-size: var(--heading-font-size-s); }
+h6 { font-size: var(--heading-font-size-xs); }
 
 p, dl, ol, ul, pre, blockquote {
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
+u {
+  text-decoration: currentcolor wavy underline;
+}
+
 a:any-link {
   color: var(--link-color);
-  text-decoration: none;
+  text-decoration: underline;
+  transition: color .2s;
 }
 
 a:hover {
-  text-decoration: underline;
   color: var(--link-hover-color);
 }
 
@@ -98,43 +159,53 @@ code, pre, samp {
 }
 
 code, samp {
-  padding: .125em;
+  padding: .25em;
 }
 
 pre {
   overflow: scroll;
 }
 
-/* buttons */
-
-a.button:any-link, button {
-  font-family: var(--body-font-family);
-  display: inline-block;
-  box-sizing: border-box;
-  text-decoration: none;
-  border: 2px solid transparent;
-  padding: 5px 30px;
-  text-align: center;
-  font-style: normal; 
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--background-color);
-  background-color: var(--link-color);
-  margin: 16px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: 30px;
+svg {
+  fill: currentcolor;
 }
 
-a.button:hover, a.button:focus, button:hover, button:focus  {
-  background-color: var(--link-hover-color);
+/* buttons */
+a.button:any-link, button {
+  box-sizing: border-box;
+  display: inline-block;
+  margin: .5em 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: var(--pad-s) var(--pad-l);
+  background-color: var(--link-color);
+  color: var(--background-color);
+  font-family: var(--heading-font-family);
+  font-size: var(--body-font-size-l);
+  font-style: normal; 
+  font-weight: 400;
+  letter-spacing: .5px;
+  line-height: 1.6em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: lowercase;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   cursor: pointer;
+  transition: background-color .2s, border-radius .2s;
+}
+
+a.button:hover, button:hover, 
+a.button:focus, button:focus  {
+  border-radius: 2px;
+  background-color: var(--link-hover-color);
 }
 
 button:disabled, button:disabled:hover {
-  background-color: var(--overlay-background-color);
-  cursor: unset;
+  border-radius: 8px;
+  background-color: var(--color-gray);
+  cursor: not-allowed;
 }
 
 a.button.secondary, button.secondary {
@@ -143,33 +214,28 @@ a.button.secondary, button.secondary {
   color: var(--text-color)
 } 
 
-
 main input {
-  font-size: 1.25rem;
-  width: 100%;
-  max-width: 50rem;
-  display: block;
-  margin-bottom: 1rem;
-  padding: 0.75rem 0.6rem;    
-  border-radius: 0.25rem;
   box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin-bottom: 1em;
   border: 1px solid var(--text-color);
-  color: var(--text-color);
+  border-radius: 0.25rem;
+  padding: 0.75em 0.6em;    
   background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: inherit;
 }
 
 main input:hover {
   border: 1px solid var(--text-color);
 }
 
-main .section {
-  padding: 64px 16px;
-}
-
 main pre {
-  background-color: var(--overlay-background-color);
-  padding: 1em;
   border-radius: .25em;
+  padding: 1em;
+  background-color: var(--overlay-background-color);
   overflow-x: auto;
   white-space: pre;
 }
@@ -192,36 +258,30 @@ main blockquote p::after {
 }
 
 hr {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
+  margin-top: var(--pad-m) 0;
   border: 0;
-  border-bottom: 1px solid var(--overlay-background-color);
+  border-bottom: 1px solid var(--text-color);
 }
 
 main img {
-  max-width: 100%;
   width: auto;
+  max-width: 100%;
   height: auto;
+}
+
+main .section {
+  padding: var(--pad-l);
 }
 
 @media (min-width: 600px) {
   main .section {
-    padding: 64px 32px;
+    padding: var(--pad-xl);
   }  
 }
 
 @media (min-width: 900px) {
-  :root {
-    --heading-font-size-xxl: 60px;
-    --heading-font-size-xl: 48px;
-    --heading-font-size-l: 36px;
-    --heading-font-size-m: 30px;
-    --heading-font-size-s: 24px;
-    --heading-font-size-xs: 22px;  
-  }
-  
   .section > div {
-    max-width: 1200px;
+    max-width: 900px;
     margin: auto;
   }
 }
