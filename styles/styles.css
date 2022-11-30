@@ -19,7 +19,7 @@
   --color-red: #F94F0C; /* 962D03 */
   --color-yellow: #FFFC93; /* FFF8D6 */
   --color-yellow-alt: #F7FF24;
-  --color-cyan: #07C1C6; /* 065D60 */
+  --color-green: #07C1C6; /* 065D60 */
   --color-blue: #0C26F9;
   --color-blue-dark: #091DC1;
   --background-color: var(--color-white);
@@ -162,8 +162,9 @@ h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
 
 p, dl, ol, ul, pre, blockquote {
-  margin-top: 1em;
-  margin-bottom: 1em;
+  width: clamp(45ch, 50%, 75ch);
+  max-width: 100%;
+  margin: 1em auto;
 }
 
 u {
