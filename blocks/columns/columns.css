@@ -1,7 +1,11 @@
 .columns > div {
   display: flex;
   flex-direction: column;
-  gap: var(--pad-l);
+  gap: 0 var(--pad-l);
+}
+
+.columns > div:not(:last-of-type) {
+  margin-bottom: var(--pad-l);
 }
 
 .columns h2 {
