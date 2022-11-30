@@ -11,16 +11,16 @@
   color: var(--color-blue);
 }
 
-.anchor-position-right .anchor {
-  transform: rotate(13deg);
-}
-
 .anchor {
   position: relative;
   transform: rotate(-13deg);
   transition: transform .2s;
   z-index: 1;
   overflow: hidden;
+}
+
+.anchor-position-right .anchor {
+  transform: rotate(13deg);
 }
 
 .anchor:hover {
@@ -67,12 +67,8 @@
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  } 
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); } 
+  to { transform: rotate(360deg); }
 }
 
 @media (min-width: 700px) {

@@ -4,6 +4,11 @@
   gap: 0 var(--pad-l);
 }
 
+.columns > div > div {
+  order: 2;
+  padding: var(--pad-l);
+}
+
 .columns > div:not(:last-of-type) {
   margin-bottom: var(--pad-l);
 }
@@ -22,11 +27,6 @@
   font-size: var(--heading-font-size-xxl);
   width: 180px;
   height: 180px;
-}
-
-.columns > div > div {
-  order: 2;
-  padding: var(--pad-l);
 }
 
 .columns .columns-img-col {
