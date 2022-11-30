@@ -1,25 +1,74 @@
 .columns > div {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pad-l);
+}
+
+.columns h2 {
+  margin-top: .125em;
+  margin-bottom: .5em;
+}
+
+.columns p {
+  margin-top: .25em;
+  margin-bottom: .25em;
+}
+
+.columns .icon svg {
+  font-size: var(--heading-font-size-xxl);
+  width: 180px;
+  height: 180px;
+}
+
+.columns > div > div {
+  order: 2;
+  padding: var(--pad-l);
+}
+
+.columns .columns-img-col {
+  order: 1;
+  position: relative;
+  height: 66.6vw;
+  max-height: 320px;
+  padding: 0;
+}
+
+.columns picture {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .columns img {
-    width: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-@media (min-width: 900px) {
-    .columns > div {
-        display: flex;
-        align-items: center;
-        flex-direction: unset;
-    }
+@media (min-width: 700px) {
+  .columns > div {
+    display: flex;
+    flex-direction: unset;
+    align-items: center;
+    margin-bottom: var(--pad-xl);
+  }
 
-    .columns > div > div {
-        flex: 1;
-        margin-left: 32px;
-    }
+  .columns > div > div {
+    flex: 0 0 40%;
+  }
 
-    .columns > div > div:first-of-type {
-        margin-left: unset;
-    }
+  .columns > div > div,
+  .columns .columns-img-col {
+    order: unset;
+  }
+
+  .columns .columns-img-col {
+    flex: 0 0 60%;
+    align-self: stretch;
+    height: unset;
+    max-height: unset;
+  }
 }
