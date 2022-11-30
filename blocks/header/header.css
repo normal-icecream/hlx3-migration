@@ -30,16 +30,16 @@ header .header-brand a {
   display: block;
 }
 
+header .header-brand svg {
+  transition: transform .2s;
+}
+
 header .header-brand a:hover svg {
   transform: rotate(13deg);
 }
 
 header .header-brand span {
   display: flex;
-}
-
-header .header-brand svg {
-  transition: transform .2s;
 }
 
 /* cart */

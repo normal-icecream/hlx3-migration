@@ -4,6 +4,7 @@
   font-family: var(--brand-font-family);
   font-size: var(--heading-font-size-xxxl);
   font-weight: lighter;
+  text-align: left;
   transform: scale(1, 1.3);
 }
 
