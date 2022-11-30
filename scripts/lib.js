@@ -361,6 +361,42 @@ export function buildBlock(blockName, content) {
 }
 
 /**
+ * Loads JS and CSS for a template.
+ * @param {Element} body The template element
+ */
+export async function loadTemplate(body) {
+  const status = body.getAttribute('data-template-status');
+  if (status !== 'loading' && status !== 'loaded') {
+    body.setAttribute('data-template-status', 'loading');
+    const templateName = body.classList[0];
+    try {
+      const cssLoaded = new Promise((resolve) => {
+        loadCSS(`${window.hlx.codeBasePath}/templates/${templateName}/${templateName}.css`, resolve);
+      });
+      const decorationComplete = new Promise((resolve) => {
+        (async () => {
+          try {
+            const mod = await import(`../templates/${templateName}/${templateName}.js`);
+            if (mod.default) {
+              await mod.default(body);
+            }
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.log(`failed to load module for ${templateName}`, error);
+          }
+          resolve();
+        })();
+      });
+      await Promise.all([cssLoaded, decorationComplete]);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(`failed to load template ${templateName}`, error);
+    }
+    body.setAttribute('data-template-status', 'loaded');
+  }
+}
+
+/**
  * Loads JS and CSS for a block.
  * @param {Element} block The block element
  */
@@ -481,14 +517,17 @@ export function normalizeHeadings(el, allowedHeadings) {
 /**
  * Set template (page structure) and theme (page styles).
  */
-export function decorateTemplateAndTheme() {
+export async function decorateTemplateAndTheme() {
   const addClasses = (elem, classes) => {
     classes.split(',').forEach((v) => {
       elem.classList.add(toClassName(v.trim()));
     });
   };
   const template = getMetadata('template');
-  if (template) addClasses(document.body, template);
+  if (template) {
+    addClasses(document.body, template);
+    loadTemplate(document.body);
+  }
   const theme = getMetadata('theme');
   if (theme) addClasses(document.body, theme);
 }

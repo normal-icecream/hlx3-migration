@@ -327,19 +327,48 @@ main .section.highlight {
   background-color: var(--highlight-background-color);
 }
 
-/* index template */
-.index h1 {
+/* icons */
+.icon, .icon::after, .icon::before {
+  box-sizing: border-box;
+  display: block;
   position: relative;
-  font-family: var(--brand-font-family);
-  font-size: var(--heading-font-size-xxxl);
-  font-weight: lighter;
-  transform: scale(1, 1.3);
 }
 
-.index h1 .icon-reg svg {
+.icon::after, .icon::before {
+  display: block;
   position: absolute;
-  top: 0;
-  transform: scale(1.3, 1);
-  margin-left: -16px;
-  font-family: var(--body-font-family);
+}
+
+.icon.icon-arrow {
+  width: 1em;
+  height: 1em;
+}
+
+.icon.icon-arrow::before {
+  content: '';
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+}
+
+.icon.icon-arrow::after {
+  content: '';
+  top: calc(50% - 1.5px);
+  width: .333em;
+  height: .333em;
+  transform: rotate(45deg) translateY(-50%) ;
+}
+
+.icon.icon-arrow-left::after {
+  left: -3px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+
+.icon.icon-arrow-right::after {
+  right: 6px;
+  border-top: 2px solid;
+  border-right: 2px solid;
 }

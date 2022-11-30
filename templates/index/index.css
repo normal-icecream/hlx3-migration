@@ -1,0 +1,57 @@
+/* heading */
+.index h1 {
+  position: relative;
+  font-family: var(--brand-font-family);
+  font-size: var(--heading-font-size-xxxl);
+  font-weight: lighter;
+  transform: scale(1, 1.3);
+}
+
+.index h1 .icon-reg svg {
+  position: absolute;
+  top: 0;
+  transform: scale(1.3, 1);
+  margin-left: -16px;
+  font-family: var(--body-font-family);
+}
+
+/* nav */
+.index nav {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-m);
+}
+
+.index nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pad-m);
+}
+
+.index nav ul li {
+  /* background-color: gold; */
+  border-bottom: 1px solid;
+}
+
+.index nav ul li a {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pad-l);
+  padding-top: var(--pad-s);
+  padding-bottom: var(--pad-l);
+  line-height: 1;
+  text-decoration: none;
+  transition: letter-spacing .2s;
+}
+
+.index nav ul li a:hover {
+  letter-spacing: .05em;
+}
+
+.index nav ul li a:hover span {
+  flex-grow: 1;
+}
+
+.index nav ul li span {
+  transition: flex-grow .2s;
+}
