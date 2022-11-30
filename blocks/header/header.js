@@ -4,11 +4,11 @@ function decorateCart(section) {
   const a = section.querySelector('a');
   if (a) {
     const btn = createEl('button', {
-      className: 'nav-cart-btn',
+      className: 'header-cart-btn',
       html: a.innerHTML,
     });
     const total = createEl('div', {
-      html: '<p class="nav-cart-total">0</p>',
+      html: '<p class="header-cart-total">0</p>',
       'aria-live': 'polite',
       'aria-label': 'Items in cart: 0',
     });
@@ -36,23 +36,23 @@ export default async function decorate(block) {
   if (resp.ok) {
     const html = await resp.text();
 
-    // decorate nav DOM
-    const nav = document.createElement('nav');
-    nav.innerHTML = html;
+    // decorate header DOM
+    const header = document.createElement('div');
+    header.innerHTML = html;
 
     const classes = ['brand', 'cart'];
     classes.forEach((e, j) => {
-      const section = nav.children[j];
-      if (section) section.classList.add(`nav-${e}`);
+      const section = header.children[j];
+      if (section) section.classList.add(`header-${e}`);
     });
 
-    const brand = nav.querySelector('.nav-brand');
+    const brand = header.querySelector('.header-brand');
     if (brand) decorateBrand(brand);
 
-    const cart = nav.querySelector('.nav-cart');
+    const cart = header.querySelector('.header-cart');
     if (cart) decorateCart(cart);
 
-    decorateIcons(nav);
-    block.append(nav);
+    decorateIcons(header);
+    block.append(header);
   }
 }

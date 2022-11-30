@@ -1,10 +1,10 @@
-/* header and nav layout */
+/* header layout */
 header .header {
   height: var(--header-height);
   background-color: var(--background-color);
 }
 
-header nav {
+header .header > div {
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -15,40 +15,40 @@ header nav {
   padding: var(--pad-l);
 }
 
-header nav p {
+header .header p {
   margin: 0;
 }
 
 /* brand */
-header .nav-brand {
+header .header-brand {
   justify-self: start;
   font-size: 124px;
 }
 
-header .nav-brand p,
-header .nav-brand a {
+header .header-brand p,
+header .header-brand a {
   display: block;
 }
 
-header .nav-brand a:hover svg {
+header .header-brand a:hover svg {
   transform: rotate(13deg);
 }
 
-header .nav-brand span {
+header .header-brand span {
   display: flex;
 }
 
-header .nav-brand svg {
+header .header-brand svg {
   transition: transform .2s;
 }
 
 /* cart */
-header .nav-cart {
+header .header-cart {
   justify-self: end;
   font-size: 74px;
 }
 
-header .nav-cart button {
+header .header-cart button {
   position: relative;
   width: 74px;
   height: 74px;
@@ -60,22 +60,22 @@ header .nav-cart button {
   transition: transform .2s;
 }
 
-header .nav-cart button[data-btn-status=initialized] {
+header .header-cart button[data-btn-status=initialized] {
   cursor: pointer;
 }
 
-header .nav-cart button[data-btn-status=initialized]:hover {
+header .header-cart button[data-btn-status=initialized]:hover {
   box-shadow: 3px 3px 8px var(--shadow-light);
   transform: rotate(3deg) scale(1.3);
 }
 
-header .nav-cart .icon {
+header .header-cart .icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-header .nav-cart .nav-cart-total {
+header .header-cart .header-cart-total {
   position: absolute;
   top: .666em;
   left: 50%;
