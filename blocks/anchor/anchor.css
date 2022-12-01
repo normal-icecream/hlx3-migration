@@ -138,11 +138,11 @@
 
 @media (min-width: 1100px) {
   .anchor-position-left {
-    left: calc(-1 * var(--pad-xxl));
+    left: calc(-1 * var(--pad-xxxl));
   }
   
   .anchor-position-right {
-    right: calc(-1 * var(--pad-xxl));
+    right: calc(-1 * var(--pad-xxxl));
   }
 }
 

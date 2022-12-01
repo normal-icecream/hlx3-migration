@@ -56,7 +56,8 @@
   --heading-font-size-xs: 20px;
 
   /* spacing sizes */
-  --pad-xxl: 64px;
+  --pad-xxxl: 64px;
+  --pad-xxl: 48px;
   --pad-xl: 32px;
   --pad-l: 16px;
   --pad-m: 8px;
@@ -162,9 +163,14 @@ h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
 
 p, dl, ol, ul, pre, blockquote {
+  margin: 1em 0;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
   width: clamp(45ch, 50%, 75ch);
   max-width: 100%;
-  margin: 1em auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 u {
@@ -208,6 +214,34 @@ svg {
 span.icon svg {
   width: .6em;
   height: .6em;
+}
+
+/* forms */
+input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin-bottom: 1em;
+  border: 1px solid var(--text-color);
+  border-radius: 0.25rem;
+  padding: 0.75em 0.6em;    
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input:hover {
+  border: 1px solid var(--text-color);
+}
+
+button {
+  border: 0;
+  color: inherit;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
 }
 
 /* buttons */
@@ -254,24 +288,6 @@ a.button.secondary, button.button.secondary {
   border: 2px solid currentcolor;
   color: var(--text-color)
 } 
-
-main input {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  margin-bottom: 1em;
-  border: 1px solid var(--text-color);
-  border-radius: 0.25rem;
-  padding: 0.75em 0.6em;    
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: inherit;
-  font-size: inherit;
-}
-
-main input:hover {
-  border: 1px solid var(--text-color);
-}
 
 main pre {
   border-radius: .25em;
@@ -366,26 +382,26 @@ main .section.big-text p {
   top: 50%;
   transform: translateY(-50%);
   width: 100%;
-  height: 2px;
+  height: .05em;
   background-color: currentcolor;
 }
 
 .icon.icon-arrow::after {
   content: '';
-  top: calc(50% - 1.5px);
+  top: calc(50% - .05em);
   width: .333em;
   height: .333em;
   transform: rotate(45deg) translateY(-50%) ;
 }
 
 .icon.icon-arrow-left::after {
-  left: -3px;
-  border-bottom: 2px solid;
-  border-left: 2px solid;
+  left: calc(-1 * .1em);
+  border-bottom: .05em solid;
+  border-left: .05em solid;
 }
 
 .icon.icon-arrow-right::after {
-  right: 6px;
-  border-top: 2px solid;
-  border-right: 2px solid;
+  right: calc(1 * .15em);
+  border-top: .05em solid;
+  border-right: .05em solid;
 }
