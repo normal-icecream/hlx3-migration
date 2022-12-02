@@ -217,6 +217,12 @@ a:hover {
   transform: rotate(-3deg) translate(-50%, -50%);
 }
 
+.button a:hover::after,
+.button-container a:hover::after {
+  display: none;
+  visibility: hidden;
+}
+
 code, pre, samp {
   font-family: var(--fixed-font-family);
   font-size: var(--body-font-size-s);
@@ -245,6 +251,17 @@ span.icon-reg svg {
   stroke: currentcolor;
   font-family: inherit;
   text-transform: uppercase;
+}
+
+span.icon-gf svg,
+span.icon-v svg {
+  stroke: currentcolor;
+  padding-left: .1em;
+}
+
+span.icon-gf + span.icon-v,
+span.icon-v + span.icon-gf {
+  padding-left: .1em;
 }
 
 span.icon svg {
@@ -411,13 +428,17 @@ hr {
 
 main img {
   width: auto;
-  max-width: 100%;
+  max-width: clamp(180px, 33vw, 320px);
   height: auto;
 }
 
 main .section {
   padding: var(--pad-l);
   text-align: center;
+}
+
+main .section > div:last-of-type {
+  margin-bottom: 0;
 }
 
 @media (min-width: 700px) {

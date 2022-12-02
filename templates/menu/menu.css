@@ -1,0 +1,23 @@
+.menu [class=section] {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.menu [class=section] > div {
+  --link-color: var(--background-color);
+
+  padding: var(--pad-l);
+  background-color: var(--text-color);
+  color: var(--background-color);
+}
+
+@media (min-width: 700px) {
+  .menu [class=section] > div {
+    padding: var(--pad-xl);
+  }
+}
+
+.menu [class=section] strong,
+.menu .carousel strong {
+  font-size: 120%;
+}
