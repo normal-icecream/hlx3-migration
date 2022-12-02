@@ -2,7 +2,7 @@
   --background-color: var(--color-blue);
   --text-color: var(--color-pink);
   --link-color: var(--color-pink);
-  --link-hover-color: var(--color-white);
+  --link-hover-color: var(--color-pink-dark);
   transition: background-color .2s, color .2s;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .order .columns a {
-  display: block;
+  display: inline-block;
   text-decoration: none;
 }
 

@@ -16,6 +16,7 @@
   --color-gray: #808086;
   --color-white: #FFFCF3;
   --color-pink: #FFD4CC; /* FFF0EB */
+  --color-pink-dark: #C0A09F;
   --color-red: #F94F0C; /* 962D03 */
   --color-red-dark: #BB3C0F;
   --color-yellow: #FFFC93; /* FFF8D6 */
@@ -208,6 +209,7 @@ a:hover {
   height: 66%;
   background-color: var(--color-yellow-alt);
   z-index: -1;
+  overflow: hidden;
 }
 
 .footer a:nth-child(even)::after,
@@ -456,11 +458,6 @@ main .section.big-text p {
 
 .legal main .section h2 {
   text-align: center;
-}
-
-.legal main .section ol {
-  /* width: clamp(45ch, 50%, 75ch); */
-  /* margin: 0 auto; */
 }
 
 /* icons */

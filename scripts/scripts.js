@@ -28,9 +28,17 @@ function buildHeroBlock(main) {
   if (!index && firstSection) {
     const h1 = firstSection.querySelector('h1');
     if (h1) {
+      const contents = [];
+      let content = firstSection.firstElementChild;
+      while (content && content.nodeName !== 'DIV') {
+        contents.push(content);
+        content = content.nextElementSibling;
+      }
       const section = createEl('div');
-      section.append(buildBlock('hero', { elems: [...firstSection.children] }));
-      firstSection.replaceWith(section);
+      section.append(buildBlock('hero', { elems: contents }));
+      firstSection.parentElement.insertBefore(section, firstSection);
+      // if first section empty, remove
+      if (firstSection.innerHTML.trim() === '') firstSection.remove();
     }
   }
 }
