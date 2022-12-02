@@ -33,7 +33,7 @@ export function createEl(tag, params) {
 }
 
 /**
- * Sets external target and rel for links in a container element.
+ * Sets _blank target for external links in a container element.
  * @param {Element} container The container element
  */
 export function externalizeLinks(container) {
@@ -199,12 +199,12 @@ export async function fetchPlaceholders(prefix = 'default') {
   if (!loaded) {
     window.placeholders[`${prefix}-loaded`] = new Promise((resolve, reject) => {
       try {
-        fetch(`${prefix === 'default' ? '' : prefix}/placeholders.json`)
+        fetch(`/${prefix === 'default' ? '_admin' : prefix}/placeholders.json`)
           .then((resp) => resp.json())
           .then((json) => {
             const placeholders = {};
             json.data.forEach((placeholder) => {
-              placeholders[toCamelCase(placeholder.Key)] = placeholder.Text;
+              placeholders[toCamelCase(placeholder.Key)] = placeholder.Value;
             });
             window.placeholders[prefix] = placeholders;
             resolve();
@@ -218,6 +218,18 @@ export async function fetchPlaceholders(prefix = 'default') {
   }
   await window.placeholders[`${prefix}-loaded`];
   return window.placeholders[prefix];
+}
+
+/**
+ * Replaces {{placeholder keys}} in DOM with placeholder value element.
+ * @param {Element} container The container element
+ */
+export async function decoratePlaceholders(container) {
+  const regex = /{{(.*?)}}/g;
+  const found = regex.test(container.innerHTML);
+  if (!found) return;
+  const ph = await fetchPlaceholders();
+  container.innerHTML = container.innerHTML.replaceAll(regex, (_, key) => ph[key]);
 }
 
 /**
@@ -296,6 +308,7 @@ export function decorateSections(main) {
         if (defaultContent) {
           wrapper.classList.add('default-content-wrapper');
           externalizeLinks(wrapper);
+          decoratePlaceholders(wrapper);
         }
       }
       wrappers[wrappers.length - 1].append(e);
@@ -452,6 +465,7 @@ export async function loadBlock(block) {
       console.log(`failed to load block ${blockName}`, error);
     }
     externalizeLinks(block);
+    decoratePlaceholders(block);
     block.setAttribute('data-block-status', 'loaded');
   }
 }

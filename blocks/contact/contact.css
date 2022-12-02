@@ -1,0 +1,19 @@
+.contact-wrapper {
+  padding: var(--pad-l);
+  background-color: var(--overlay-background-color);
+  color: var(--overlay-text-color);
+}
+
+@media (min-width: 700px) {
+  .contact-wrapper {
+    padding: var(--pad-xl);
+  }
+}
+
+.contact {
+  text-align: center;
+}
+
+.contact h2 {
+  margin-top: .2em;
+}

@@ -18,6 +18,10 @@ import {
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 window.hlx.RUM_GENERATION = 'project-1'; // add your RUM generation information here
 
+export function getCurrentStore() {
+  return 'store';
+}
+
 function buildHeroBlock(main) {
   const index = getMetadata('template') === 'index';
   const firstSection = main.firstElementChild;
