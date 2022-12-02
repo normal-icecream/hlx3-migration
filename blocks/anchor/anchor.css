@@ -46,7 +46,13 @@
 }
 
 .anchor a {
+  position: static !important;
   color: inherit;
+}
+
+.anchor a:hover::after {
+  visibility: hidden;
+  display: none;
 }
 
 .anchor .icon svg {

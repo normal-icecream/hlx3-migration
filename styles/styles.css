@@ -30,8 +30,8 @@
   --link-hover-color: var(--color-blue-dark);
   --highlight-background-color: var(--color-yellow-alt);
   --highlight-text-color: var(--color-blue);
-  --overlay-background-color: var(--color-blue);
-  --overlay-text-color: var(--color-white);
+  --overlay-background-color: var(--color-pink);
+  --overlay-text-color: var(--color-blue);
   --shadow-light: #E8E5DF66;
   
   /* fonts */
@@ -189,6 +189,30 @@ a:any-link {
 
 a:hover {
   color: var(--link-hover-color);
+}
+
+.footer a:hover,
+.default-content-wrapper a:hover {
+  position: relative;
+  z-index: 1;
+}
+
+.footer a:hover::after,
+.default-content-wrapper a:hover::after {
+  content: '';
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: rotate(3deg) translate(-50%, -50%);
+  width: 105%;
+  height: 66%;
+  background-color: var(--color-yellow-alt);
+  z-index: -1;
+}
+
+.footer a:nth-child(even)::after,
+.default-content-wrapper a:nth-child(even)::after {
+  transform: rotate(-3deg) translate(-50%, -50%);
 }
 
 code, pre, samp {

@@ -6,6 +6,9 @@ import { createEl } from '../../scripts/lib.js';
  */
 export default async function decorate(body) {
   const main = body.querySelector('main');
+  // sanitize default content
+  const defaultContent = main.querySelector('.default-content-wrapper');
+  if (defaultContent) defaultContent.classList.remove('default-content-wrapper');
   // setup nav
   const ul = main.querySelector('ul');
   ul.querySelectorAll('li a').forEach((a) => {
