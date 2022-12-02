@@ -1,0 +1,109 @@
+.order {
+  --background-color: var(--color-blue);
+  --text-color: var(--color-pink);
+  --link-color: var(--color-pink);
+  --link-hover-color: var(--color-white);
+  transition: background-color .2s, color .2s;
+}
+
+.order.order-pickup {
+  --background-color: var(--color-yellow);
+  --text-color: var(--color-green);
+  --link-color: var(--color-green);
+  --link-hover-color: var(--color-green-dark);
+}
+
+.order.order-delivery {
+  --background-color: var(--color-pink);
+  --text-color: var(--color-red);
+  --link-color: var(--color-red);
+  --link-hover-color: var(--color-red-dark);
+}
+
+.order [aria-hidden=true] {
+  display: none;
+  visibility: hidden;
+}
+
+.order .order-back-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.order .order-back {
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 135px;
+  height: 135px;
+  border-radius: 50%;
+  background-color: var(--link-color);
+  color: var(--background-color);
+  transition: transform .2s;
+}
+
+.order .order-back[aria-hidden=false] {
+  display: flex;
+}
+
+.order .order-back:hover,
+.order .order-back:focus {
+  transform: rotate(-13deg) scale(1.2);
+}
+
+@media (min-width: 700px) {
+  .order .order-back-wrapper {
+    position: relative;
+    height: 67.5px;
+  }
+
+  .order .order-back {
+    position: absolute;
+    top: -22.5px;
+    left: 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .order .order-back-wrapper {
+    height: 45px;
+  }
+
+  .order .order-back {
+    top: -67.5px;
+  }
+}
+
+.order .order-back p {
+  position: relative;
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.order .order-back .icon {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0 auto;
+  font-size: var(--body-font-size-xl);
+}
+
+.order .columns a {
+  display: block;
+  text-decoration: none;
+}
+
+.order .columns a,
+.order .columns button {
+  border-radius: 8px;
+  transition: transform .2s;
+}
+
+.order .columns a:hover,
+.order .columns button:hover,
+.order .columns button:focus {
+  transform: rotate(3deg) scale(1.2);
+}
