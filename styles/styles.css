@@ -1,7 +1,7 @@
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may obtain a copy
+ * you may not use this file except in com5pliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under
@@ -17,9 +17,11 @@
   --color-white: #FFFCF3;
   --color-pink: #FFD4CC; /* FFF0EB */
   --color-red: #F94F0C; /* 962D03 */
+  --color-red-dark: #BB3C0F;
   --color-yellow: #FFFC93; /* FFF8D6 */
   --color-yellow-alt: #F7FF24;
   --color-green: #07C1C6; /* 065D60 */
+  --color-green-dark: #06929B;
   --color-blue: #0C26F9;
   --color-blue-dark: #091DC1;
   --background-color: var(--color-white);
@@ -182,6 +184,7 @@ a:any-link {
   color: var(--link-color);
   text-decoration: underline;
   transition: color .2s;
+  word-break: break-word;
 }
 
 a:hover {
@@ -305,7 +308,7 @@ a.button:any-link, button.button {
   background-color: var(--link-color);
   color: var(--background-color);
   font-family: var(--heading-font-family);
-  font-size: var(--body-font-size-l);
+  font-size: inherit;
   font-style: normal; 
   font-weight: 400;
   letter-spacing: .5px;
@@ -389,7 +392,8 @@ main .section {
 @media (min-width: 900px) {
   .section > div {
     max-width: 900px;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -449,8 +453,13 @@ main .section.big-text p {
   border-left: .05em solid;
 }
 
-.icon.icon-arrow-right::after {
+.icon.icon-arrow-right::after,
+.icon.icon-arrow-down::after {
   right: calc(1 * .15em);
   border-top: .05em solid;
   border-right: .05em solid;
+}
+
+.icon.icon-arrow-down {
+  transform: rotate(90deg);
 }
