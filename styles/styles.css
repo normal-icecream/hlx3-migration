@@ -169,7 +169,7 @@ p, dl, ol, ul, pre, blockquote {
   margin: 1em 0;
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p, h1, h2, h3, h4, h5, h6, ol, ul {
   width: clamp(45ch, 50%, 75ch);
   max-width: 100%;
   margin-left: auto;
@@ -224,6 +224,17 @@ span.icon-reg svg {
 span.icon svg {
   width: .6em;
   height: .6em;
+}
+
+ol, ul {
+  max-width: 100%;
+  padding-left: 1.5em;
+  text-align: left;
+}
+
+ol li, ul li {
+  margin-bottom: .5em;
+  padding-left: .5em;
 }
 
 /* forms */
@@ -403,6 +414,7 @@ main .section[data-section-status='initialized'] {
   display: none;
 }
 
+/* section metadata */
 main .section.highlight {
   background-color: var(--highlight-background-color);
 }
@@ -411,6 +423,20 @@ main .section.big-text p {
   font-family: var(--heading-font-family);
   font-size: var(--body-font-size-l);
   line-height: 1.1em;
+}
+
+/* themes */
+.legal main .section {
+  text-align: left;
+}
+
+.legal main .section h2 {
+  text-align: center;
+}
+
+.legal main .section ol {
+  /* width: clamp(45ch, 50%, 75ch); */
+  /* margin: 0 auto; */
 }
 
 /* icons */

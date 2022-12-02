@@ -1,6 +1,13 @@
 .carousel-wrapper ul {
   list-style: none;
   margin: 0;
+  padding: 0;
+  width: 100%;
+  text-align: unset;
+}
+
+.carousel-wrapper ul li {
+  margin: 0;
 }
 
 .carousel {
