@@ -8,22 +8,26 @@ import {
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
+  getMetadata,
   waitForLCP,
   loadBlocks,
   loadCSS,
+  createEl,
 } from './lib.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 window.hlx.RUM_GENERATION = 'project-1'; // add your RUM generation information here
 
 function buildHeroBlock(main) {
-  const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
-  // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = document.createElement('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
-    main.prepend(section);
+  const index = getMetadata('template') === 'index';
+  const firstSection = main.firstElementChild;
+  if (!index && firstSection) {
+    const h1 = firstSection.querySelector('h1');
+    if (h1) {
+      const section = createEl('div');
+      section.append(buildBlock('hero', { elems: [...firstSection.children] }));
+      firstSection.replaceWith(section);
+    }
   }
 }
 
@@ -33,7 +37,7 @@ function buildHeroBlock(main) {
  */
 function buildAutoBlocks(main) {
   try {
-    // buildHeroBlock(main);
+    buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
