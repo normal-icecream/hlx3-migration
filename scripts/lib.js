@@ -31,6 +31,26 @@ export function createEl(tag, params) {
   }
   return el;
 }
+
+/**
+ * Sets external target and rel for links in a container element.
+ * @param {Element} container The container element
+ */
+export function externalizeLinks(container) {
+  const as = container.querySelectorAll('a:any-link[href]');
+  as.forEach((a) => {
+    try {
+      const { origin } = new URL(a.href, window.location.href);
+      if (origin && origin !== window.location.origin) {
+        a.setAttribute('target', '_blank');
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`Invalid link in ${container}: ${a.href}`);
+    }
+  });
+}
+
 /**
  * log RUM if part of the sample.
  * @param {string} checkpoint identifies the checkpoint in funnel
@@ -135,7 +155,7 @@ export function toClassName(name) {
     : '';
 }
 
-/*
+/**
  * Sanitizes a name for use as a js property name.
  * @param {string} name The unsanitized name
  * @returns {string} The camelCased name
@@ -273,7 +293,10 @@ export function decorateSections(main) {
         const wrapper = document.createElement('div');
         wrappers.push(wrapper);
         defaultContent = e.tagName !== 'DIV';
-        if (defaultContent) wrapper.classList.add('default-content-wrapper');
+        if (defaultContent) {
+          wrapper.classList.add('default-content-wrapper');
+          externalizeLinks(wrapper);
+        }
       }
       wrappers[wrappers.length - 1].append(e);
     });
@@ -428,6 +451,7 @@ export async function loadBlock(block) {
       // eslint-disable-next-line no-console
       console.log(`failed to load block ${blockName}`, error);
     }
+    externalizeLinks(block);
     block.setAttribute('data-block-status', 'loaded');
   }
 }
@@ -536,7 +560,6 @@ export async function decorateTemplateAndTheme() {
  * decorates paragraphs containing a single link as buttons.
  * @param {Element} element container element
  */
-
 export function decorateButtons(element) {
   element.querySelectorAll('a').forEach((a) => {
     a.title = a.title || a.textContent;
@@ -587,7 +610,6 @@ export async function waitForLCP(lcpBlocks) {
 /**
  * loads a block named 'header' into header
  */
-
 export function loadHeader(header) {
   const headerBlock = buildBlock('header', '');
   header.append(headerBlock);
@@ -598,7 +620,6 @@ export function loadHeader(header) {
 /**
  * loads a block named 'footer' into footer
  */
-
 export function loadFooter(footer) {
   const footerBlock = buildBlock('footer', '');
   footer.append(footerBlock);
@@ -609,7 +630,6 @@ export function loadFooter(footer) {
 /**
  * init block utils
  */
-
 function init() {
   window.hlx = window.hlx || {};
   window.hlx.codeBasePath = '';
