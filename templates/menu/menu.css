@@ -21,3 +21,13 @@
 .menu .carousel strong {
   font-size: 120%;
 }
+
+.menu [class=section] img,
+.menu .carousel img {
+  transition: transform .2s;
+}
+
+.menu [class=section] img:hover,
+.menu .carousel img:hover {
+  transform: rotate(3deg) scale(1.2);
+}
