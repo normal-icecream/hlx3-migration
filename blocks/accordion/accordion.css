@@ -1,0 +1,64 @@
+.accordion > div {
+  position: relative;
+}
+
+.accordion .accordion-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pad-m);
+  width: 100%;
+  border-bottom: 1px solid;
+  padding: 0;
+  text-align: left;
+  transition: letter-spacing .2s;
+}
+
+.accordion .accordion-q h3 {
+  margin-left: 0;
+}
+
+.accordion .accordion-q:hover,
+.accordion .accordion-q:focus {
+  letter-spacing: .05em;
+}
+
+.accordion .icon {
+  flex-basis: 2em;
+  font-size: var(--body-font-size-xl);
+  transition: transform .2s;
+}
+
+.accordion .accordion-a {
+  text-align: left;
+  border-bottom: 1px solid;
+}
+
+.accordion .accordion-a p {
+  margin-left: 0;
+}
+
+.accordion .accordion-q[aria-expanded=true] {
+  border-bottom: 0;
+}
+
+.accordion .accordion-q[aria-expanded=false] + .accordion-a {
+  display: none;
+  visibility: hidden;
+}
+
+.accordion .accordion-q[aria-expanded=true] .icon {
+  transform: rotate(-90deg);
+}
+
+@media (min-width: 700px) {
+  .accordion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--pad-xl);
+  }
+
+  .accordion > div {
+    flex: 1 1 calc(50% - var(--pad-xl));
+  }
+}
