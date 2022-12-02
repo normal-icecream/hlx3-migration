@@ -36,17 +36,24 @@
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
-    main.error {
+    .error {
+      --background-color: var(--color-red);
+      --text-color: var(--color-yellow);
+      --link-color: var(--color-yellow);
+      --link-hover-color: var(--color-yellow-alt);
+    }
+
+    .error main {
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    main.error h2 {
+    .error h2 {
       margin-top: 0.2em;
     }
 
-    main.error .icon svg {
+    .error .icon svg {
       width: 100%;
       max-width: 300px;
       height: auto;
@@ -55,9 +62,9 @@
   <link rel="stylesheet" href="/styles/lazy-styles.css">
 </head>
 
-<body>
+<body class="error">
   <header></header>
-  <main class="error">
+  <main>
     <div class="section">
       <p class="error-icon"><span class="icon icon-spilled-pint"></span></p>
       <h2 class="error-message">Page Not Found</h2>
