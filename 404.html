@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Page not found</title>
+  <title>Normal Ice Cream page not found</title>
   <script type="text/javascript">
     window.isErrorPage = true;
     window.errorCode = '404';
@@ -29,20 +29,27 @@
       sampleRUM('404', { source: document.referrer, target: window.location.href });
     });
   </script>
+  <script type="module">
+    import { decorateIcons } from '/scripts/lib.js';
+
+    console.log('dec:', decorateIcons);
+  </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
     main.error {
-      min-height: calc(100vh - var(--header-height));
       display: flex;
       align-items: center;
+      justify-content: center;
     }
 
-    main.error .error-number {
+    main.error h2 {
+      margin-top: 0.2em;
+    }
+
+    main.error .icon svg {
       width: 100%;
-    }
-
-    main.error .error-number text {
-      font-family: var(--fixed-font-family);
+      max-width: 300px;
+      height: auto;
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -52,9 +59,7 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
-      </svg>
+      <p class="error-icon"><span class="icon icon-spilled-pint"></span></p>
       <h2 class="error-message">Page Not Found</h2>
       <p class="button-container">
         <a href="/" class="button secondary error-button-home">Go home</a>
