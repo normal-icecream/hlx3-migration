@@ -27,7 +27,7 @@
   transform: rotate(0deg) scale(1.2);
 }
 
-.anchor p {
+.anchor-wrapper .anchor p {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +55,7 @@
   fill: inherit;
 }
 
-.anchor a .icon.icon-starburst svg {
+.anchor .icon.icon-starburst svg {
   animation-name: spin;
   animation-duration: 24s;
   animation-timing-function: linear;

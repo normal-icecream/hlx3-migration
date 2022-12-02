@@ -4,7 +4,7 @@ function decorateCart(section) {
   const a = section.querySelector('a');
   if (a) {
     const btn = createEl('button', {
-      className: 'header-cart-btn',
+      class: 'header-cart-btn',
       html: a.innerHTML,
     });
     const total = createEl('div', {
