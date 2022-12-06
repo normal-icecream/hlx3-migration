@@ -22,6 +22,11 @@ function wholesaleOrderOpen() {
   return false;
 }
 
+async function setupAbnormal(main) {
+  const hero = main.querySelector('.hero');
+  if (hero) hero.classList.add('hero-abnormal');
+}
+
 async function setupWholesale(main) {
   const ph = await fetchPlaceholders();
   const order = main.querySelector('[data-id="place-order"]');
@@ -49,7 +54,12 @@ async function setupWholesale(main) {
  */
 export default async function decorate(body) {
   const main = body.querySelector('main');
+  // style sold out text
+  const soldOuts = main.querySelectorAll('del + em');
+  soldOuts.forEach((so) => so.classList.add('button', 'disabled'));
+  // setup page-specifics
   const page = window.location.pathname.split('/').pop();
+  if (page === 'abnormal') await setupAbnormal(main);
   if (page === 'wholesale') await setupWholesale(main);
   // setup square functionality
 }

@@ -7,3 +7,7 @@
   max-width: 180px;
   height: auto;
 }
+
+.hero.hero-abnormal h1 + p .icon svg {
+  transform: rotate(3deg) scaleX(-1);
+}
