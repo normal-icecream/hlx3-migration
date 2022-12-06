@@ -1,5 +1,33 @@
 import { createEl, fetchPlaceholders } from '../../scripts/lib.js';
 
+function styleCartBtn(a) {
+  const square = 'https://squareup.com/dashboard/items/library/';
+  const block = a.closest('.block');
+  if (block && [...block.classList].includes('carousel')) {
+    const slide = a.closest('div');
+    if (slide) slide.setAttribute('data-has-cart-btn', true);
+    const p = a.closest('p');
+    if (p) p.classList.add('anchored-container');
+  }
+  if (a.href.startsWith(square)) {
+    const btn = createEl('button', {
+      class: a.className || 'button primary',
+      text: a.textContent,
+      'data-id': a.href.split('/').pop(),
+    });
+    a.replaceWith(btn);
+  } else {
+    a.classList.add('button', 'primary');
+  }
+}
+
+/* ABNORMAL */
+async function setupAbnormal(main) {
+  const hero = main.querySelector('.hero');
+  if (hero) hero.classList.add('hero-abnormal');
+}
+
+/* WHOLESALE */
 function wholesaleOrderOpen() {
   const date = new Date();
   const day = date.toString().slice(0, 3).toLowerCase();
@@ -20,11 +48,6 @@ function wholesaleOrderOpen() {
   // check if after close (closes tuesday @ 3 [15])
   if (day === 'tue') return hour < 15;
   return false;
-}
-
-async function setupAbnormal(main) {
-  const hero = main.querySelector('.hero');
-  if (hero) hero.classList.add('hero-abnormal');
 }
 
 async function setupWholesale(main) {
@@ -57,6 +80,9 @@ export default async function decorate(body) {
   // style sold out text
   const soldOuts = main.querySelectorAll('del + em');
   soldOuts.forEach((so) => so.classList.add('button', 'disabled'));
+  // style cart buttons
+  const as = main.querySelectorAll('a[href]');
+  as.forEach((a) => styleCartBtn(a));
   // setup page-specifics
   const page = window.location.pathname.split('/').pop();
   if (page === 'abnormal') await setupAbnormal(main);

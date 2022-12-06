@@ -15,7 +15,7 @@
   }
 }
 
-.menu [class=section] > div a:any-link {
+.menu [class=section] > div a:not(.button) {
   color: var(--background-color);
 }
 
@@ -48,10 +48,16 @@
 .menu [class=section] img,
 .menu .carousel img {
   max-height: 180px;
-  transition: transform .2s;
+  transition: border-radius .2s, transform .2s;
 }
 
 .menu [class=section] img:hover,
-.menu .carousel img:hover {
+.menu .carousel img:hover,
+.menu .carousel svg:hover {
+  transform: rotate(3deg) scale(1.2);
+}
+
+.menu .carousel.circle img:hover {
+  border-radius: 8px;
   transform: rotate(3deg) scale(1.2);
 }
