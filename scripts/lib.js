@@ -224,12 +224,12 @@ export async function fetchPlaceholders(prefix = 'default') {
  * Replaces {{placeholder keys}} in DOM with placeholder value element.
  * @param {Element} container The container element
  */
-export async function decoratePlaceholders(container) {
+export async function replacePlaceholders(container) {
   const regex = /{{(.*?)}}/g;
   const found = regex.test(container.innerHTML);
   if (!found) return;
   const ph = await fetchPlaceholders();
-  container.innerHTML = container.innerHTML.replaceAll(regex, (_, key) => ph[key]);
+  container.innerHTML = container.innerHTML.replaceAll(regex, (_, key) => ph[toCamelCase(key)]);
 }
 
 /**
@@ -307,10 +307,10 @@ export function decorateSections(main) {
         defaultContent = e.tagName !== 'DIV';
         if (defaultContent) {
           wrapper.classList.add('default-content-wrapper');
-          externalizeLinks(wrapper);
-          decoratePlaceholders(wrapper);
         }
       }
+      externalizeLinks(e);
+      replacePlaceholders(e);
       wrappers[wrappers.length - 1].append(e);
     });
     wrappers.forEach((wrapper) => section.append(wrapper));
@@ -465,7 +465,7 @@ export async function loadBlock(block) {
       console.log(`failed to load block ${blockName}`, error);
     }
     externalizeLinks(block);
-    decoratePlaceholders(block);
+    replacePlaceholders(block);
     block.setAttribute('data-block-status', 'loaded');
   }
 }

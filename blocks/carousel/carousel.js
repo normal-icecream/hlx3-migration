@@ -80,18 +80,22 @@ export default async function decorate(block) {
       const offsetSlides = windowWidth >= 900 ? 3 : windowWidth >= 700 ? 2 : 1;
       const slideWidth = carousel.lastElementChild.offsetWidth;
       const slides = carousel.querySelectorAll('.carousel-slide');
-      const slidesWidth = (slides.length - (offsetSlides * 1.05)) * slideWidth;
+      const slidesWidth = (slides.length - offsetSlides) * slideWidth;
       // trying to scroll right at end of carousel
-      if ((carousel.scrollLeft >= slidesWidth) && direction === 'right') {
+      if ((carousel.scrollLeft >= (slidesWidth * 0.95)) && direction === 'right') {
         carousel.scrollLeft = 0;
       // trying to scroll left at beginning of carousel
-      } else if ((carousel.scrollLeft <= slideWidth) && direction === 'left') {
+      } else if ((carousel.scrollLeft < (slideWidth * 0.95)) && direction === 'left') {
         carousel.scrollLeft += slidesWidth;
       } else if (direction === 'right') {
         carousel.scrollLeft += slideWidth;
       } else if (direction === 'left') {
         carousel.scrollLeft -= slideWidth;
       }
+    });
+    control.addEventListener('dblclick', () => {
+      if (direction === 'right') carousel.scrollLeft = 0;
+      if (direction === 'left') carousel.scrollLeft += carousel.offsetWidth;
     });
     controls.append(control);
   });
