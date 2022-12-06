@@ -55,7 +55,7 @@
 /* controls */
 .carousel-controls {
   position: absolute;
-  top: 50%;
+  top: calc(50% + (2 * var(--pad-xl)));
   transform: translateY(-50%);
   display: flex;
   align-items: center;
