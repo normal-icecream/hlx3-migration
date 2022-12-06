@@ -3,7 +3,7 @@ import { createEl, decorateIcons } from '../../scripts/lib.js';
 function generateRandomIcon(text) {
   const words = text.replace(/[^a-z ]/gi, '').split(' ').filter((w) => w.trim());
   const counts = {
-    pint: 0, pints: 0, store: 0, truck: 0, van: 0,
+    bar: 0, cone: 0, drink: 0, normal: 0, pint: 0, pints: 0, store: 0, truck: 0, van: 0,
   };
   words.forEach((word) => {
     if (word.toLowerCase() in counts) counts[word.toLowerCase()] += 1;
@@ -33,25 +33,44 @@ export default async function decorate(block) {
     carousel = wrapper;
     carouselWrapper = block;
     [...block.children].slice(1).forEach((child) => {
-      const slide = createEl('li', {
-        class: 'carousel-slide',
-        html: child.firstElementChild.innerHTML,
-      });
-      const hasImg = slide.querySelector(':first-child picture');
-      if (hasImg) {
-        hasImg.parentElement.className = 'carousel-slide-img';
+      // check if slide has visible content
+      const clone = child.cloneNode(true);
+      if (clone.querySelector('del')) {
+        clone.querySelectorAll('del').forEach((del) => del.remove());
+        if (clone.textContent.trim() === '') child.remove();
       } else {
-        // create fallback img if none
-        const img = createEl('div', {
-          class: 'carousel-slide-img',
-          html: `<span class="icon icon-${generateRandomIcon(slide.textContent)}"></span>`,
+        const slide = createEl('li', {
+          class: 'carousel-slide',
+          html: child.firstElementChild.innerHTML,
         });
-        decorateIcons(img);
-        slide.prepend(img);
+        const hasCartBtn = child.querySelector('[data-has-cart-btn]');
+        if (hasCartBtn) slide.classList.add('carousel-anchor-btn');
+        const hasImg = slide.querySelector(':first-child picture');
+        if (hasImg) {
+          hasImg.parentElement.className = 'carousel-slide-img';
+        } else {
+          let page = window.location.pathname.split('/').join(' ').trim();
+          if (page.includes('about')) page = 'normal';
+          let title = hasTitle.textContent;
+          if (title === 'soft serve' || title === 'composed cone') title = 'cone';
+          if (title.includes('bar')) title = 'bar';
+          if (title.includes('drink')) title = 'drink';
+          if (title.includes('pint')) title = 'pint';
+          title = `${title} `.repeat(2);
+          // create fallback img if none
+          const img = createEl('div', {
+            class: 'carousel-slide-img',
+            html: `<span class="icon icon-${generateRandomIcon(`${page} ${title} ${slide.textContent}`)}"></span>`,
+          });
+          decorateIcons(img);
+          slide.prepend(img);
+        }
+        child.remove();
+        wrapper.append(slide);
       }
-      child.remove();
-      wrapper.append(slide);
     });
+    const numOfSlides = wrapper.children.length;
+    block.setAttribute('data-slides', numOfSlides > 3 ? 'multi' : numOfSlides);
     block.append(wrapper);
   } else if (block.className.includes('images')) {
     // images carousel
