@@ -4,11 +4,9 @@
 }
 
 .menu [class=section] > div {
-  --link-color: var(--background-color);
-
-  padding: var(--pad-l);
   background-color: var(--text-color);
   color: var(--background-color);
+  padding: var(--pad-l);
 }
 
 @media (min-width: 700px) {
@@ -16,6 +14,17 @@
     padding: var(--pad-xl);
   }
 }
+
+.menu [class=section] > div .button {
+  background-color: var(--background-color);
+  color: var(--link-color);
+}
+
+.menu [class=section] > div .button:hover,
+.menu [class=section] > div .button:focus {
+  background-color: var(--highlight-background-color);
+}
+
 
 .menu [class=section] strong,
 .menu .carousel strong {
