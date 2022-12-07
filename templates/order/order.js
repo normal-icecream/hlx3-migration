@@ -4,6 +4,7 @@ function createTileBtns(wrapper) {
   const headings = wrapper.querySelectorAll('h2');
   headings.forEach((heading) => {
     const tile = heading.closest('div');
+    tile.classList.add('order-tile');
     const icon = tile.querySelector('.icon').closest('p');
     const link = tile.querySelector('a');
     const a = createEl('a', {
@@ -24,7 +25,7 @@ function createTileBtns(wrapper) {
  */
 export default async function decorate(body) {
   const main = body.querySelector('main');
-  const [toggle, pickup, delivery] = main.querySelectorAll('.columns-wrapper');
+  const [toggle, pickup, delivery] = main.querySelectorAll('.columns');
 
   // create back button
   const aside = createEl('aside', {

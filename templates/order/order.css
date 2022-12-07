@@ -91,6 +91,12 @@
   font-size: var(--body-font-size-xl);
 }
 
+.order .order-tile a {
+  background-color: unset;
+  color: unset;
+  white-space: unset;
+}
+
 .order .columns a {
   display: inline-block;
   text-decoration: none;

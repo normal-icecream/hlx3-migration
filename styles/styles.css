@@ -142,7 +142,7 @@ footer {
 }
 
 main {
-  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--pad-l));
 }
 
 h1, h2, h3,
