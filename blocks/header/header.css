@@ -1,7 +1,6 @@
 /* header layout */
 header .header {
   height: var(--header-height);
-  background-color: var(--background-color);
 }
 
 header .header > div {

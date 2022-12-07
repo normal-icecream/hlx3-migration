@@ -1,6 +1,5 @@
 footer .footer {
   height: var(--footer-height);
-  background-color: var(--background-color);
   display: flex;
   align-items: center;
   justify-content: center;
