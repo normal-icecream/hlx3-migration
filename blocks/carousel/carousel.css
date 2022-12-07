@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity */
 .carousel-wrapper {
   margin-bottom: var(--pad-l);
 }
@@ -155,6 +156,7 @@
 }
 
 .carousel .carousel-slide .carousel-slide-img img {
+  width: auto;
   height: 180px;
   max-width: 180px;
   max-height: 180px;
@@ -240,4 +242,110 @@
 .carousel.circle .carousel-slide-img img,
 .carousel.circle div.carousel-slide-img {
   border-radius: 50%;
+}
+
+.carousel-collapse-target {
+  position: relative;
+}
+
+.carousel-collapse {
+  margin: var(--pad-l) auto;
+  color: var(--color-blue);
+}
+
+.carousel-collapse[aria-hidden=true] {
+  display: none;
+  visibility: hidden;
+}
+
+.carousel-collapse + .carousel,
+.carousel-collapse + .carousel .carousel-control button {
+  background-color: var(--color-pink);
+}
+
+.carousel-collapse + .carousel .carousel-control button:hover,
+.carousel-collapse + .carousel .carousel-control button:focus {
+  background-color: var(--text-color);
+}
+
+.carousel-collapse[aria-expanded=false] + .carousel {
+  display: none;
+  visibility: hidden;
+}
+
+.carousel-collapse .icon svg {
+  width: 180px;
+  height: 180px;
+  fill: var(--color-pink);
+  animation-name: spin;
+  animation-duration: 24s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); } 
+  to { transform: rotate(360deg); }
+}
+
+.carousel-collapse button {
+  position: relative;
+  transform: rotate(-13deg);
+  transition: transform .2s;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.carousel-collapse button:hover,
+.carousel-collapse button:focus {
+  transform: rotate(0deg) scale(1.2);
+}
+
+.carousel-collapse button:hover svg,
+.carousel-collapse button:focus svg {
+  animation-duration: 8s;
+}
+
+.carousel-collapse p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  margin: 0;
+  padding: var(--pad-xl);
+  color: inherit;
+  font-family: var(--body-font-family);
+  font-weight: bold;
+  line-height: 1.2em;
+  z-index: 1;
+}
+
+@media (min-width: 700px) {
+  .carousel-collapse {
+    position: absolute;
+    top: calc(-90px - var(--pad-l));
+  }
+}
+
+@media (min-width: 1000px) {
+  .carousel-collapse {
+    left: calc(-1 * var(--pad-l));
+  }
+}
+
+@media (min-width: 1100px) {
+  .carousel-collapse {
+    left: calc(-1 * var(--pad-xxxl));
+  }
+}
+
+@media (min-width: 1200px) {
+  .carousel-collapse {
+    left: -90px;
+  }
 }

@@ -26,6 +26,34 @@ export default async function decorate(block) {
     // setup carousel title
     block.firstElementChild.className = 'carousel-title';
     block.setAttribute('aria-labelledby', hasTitle.id);
+    // setup collapse
+    if ([...block.classList].includes('collapse')) {
+      // build starburst
+      const aside = createEl('aside', {
+        class: 'carousel-collapse',
+        id: `collapse-${hasTitle.id}`,
+        'aria-expanded': false,
+        'aria-controls': `${hasTitle.id}-menu`,
+        html: `<button>
+            <span class="icon icon-starburst"></span>
+            <p>view the ${hasTitle.textContent}</p>
+          </button>`,
+      });
+      aside.querySelector('button').addEventListener('click', () => {
+        // eslint-disable-next-line eqeqeq
+        const expanded = aside.getAttribute('aria-expanded') == 'true';
+        aside.setAttribute('aria-expanded', !expanded);
+        aside.setAttribute('aria-hidden', !expanded);
+      });
+      decorateIcons(aside);
+      // setup anchor
+      const anchor = block.parentElement;
+      anchor.id = `${hasTitle.id}-menu`;
+      anchor.setAttribute('role', 'region');
+      anchor.setAttribute('aria-labelledby', `collapse-${hasTitle.id}`);
+      anchor.classList.add('carousel-collapse-target');
+      anchor.prepend(aside);
+    }
     // wrap remaining children in slide wrapper
     const wrapper = createEl('ul', {
       class: 'carousel-slide-wrapper',
@@ -37,37 +65,39 @@ export default async function decorate(block) {
       const clone = child.cloneNode(true);
       if (clone.querySelector('del')) {
         clone.querySelectorAll('del').forEach((del) => del.remove());
-        if (clone.textContent.trim() === '') child.remove();
-      } else {
-        const slide = createEl('li', {
-          class: 'carousel-slide',
-          html: child.firstElementChild.innerHTML,
-        });
-        const hasCartBtn = child.querySelector('[data-has-cart-btn]');
-        if (hasCartBtn) slide.classList.add('carousel-anchor-btn');
-        const hasImg = slide.querySelector(':first-child picture');
-        if (hasImg) {
-          hasImg.parentElement.className = 'carousel-slide-img';
-        } else {
-          let page = window.location.pathname.split('/').join(' ').trim();
-          if (page.includes('about')) page = 'normal';
-          let title = hasTitle.textContent;
-          if (title === 'soft serve' || title === 'composed cone') title = 'cone';
-          if (title.includes('bar')) title = 'bar';
-          if (title.includes('drink')) title = 'drink';
-          if (title.includes('pint')) title = 'pint';
-          title = `${title} `.repeat(2);
-          // create fallback img if none
-          const img = createEl('div', {
-            class: 'carousel-slide-img',
-            html: `<span class="icon icon-${generateRandomIcon(`${page} ${title} ${slide.textContent}`)}"></span>`,
-          });
-          decorateIcons(img);
-          slide.prepend(img);
+        if (clone.textContent.trim() === '') {
+          child.remove();
+          return;
         }
-        child.remove();
-        wrapper.append(slide);
       }
+      const slide = createEl('li', {
+        class: 'carousel-slide',
+        html: child.firstElementChild.innerHTML,
+      });
+      const hasCartBtn = child.querySelector('[data-has-cart-btn]');
+      if (hasCartBtn) slide.classList.add('carousel-anchor-btn');
+      const hasImg = slide.querySelector(':first-child picture');
+      if (hasImg) {
+        hasImg.parentElement.className = 'carousel-slide-img';
+      } else {
+        let page = window.location.pathname.split('/').join(' ').trim();
+        if (page.includes('about')) page = 'normal';
+        let title = hasTitle.textContent;
+        if (title === 'soft serve' || title === 'composed cone') title = 'cone';
+        if (title.includes('bar')) title = 'bar';
+        if (title.includes('drink')) title = 'drink';
+        if (title.includes('pint')) title = 'pint';
+        title = `${title} `.repeat(2);
+        // create fallback img if none
+        const img = createEl('div', {
+          class: 'carousel-slide-img',
+          html: `<span class="icon icon-${generateRandomIcon(`${page} ${title} ${slide.textContent}`)}"></span>`,
+        });
+        decorateIcons(img);
+        slide.prepend(img);
+      }
+      child.remove();
+      wrapper.append(slide);
     });
     const numOfSlides = wrapper.children.length;
     block.setAttribute('data-slides', numOfSlides > 3 ? 'multi' : numOfSlides);
