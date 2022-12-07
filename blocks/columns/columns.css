@@ -33,6 +33,14 @@
   height: 180px;
 }
 
+.columns .columns-inline-col img {
+  height: 180px;
+  max-width: 180px;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
 .columns .columns-img-col {
   order: 1;
   position: relative;
@@ -41,7 +49,7 @@
   padding: 0;
 }
 
-.columns picture {
+.columns .columns-img-col picture {
   box-sizing: border-box;
   position: absolute;
   top: 0;
@@ -50,7 +58,7 @@
   right: 0;
 }
 
-.columns img {
+.columns .columns-img-col img {
   width: 100%;
   max-width: unset;
   height: 100%;
@@ -92,4 +100,9 @@
 .columns.invert .button {
   background-color: var(--background-color);
   color: var(--text-color);
+}
+
+.columns.invert .button:hover,
+.columns.invert .button:focus {
+  background-color: var(--color-yellow-alt);
 }

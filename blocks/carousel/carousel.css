@@ -119,6 +119,7 @@
 
 @media (min-width: 700px) {
   .carousel .carousel-slide {
+    flex-grow: 1;
     flex-basis: 50%;
   }
 }
@@ -156,7 +157,7 @@
 }
 
 .carousel .carousel-slide .carousel-slide-img img {
-  width: auto;
+  /* width: auto; */
   height: 180px;
   max-width: 180px;
   max-height: 180px;
