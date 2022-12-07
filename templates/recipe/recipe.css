@@ -1,0 +1,16 @@
+.recipe [class=section] > div {
+  background-color: var(--text-color);
+  color: var(--background-color);
+  padding: var(--pad-l);
+}
+
+.recipe ul + ul, .recipe ul + ol,
+.recipe ol + ol, .recipe ol + ul {
+  padding-top: var(--pad-l);
+}
+
+@media (min-width: 700px) {
+  .recipe .anchor-wrapper {
+    top: var(--pad-s);
+  }
+}
