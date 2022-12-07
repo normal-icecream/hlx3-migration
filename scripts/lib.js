@@ -564,7 +564,7 @@ export async function decorateTemplateAndTheme() {
   const template = getMetadata('template');
   if (template) {
     addClasses(document.body, template);
-    loadTemplate(document.body);
+    await loadTemplate(document.body);
   }
   const theme = getMetadata('theme');
   if (theme) addClasses(document.body, theme);
