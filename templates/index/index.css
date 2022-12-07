@@ -1,3 +1,12 @@
+/* columns */
+@media (min-width: 700px) {
+  .index main {
+    display: grid;
+    grid-template-columns: 344px 1fr;
+    align-items: center;
+  }
+}
+
 /* heading */
 .index h1 {
   position: relative;
@@ -14,6 +23,11 @@
   transform: scale(1.3, 1);
   margin-left: -16px;
   font-family: var(--body-font-family);
+}
+
+.index h1 + ul {
+  display: none;
+  visibility: hidden;
 }
 
 /* nav */
@@ -58,4 +72,11 @@
 
 .index nav ul li span {
   transition: flex-grow .2s;
+}
+
+/* carousel */
+@media (min-width: 700px) {
+  .index .carousel.images .carousel-slide {
+    height: 528px;
+  }
 }
